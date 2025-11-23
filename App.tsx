@@ -3,7 +3,7 @@ import CanvasBoard from './components/CanvasBoard';
 import Toolbar from './components/Toolbar';
 import { AppState, DEFAULT_PALETTE, DEFAULT_SIZE, Language, ToolType } from './types';
 import { imageToPixelGrid, TRANSLATIONS } from './utils';
-import { Undo, Redo, Grid3X3, X, Settings, Eye, EyeOff, Layers, Moon, Sun, Monitor, Globe, HelpCircle, Pencil, Palette, Move, Image as ImageIcon, Save, Layers as LayersIcon, BookOpen, Menu, Keyboard } from 'lucide-react';
+import { Undo, Redo, Grid3X3, X, Settings, Eye, EyeOff, Layers, Moon, Sun, Monitor, Globe, HelpCircle, Pencil, Palette, Move, Image as ImageIcon, Save, Layers as LayersIcon, BookOpen, Menu, Keyboard, MoreVertical, Hand } from 'lucide-react';
 import { SiGithub } from '@icons-pack/react-simple-icons';
 
 // Resize Modal Component
@@ -307,12 +307,20 @@ const App: React.FC = () => {
   const [isTutorialOpen, setIsTutorialOpen] = useState(false);
   const [computedIsDarkMode, setComputedIsDarkMode] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isMobileHeaderMenuOpen, setIsMobileHeaderMenuOpen] = useState(false);
+  
+  // Mobile Pan Mode
+  const [isMobilePanning, setIsMobilePanning] = useState(false);
 
   // Panning & Zooming State
   const [isSpacePressed, setIsSpacePressed] = useState(false);
   const [isPanning, setIsPanning] = useState(false);
+  const [panOffset, setPanOffset] = useState({ x: 0, y: 0 }); // New pan state
+  
   const canvasContainerRef = useRef<HTMLDivElement>(null);
   const lastMousePos = useRef<{x: number, y: number} | null>(null);
+  const lastTouchPos = useRef<{x: number, y: number} | null>(null);
+  const lastPinchDist = useRef<number | null>(null); // For pinch zoom
 
   // Helper for translations in component body
   const t = TRANSLATIONS[state.language];
@@ -686,10 +694,10 @@ const App: React.FC = () => {
       setTimeout(() => setNotification(null), 3000);
   };
 
-  // Panning Event Handlers (for Container)
+  // Panning Event Handlers (for Container) - Refactored to use panOffset state
   const handleContainerMouseDown = (e: React.MouseEvent) => {
-      // Middle mouse (button 1) or Space + Left Click (button 0)
-      if (e.button === 1 || (isSpacePressed && e.button === 0)) {
+      // Middle mouse (button 1) or Space + Left Click (button 0) or Mobile Pan Mode
+      if (e.button === 1 || (isSpacePressed && e.button === 0) || isMobilePanning) {
           e.preventDefault();
           setIsPanning(true);
           lastMousePos.current = { x: e.clientX, y: e.clientY };
@@ -697,12 +705,11 @@ const App: React.FC = () => {
   };
 
   const handleContainerMouseMove = (e: React.MouseEvent) => {
-      if (isPanning && canvasContainerRef.current && lastMousePos.current) {
+      if (isPanning && lastMousePos.current) {
           const dx = e.clientX - lastMousePos.current.x;
           const dy = e.clientY - lastMousePos.current.y;
           
-          canvasContainerRef.current.scrollLeft -= dx;
-          canvasContainerRef.current.scrollTop -= dy;
+          setPanOffset(prev => ({ x: prev.x + dx, y: prev.y + dy }));
           
           lastMousePos.current = { x: e.clientX, y: e.clientY };
       }
@@ -712,13 +719,72 @@ const App: React.FC = () => {
       setIsPanning(false);
       lastMousePos.current = null;
   };
+  
+  // Touch Panning & Pinch Zoom Handlers (Mobile)
+  const handleContainerTouchStart = (e: React.TouchEvent) => {
+      if (e.touches.length === 2) {
+          // Pinch Zoom Start
+          const dist = Math.hypot(
+             e.touches[0].clientX - e.touches[1].clientX,
+             e.touches[0].clientY - e.touches[1].clientY
+          );
+          lastPinchDist.current = dist;
+      } else if (isMobilePanning || isSpacePressed) {
+          // Pan Start
+          const touch = e.touches[0];
+          setIsPanning(true);
+          lastTouchPos.current = { x: touch.clientX, y: touch.clientY };
+      }
+  };
+
+  const handleContainerTouchMove = (e: React.TouchEvent) => {
+      // Handle Pinch Zoom
+      if (e.touches.length === 2 && lastPinchDist.current) {
+          e.preventDefault(); // Prevent native zoom
+          const dist = Math.hypot(
+             e.touches[0].clientX - e.touches[1].clientX,
+             e.touches[0].clientY - e.touches[1].clientY
+          );
+          
+          const delta = dist - lastPinchDist.current;
+          // Threshold to prevent jitter
+          if (Math.abs(delta) > 5) {
+             const zoomDirection = delta > 0 ? 1 : -1;
+             setState(s => {
+                 const newSize = Math.min(60, Math.max(4, s.config.size + zoomDirection));
+                 // Optional: Could throttle this for performance, but React 18 usually handles it ok
+                 return { ...s, config: { ...s.config, size: newSize } };
+             });
+             lastPinchDist.current = dist;
+          }
+          return;
+      }
+
+      // Handle Panning
+      if (isPanning && lastTouchPos.current) {
+           const touch = e.touches[0];
+           const dx = touch.clientX - lastTouchPos.current.x;
+           const dy = touch.clientY - lastTouchPos.current.y;
+           
+           setPanOffset(prev => ({ x: prev.x + dx, y: prev.y + dy }));
+           
+           lastTouchPos.current = { x: touch.clientX, y: touch.clientY };
+      }
+  };
+
+  const handleContainerTouchEnd = () => {
+      setIsPanning(false);
+      lastTouchPos.current = null;
+      lastPinchDist.current = null;
+  };
+
 
   const handleZoomWheel = (e: React.WheelEvent) => {
       const direction = e.deltaY < 0 ? 1 : -1;
       setState(s => {
           const newSize = Math.min(60, Math.max(4, s.config.size + direction * 2));
           return { ...s, config: { ...s.config, size: newSize } };
-      });
+              });
   };
 
   const handleOpacityWheel = (e: React.WheelEvent) => {
@@ -757,6 +823,133 @@ const App: React.FC = () => {
         />
       )}
 
+      {/* Mobile Header Menu Overlay */}
+      {isMobileHeaderMenuOpen && (
+        <div 
+            className="fixed inset-0 bg-black/50 z-40 md:hidden backdrop-blur-sm transition-opacity" 
+            onClick={() => setIsMobileHeaderMenuOpen(false)} 
+        />
+      )}
+
+       {/* MOBILE DROPDOWN MENU PANEL (Moved to Root Level for Correct Z-Index Stacking) */}
+       {isMobileHeaderMenuOpen && (
+           <div className="fixed top-16 left-0 right-0 bg-paper-50 dark:bg-slate-900 border-b border-paper-200 dark:border-slate-800 shadow-2xl z-40 p-4 flex flex-col gap-4 animate-in slide-in-from-top-2 md:hidden max-h-[80vh] overflow-y-auto">
+                
+                {/* Size & Grid Row */}
+                <div className="flex gap-3">
+                     <button 
+                        onClick={() => { setIsResizeModalOpen(true); setIsMobileHeaderMenuOpen(false); }}
+                        className="flex-1 h-12 flex items-center justify-center gap-2 bg-paper-100 dark:bg-slate-800 hover:bg-paper-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg border border-paper-200 dark:border-slate-700 font-medium text-sm"
+                    >
+                        <Grid3X3 size={18} className="text-indigo-500"/>
+                        {state.config.width} × {state.config.height}
+                    </button>
+                    <button 
+                        onClick={() => setState(s => ({ ...s, showGrid: !s.showGrid }))}
+                        className={`flex-1 h-12 flex items-center justify-center gap-2 rounded-lg border text-sm font-medium ${
+                            state.showGrid 
+                            ? 'bg-indigo-50 border-indigo-200 text-indigo-600 dark:bg-indigo-500/10 dark:border-indigo-500/50 dark:text-indigo-400' 
+                            : 'bg-paper-100 dark:bg-slate-800 border-paper-200 dark:border-slate-700 text-slate-500'
+                        }`}
+                    >
+                        {state.showGrid ? t.ui.gridOn : t.ui.gridOff}
+                    </button>
+                </div>
+
+                {/* Zoom Row */}
+                <div className="bg-paper-100 dark:bg-slate-800 p-3 rounded-lg border border-paper-200 dark:border-slate-700">
+                     <div className="flex justify-between mb-2">
+                         <label className="text-xs font-bold text-slate-500 uppercase">{t.ui.zoom}</label>
+                         <span className="text-xs font-mono text-slate-500">{state.config.size}px</span>
+                     </div>
+                     <input 
+                        type="range" 
+                        min="4" max="60" 
+                        value={state.config.size} 
+                        onChange={(e) => setState(s => ({ ...s, config: { ...s.config, size: parseInt(e.target.value) } }))}
+                        className="w-full accent-indigo-500 h-2 bg-paper-300 dark:bg-slate-700 rounded-lg appearance-none"
+                     />
+                </div>
+
+                {/* Layers Row */}
+                <div className="bg-paper-100 dark:bg-slate-800 p-3 rounded-lg border border-paper-200 dark:border-slate-700">
+                    <label className="text-xs font-bold text-slate-500 uppercase mb-3 block">{t.ui.layers}</label>
+                    <div className="flex gap-2 mb-3">
+                         <button 
+                            onClick={() => setState(s => ({...s, showDrawingLayer: !s.showDrawingLayer}))}
+                            className={`flex-1 py-2 px-3 rounded-lg text-sm flex items-center justify-center gap-2 transition-colors ${state.showDrawingLayer ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300' : 'bg-paper-200 dark:bg-slate-700 text-slate-500'}`}
+                         >
+                             {state.showDrawingLayer ? <Eye size={16} /> : <EyeOff size={16} />}
+                             {t.ui.layers}
+                         </button>
+                         <button 
+                            onClick={() => setState(s => ({...s, showReferenceLayer: !s.showReferenceLayer}))}
+                            disabled={!state.backgroundImage}
+                            className={`flex-1 py-2 px-3 rounded-lg text-sm flex items-center justify-center gap-2 transition-colors ${
+                                !state.backgroundImage 
+                                    ? 'opacity-50 cursor-not-allowed bg-paper-200 dark:bg-slate-700 text-slate-400' 
+                                    : state.showReferenceLayer 
+                                        ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' 
+                                        : 'bg-paper-200 dark:bg-slate-700 text-slate-500'
+                            }`}
+                         >
+                             {state.showReferenceLayer ? <Eye size={16} /> : <EyeOff size={16} />}
+                             {t.ui.refLayer}
+                         </button>
+                    </div>
+                    {state.backgroundImage && state.showReferenceLayer && (
+                        <div className="pt-2 border-t border-slate-200 dark:border-slate-700">
+                             <div className="flex justify-between mb-2">
+                                 <span className="text-xs text-slate-500">{t.ui.refOpacity}</span>
+                                 <span className="text-xs font-mono text-slate-500">{Math.round(state.backgroundOpacity * 100)}%</span>
+                             </div>
+                             <input 
+                                 type="range" min="0" max="1" step="0.1"
+                                 value={state.backgroundOpacity}
+                                 onChange={(e) => setState(s => ({ ...s, backgroundOpacity: parseFloat(e.target.value) }))}
+                                 className="w-full accent-green-500 h-2 bg-paper-300 dark:bg-slate-700 rounded-lg appearance-none"
+                             />
+                        </div>
+                    )}
+                </div>
+
+                {/* Theme & Language Row */}
+                <div className="flex gap-3">
+                     <div className="flex-1 bg-paper-100 dark:bg-slate-800 rounded-lg border border-paper-200 dark:border-slate-700 overflow-hidden relative">
+                         <select 
+                            value={state.language}
+                            onChange={(e) => setState(s => ({...s, language: e.target.value as Language}))}
+                            className="w-full h-12 pl-3 pr-8 bg-paper-100 dark:bg-slate-800 text-sm text-slate-700 dark:text-slate-200 outline-none appearance-none z-10 relative"
+                            style={{ colorScheme: computedIsDarkMode ? 'dark' : 'light' }}
+                         >
+                             <option value="en" className="bg-paper-100 dark:bg-slate-800 text-slate-900 dark:text-white">English</option>
+                             <option value="zh-CN" className="bg-paper-100 dark:bg-slate-800 text-slate-900 dark:text-white">简体中文</option>
+                             <option value="zh-HK" className="bg-paper-100 dark:bg-slate-800 text-slate-900 dark:text-white">繁體中文</option>
+                             <option value="ja" className="bg-paper-100 dark:bg-slate-800 text-slate-900 dark:text-white">日本語</option>
+                             <option value="ko" className="bg-paper-100 dark:bg-slate-800 text-slate-900 dark:text-white">한국어</option>
+                             <option value="fr" className="bg-paper-100 dark:bg-slate-800 text-slate-900 dark:text-white">Français</option>
+                             <option value="de" className="bg-paper-100 dark:bg-slate-800 text-slate-900 dark:text-white">Deutsch</option>
+                             <option value="es" className="bg-paper-100 dark:bg-slate-800 text-slate-900 dark:text-white">Español</option>
+                             <option value="pt-BR" className="bg-paper-100 dark:bg-slate-800 text-slate-900 dark:text-white">Português</option>
+                             <option value="ru" className="bg-paper-100 dark:bg-slate-800 text-slate-900 dark:text-white">Русский</option>
+                             <option value="ar" className="bg-paper-100 dark:bg-slate-800 text-slate-900 dark:text-white">العربية</option>
+                         </select>
+                         <div className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none z-0">
+                             <Globe size={16} />
+                         </div>
+                     </div>
+
+                     <button 
+                         onClick={() => setState(s => ({...s, theme: state.theme === 'dark' ? 'light' : 'dark'}))} 
+                         className="h-12 w-12 flex-shrink-0 flex items-center justify-center bg-paper-100 dark:bg-slate-800 rounded-lg border border-paper-200 dark:border-slate-700 text-slate-700 dark:text-slate-200"
+                     >
+                         {state.theme === 'dark' || (state.theme === 'system' && computedIsDarkMode) ? <Moon size={20} /> : <Sun size={20} />}
+                     </button>
+                </div>
+
+           </div>
+      )}
+
       {/* Sidebar */}
       <Toolbar 
         activeTool={state.tool}
@@ -778,18 +971,47 @@ const App: React.FC = () => {
       {/* Main Area */}
       <main className="flex-1 flex flex-col relative min-w-0">
         
-        {/* Top Bar */}
-        <header className="h-16 bg-paper-50 dark:bg-slate-900 border-b border-paper-200 dark:border-slate-800 flex items-center px-4 md:px-6 flex-shrink-0 z-30 transition-colors gap-4">
+        {/* Top Bar - Increased z-index to stay above overlay (z-40) */}
+        <header className="h-16 bg-paper-50 dark:bg-slate-900 border-b border-paper-200 dark:border-slate-800 flex items-center px-4 md:px-6 flex-shrink-0 z-40 transition-colors gap-4 relative">
            
-           {/* Mobile Menu Button */}
-           <button 
-             onClick={() => setIsSidebarOpen(true)}
-             className="md:hidden p-2 -ml-2 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white rounded-lg flex-shrink-0"
-           >
-               <Menu size={24} />
-           </button>
+           {/* MOBILE LAYOUT: Simple bar with Menu, Panning, Undo/Redo, and More */}
+           <div className="flex md:hidden items-center justify-between w-full h-full">
+                <div className="flex items-center gap-2">
+                    <button 
+                        onClick={() => setIsSidebarOpen(true)}
+                        className="p-2 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white rounded-lg"
+                    >
+                        <Menu size={24} />
+                    </button>
+                    
+                    <div className="h-6 w-px bg-paper-300 dark:bg-slate-700 mx-1"></div>
+                    
+                    {/* Mobile Pan Toggle */}
+                    <button 
+                        onClick={() => setIsMobilePanning(!isMobilePanning)}
+                        className={`p-2 rounded-lg transition-colors ${isMobilePanning ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800' : 'text-slate-500 dark:text-slate-400'}`}
+                        title={t.ui.pan}
+                    >
+                        <Hand size={22} />
+                    </button>
 
-           <div className="flex-1 flex items-center justify-between min-w-0 gap-4">
+                    <div className="flex items-center gap-1">
+                        <button onClick={handleUndo} disabled={state.historyIndex === 0} className="p-2 hover:bg-paper-200 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 rounded-lg disabled:opacity-30"><Undo size={22} /></button>
+                        <button onClick={handleRedo} disabled={state.historyIndex === state.history.length - 1} className="p-2 hover:bg-paper-200 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 rounded-lg disabled:opacity-30"><Redo size={22} /></button>
+                    </div>
+                </div>
+
+                <button 
+                    onClick={() => setIsMobileHeaderMenuOpen(!isMobileHeaderMenuOpen)}
+                    className={`p-2 rounded-lg transition-colors ${isMobileHeaderMenuOpen ? 'bg-indigo-50 text-indigo-600 dark:bg-slate-800 dark:text-indigo-400' : 'text-slate-500 dark:text-slate-400'}`}
+                >
+                    <MoreVertical size={24} />
+                </button>
+           </div>
+
+
+           {/* DESKTOP LAYOUT: Full detailed controls */}
+           <div className="hidden md:flex flex-1 items-center justify-between min-w-0 gap-4">
                
                {/* LEFT SIDE: Scrollable (Undo, Redo, Size, Zoom) */}
                <div className="flex items-center gap-3 overflow-x-auto no-scrollbar pb-2 pt-2 -mb-2 -mt-2">
@@ -927,23 +1149,32 @@ const App: React.FC = () => {
            </div>
         </header>
 
-        {/* Canvas Container */}
+        {/* Canvas Container - Refactored for Pan/Zoom with Transforms */}
         <div 
              ref={canvasContainerRef}
              onMouseDown={handleContainerMouseDown}
              onMouseMove={handleContainerMouseMove}
              onMouseUp={handleContainerMouseUp}
              onMouseLeave={handleContainerMouseUp}
-             className={`flex-1 bg-paper-100 dark:bg-slate-950 overflow-auto relative transition-colors ${
-                isPanning ? 'cursor-grabbing' : isSpacePressed ? 'cursor-grab' : 'cursor-default'
+             onTouchStart={handleContainerTouchStart}
+             onTouchMove={handleContainerTouchMove}
+             onTouchEnd={handleContainerTouchEnd}
+             className={`flex-1 bg-paper-100 dark:bg-slate-950 overflow-hidden relative transition-colors ${
+                isPanning || isMobilePanning ? 'cursor-grabbing' : isSpacePressed ? 'cursor-grab' : 'cursor-default'
              }`}
              style={{
-                 // Adjusted dot pattern color to be Paper 300 (a bit darker beige) for better visibility on the new warmer background
+                 // Background dots remain static to give reference
                  backgroundImage: `radial-gradient(${computedIsDarkMode ? '#1e293b' : '#D1CEC7'} 1px, transparent 1px)`,
                  backgroundSize: '20px 20px'
              }}
         >
-            <div className="min-w-full min-h-full flex items-center justify-center p-12 pointer-events-none">
+            {/* Movable/Scalable Wrapper */}
+            <div 
+                className="absolute top-1/2 left-1/2"
+                style={{ 
+                    transform: `translate(-50%, -50%) translate(${panOffset.x}px, ${panOffset.y}px)` 
+                }}
+            >
                 <div className="shadow-2xl shadow-black/10 dark:shadow-black/50 pointer-events-auto">
                     <CanvasBoard 
                         grid={state.grid}
@@ -958,7 +1189,7 @@ const App: React.FC = () => {
                         isDarkMode={computedIsDarkMode}
                         onGridChange={handleGridChangeFromCanvas}
                         onEyeDropper={(c) => setState(s => ({ ...s, selectedColor: c, tool: 'pencil' }))}
-                        isSpacePressed={isSpacePressed}
+                        isSpacePressed={isSpacePressed || isMobilePanning}
                     />
                 </div>
             </div>
