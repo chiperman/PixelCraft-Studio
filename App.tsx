@@ -5,7 +5,8 @@ import CanvasBoard from './components/CanvasBoard';
 import Toolbar from './components/Toolbar';
 import { AppState, DEFAULT_PALETTE, DEFAULT_SIZE, Language } from './types';
 import { imageToPixelGrid, TRANSLATIONS } from './utils';
-import { Undo, Redo, Grid3X3, X, Settings, Eye, EyeOff, Layers, Moon, Sun, Monitor, Globe, HelpCircle, Pencil, Palette, Move, Image as ImageIcon, Save, Layers as LayersIcon, BookOpen, MousePointer, Menu, Github } from 'lucide-react';
+import { Undo, Redo, Grid3X3, X, Settings, Eye, EyeOff, Layers, Moon, Sun, Monitor, Globe, HelpCircle, Pencil, Palette, Move, Image as ImageIcon, Save, Layers as LayersIcon, BookOpen, MousePointer, Menu } from 'lucide-react';
+import { Github } from 'react-simple-icons';
 
 // Resize Modal Component
 interface ResizeModalProps {
@@ -183,7 +184,7 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ isOpen, onClose, language
                     className="text-slate-400 hover:text-slate-700 dark:text-slate-500 dark:hover:text-white transition-colors flex items-center gap-2 text-xs font-medium"
                     title={t.tutorial.github}
                 >
-                    <Github size={20} />
+                    <Github color="currentColor" size={20} />
                     <span className="hidden sm:inline">{t.tutorial.github}</span>
                 </a>
               </div>
