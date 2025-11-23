@@ -168,7 +168,7 @@ const CanvasBoard: React.FC<CanvasBoardProps> = ({
   }
 
   return (
-    <div className={`relative shadow-2xl rounded bg-white dark:bg-slate-800 select-none border border-paper-300 dark:border-slate-700 transition-colors ${cursorStyle}`}>
+    <div className={`relative shadow-2xl rounded-lg bg-white dark:bg-slate-800 select-none border border-paper-300 dark:border-slate-700 transition-colors ${cursorStyle}`}>
       {backgroundImage && showReferenceLayer && (
         <div 
           className="absolute inset-0 pointer-events-none bg-no-repeat bg-cover z-0"

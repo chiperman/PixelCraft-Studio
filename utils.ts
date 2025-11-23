@@ -123,6 +123,7 @@ export const TRANSLATIONS = {
       undo: 'Undo',
       redo: 'Redo',
       zoom: 'Zoom',
+      pan: 'Pan',
       gridOn: 'Grid On',
       gridOff: 'Grid Off',
       layers: 'Toggle Drawing Layer',
@@ -154,7 +155,8 @@ export const TRANSLATIONS = {
         nav: { title: 'Navigation', desc: 'Zoom: Slider or Ctrl+Scroll. Pan: Hold Space+Drag or Middle Mouse.' },
         layers: { title: 'Layers', desc: 'Toggle Drawing & Reference layers. Adjust Reference Opacity.' },
         images: { title: 'Images', desc: '"Import" to convert image to pixels. "Ref Layer" for tracing background.' },
-        project: { title: 'Project', desc: 'Save/Load .json projects and Export to PNG.' }
+        project: { title: 'Project', desc: 'Save/Load .json projects and Export to PNG.' },
+        shortcuts: { title: 'Shortcuts', desc: 'Key bindings for tools and actions.' }
       }
     }
   },
@@ -192,6 +194,7 @@ export const TRANSLATIONS = {
       undo: '撤销',
       redo: '重做',
       zoom: '缩放',
+      pan: '平移',
       gridOn: '显示网格',
       gridOff: '隐藏网格',
       layers: '切换绘画图层',
@@ -223,7 +226,8 @@ export const TRANSLATIONS = {
         nav: { title: '画布导航', desc: '缩放：滑块或 Ctrl+滚轮。平移：按住空格+拖拽或鼠标中键。' },
         layers: { title: '图层管理', desc: '切换绘画/参考图层显示。调整参考图透明度用于临摹。' },
         images: { title: '图片处理', desc: '“导入图片”转换像素画。“参考图层”设置背景垫图。' },
-        project: { title: '项目管理', desc: '保存/加载 .json 项目文件，导出 PNG 图片。' }
+        project: { title: '项目管理', desc: '保存/加载 .json 项目文件，导出 PNG 图片。' },
+        shortcuts: { title: '快捷键', desc: '工具和操作的键盘快捷方式。' }
       }
     }
   },
@@ -261,6 +265,7 @@ export const TRANSLATIONS = {
       undo: '復原',
       redo: '重做',
       zoom: '縮放',
+      pan: '平移',
       gridOn: '顯示網格',
       gridOff: '隱藏網格',
       layers: '切換繪畫圖層',
@@ -292,7 +297,8 @@ export const TRANSLATIONS = {
         nav: { title: '畫布導航', desc: '縮放：滑桿或 Ctrl+滾輪。平移：按住空白鍵+拖曳或滑鼠中鍵。' },
         layers: { title: '圖層管理', desc: '切換繪畫/參考圖層顯示。調整參考圖透明度用於臨摹。' },
         images: { title: '圖片處理', desc: '「匯入圖片」轉換像素畫。「參考圖層」設定背景墊圖。' },
-        project: { title: '專案管理', desc: '儲存/載入 .json 專案檔，匯出 PNG 圖片。' }
+        project: { title: '專案管理', desc: '儲存/載入 .json 專案檔，匯出 PNG 圖片。' },
+        shortcuts: { title: '快捷鍵', desc: '工具與動作的鍵盤快捷鍵。' }
       }
     }
   },
@@ -330,6 +336,7 @@ export const TRANSLATIONS = {
       undo: '元に戻す',
       redo: 'やり直し',
       zoom: 'ズーム',
+      pan: '移動',
       gridOn: 'グリッド表示',
       gridOff: 'グリッド非表示',
       layers: '描画レイヤー切替',
@@ -361,7 +368,8 @@ export const TRANSLATIONS = {
         nav: { title: '操作', desc: '拡大縮小：Ctrl+スクロール。移動：スペースキー+ドラッグ。' },
         layers: { title: 'レイヤー', desc: '描画/参照レイヤーの表示切替。参照画像の不透明度調整。' },
         images: { title: '画像', desc: '「画像読込」でドット絵変換。「参照画像」でトレース用背景設定。' },
-        project: { title: 'プロジェクト', desc: '.json形式で保存/読込、PNGでエクスポート。' }
+        project: { title: 'プロジェクト', desc: '.json形式で保存/読込、PNGでエクスポート。' },
+        shortcuts: { title: 'ショートカット', desc: 'ツールとアクションのキー割り当て。' }
       }
     }
   },
@@ -399,6 +407,7 @@ export const TRANSLATIONS = {
       undo: '실행 취소',
       redo: '다시 실행',
       zoom: '확대/축소',
+      pan: '이동',
       gridOn: '그리드 켜기',
       gridOff: '그리드 끄기',
       layers: '그리기 레이어 토글',
@@ -430,7 +439,8 @@ export const TRANSLATIONS = {
         nav: { title: '탐색', desc: '확대/축소: Ctrl+스크롤. 이동: 스페이스바+드래그.' },
         layers: { title: '레이어', desc: '그리기/참조 레이어 전환. 참조 불투명도 조절.' },
         images: { title: '이미지', desc: '이미지를 픽셀로 변환하거나 참조 배경으로 설정.' },
-        project: { title: '프로젝트', desc: '.json 프로젝트 저장/불러오기 및 PNG 내보내기.' }
+        project: { title: '프로젝트', desc: '.json 프로젝트 저장/불러오기 및 PNG 내보내기.' },
+        shortcuts: { title: '단축키', desc: '도구 및 동작에 대한 키보드 단축키.' }
       }
     }
   },
@@ -468,6 +478,7 @@ export const TRANSLATIONS = {
       undo: 'Annuler',
       redo: 'Refaire',
       zoom: 'Zoom',
+      pan: 'Déplacer',
       gridOn: 'Grille On',
       gridOff: 'Grille Off',
       layers: 'Afficher Dessin',
@@ -499,7 +510,8 @@ export const TRANSLATIONS = {
         nav: { title: 'Navigation', desc: 'Zoom : Ctrl+Molette. Déplacer : Espace+Glisser.' },
         layers: { title: 'Calques', desc: 'Gérer les calques Dessin et Référence.' },
         images: { title: 'Images', desc: 'Convertir en pixels ou utiliser comme référence.' },
-        project: { title: 'Projet', desc: 'Sauvegarder/Charger .json et Exporter PNG.' }
+        project: { title: 'Projet', desc: 'Sauvegarder/Charger .json et Exporter PNG.' },
+        shortcuts: { title: 'Raccourcis', desc: 'Raccourcis clavier pour les outils et les actions.' }
       }
     }
   },
@@ -537,6 +549,7 @@ export const TRANSLATIONS = {
       undo: 'Rückgängig',
       redo: 'Wiederholen',
       zoom: 'Zoom',
+      pan: 'Bewegen',
       gridOn: 'Raster Ein',
       gridOff: 'Raster Aus',
       layers: 'Zeichnungsebene',
@@ -568,7 +581,8 @@ export const TRANSLATIONS = {
         nav: { title: 'Navigation', desc: 'Zoom: Ctrl+Mausrad. Bewegen: Leertaste+Ziehen.' },
         layers: { title: 'Ebenen', desc: 'Zeichnungs- und Referenzebenen verwalten.' },
         images: { title: 'Bilder', desc: 'In Pixel umwandeln oder als Referenz nutzen.' },
-        project: { title: 'Projekt', desc: '.json speichern/laden und PNG exportieren.' }
+        project: { title: 'Projekt', desc: '.json speichern/laden und PNG exportieren.' },
+        shortcuts: { title: 'Tastenkürzel', desc: 'Tastenkürzel für Werkzeuge und Aktionen.' }
       }
     }
   },
@@ -606,6 +620,7 @@ export const TRANSLATIONS = {
       undo: 'Deshacer',
       redo: 'Rehacer',
       zoom: 'Zoom',
+      pan: 'Mover',
       gridOn: 'Ver Rejilla',
       gridOff: 'Ocultar Rejilla',
       layers: 'Capa Dibujo',
@@ -637,7 +652,8 @@ export const TRANSLATIONS = {
         nav: { title: 'Navegación', desc: 'Zoom: Ctrl+Rueda. Mover: Espacio+Arrastrar.' },
         layers: { title: 'Capas', desc: 'Gestionar capas de dibujo y referencia.' },
         images: { title: 'Imágenes', desc: 'Convertir a píxeles o usar como referencia.' },
-        project: { title: 'Proyecto', desc: 'Guardar/Cargar .json y Exportar PNG.' }
+        project: { title: 'Proyecto', desc: 'Guardar/Cargar .json y Exportar PNG.' },
+        shortcuts: { title: 'Atajos', desc: 'Atajos de teclado para herramientas y acciones.' }
       }
     }
   },
@@ -675,6 +691,7 @@ export const TRANSLATIONS = {
       undo: 'Desfazer',
       redo: 'Refazer',
       zoom: 'Zoom',
+      pan: 'Mover',
       gridOn: 'Grade On',
       gridOff: 'Grade Off',
       layers: 'Camada de Desenho',
@@ -706,7 +723,8 @@ export const TRANSLATIONS = {
         nav: { title: 'Navegação', desc: 'Zoom: Ctrl+Roda. Mover: Espaço+Arrastar.' },
         layers: { title: 'Camadas', desc: 'Gerenciar camadas de desenho e referência.' },
         images: { title: 'Imagens', desc: 'Converter para pixels ou usar como referência.' },
-        project: { title: 'Projeto', desc: 'Salvar/Carregar .json e Exportar PNG.' }
+        project: { title: 'Projeto', desc: 'Salvar/Carregar .json e Exportar PNG.' },
+        shortcuts: { title: 'Atalhos', desc: 'Atalhos de teclado para ferramentas e ações.' }
       }
     }
   },
@@ -744,6 +762,7 @@ export const TRANSLATIONS = {
       undo: 'Отменить',
       redo: 'Вернуть',
       zoom: 'Зум',
+      pan: 'Панорама',
       gridOn: 'Сетка вкл',
       gridOff: 'Сетка выкл',
       layers: 'Слой рис.',
@@ -775,7 +794,8 @@ export const TRANSLATIONS = {
         nav: { title: 'Навигация', desc: 'Зум: Ctrl+Колесо. Перемещение: Пробел+Тянуть.' },
         layers: { title: 'Слои', desc: 'Управление слоями рисования и референса.' },
         images: { title: 'Изображения', desc: 'Конвертация в пиксели или фон для обводки.' },
-        project: { title: 'Проект', desc: 'Сохранить/Открыть .json и Экспорт PNG.' }
+        project: { title: 'Проект', desc: 'Сохранить/Открыть .json и Экспорт PNG.' },
+        shortcuts: { title: 'Горячие клавиши', desc: 'Горячие клавиши для инструментов и действий.' }
       }
     }
   },
@@ -813,6 +833,7 @@ export const TRANSLATIONS = {
       undo: 'تراجع',
       redo: 'إعادة',
       zoom: 'تكبير/تصغير',
+      pan: 'تحريك',
       gridOn: 'شبكة تشغيل',
       gridOff: 'شبكة إيقاف',
       layers: 'طبقة الرسم',
@@ -844,7 +865,8 @@ export const TRANSLATIONS = {
         nav: { title: 'التنقل', desc: 'تكبير: Ctrl+عجلة. تحريك: مسافة+سحب.' },
         layers: { title: 'الطبقات', desc: 'إدارة طبقات الرسم والمرجع.' },
         images: { title: 'الصور', desc: 'تحويل إلى بكسل أو استخدام كخلفية مرجعية.' },
-        project: { title: 'المشروع', desc: 'حفظ/تحميل .json وتصدير PNG.' }
+        project: { title: 'المشروع', desc: 'حفظ/تحميل .json وتصدير PNG.' },
+        shortcuts: { title: 'اختصارات', desc: 'اختصارات لوحة المفاتيح للأدوات والإجراءات.' }
       }
     }
   }

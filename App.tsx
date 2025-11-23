@@ -1,11 +1,9 @@
-
-
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import CanvasBoard from './components/CanvasBoard';
 import Toolbar from './components/Toolbar';
-import { AppState, DEFAULT_PALETTE, DEFAULT_SIZE, Language } from './types';
+import { AppState, DEFAULT_PALETTE, DEFAULT_SIZE, Language, ToolType } from './types';
 import { imageToPixelGrid, TRANSLATIONS } from './utils';
-import { Undo, Redo, Grid3X3, X, Settings, Eye, EyeOff, Layers, Moon, Sun, Monitor, Globe, HelpCircle, Pencil, Palette, Move, Image as ImageIcon, Save, Layers as LayersIcon, BookOpen, MousePointer, Menu } from 'lucide-react';
+import { Undo, Redo, Grid3X3, X, Settings, Eye, EyeOff, Layers, Moon, Sun, Monitor, Globe, HelpCircle, Pencil, Palette, Move, Image as ImageIcon, Save, Layers as LayersIcon, BookOpen, Menu, Keyboard } from 'lucide-react';
 import { SiGithub } from '@icons-pack/react-simple-icons';
 
 // Resize Modal Component
@@ -43,14 +41,14 @@ const ResizeModal: React.FC<ResizeModalProps> = ({ isOpen, onClose, onResize, cu
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-       <div className="bg-paper-50 dark:bg-slate-900 p-6 rounded-xl shadow-2xl border border-paper-200 dark:border-slate-700 w-full max-w-sm animate-in fade-in zoom-in duration-200">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
+       <div className="bg-paper-50 dark:bg-slate-900 p-6 rounded-lg shadow-2xl border border-paper-200 dark:border-slate-700 w-full max-w-sm animate-in fade-in zoom-in duration-200">
           <div className="flex justify-between items-center mb-4">
              <h3 className="text-lg font-bold text-slate-800 dark:text-white">{t.resize.title}</h3>
              <button onClick={onClose} className="text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white"><X size={20}/></button>
           </div>
           
-          <div className="bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 text-amber-700 dark:text-amber-200 text-xs p-3 rounded mb-4">
+          <div className="bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 text-amber-700 dark:text-amber-200 text-xs p-3 rounded-lg mb-4">
              {t.resize.warning}
           </div>
 
@@ -62,7 +60,7 @@ const ResizeModal: React.FC<ResizeModalProps> = ({ isOpen, onClose, onResize, cu
                  <button
                     key={preset.label}
                     onClick={() => { setWidth(preset.w); setHeight(preset.h); }}
-                    className="px-2 py-1.5 bg-paper-200 dark:bg-slate-800 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 hover:text-indigo-700 dark:hover:text-indigo-300 text-slate-600 dark:text-slate-400 text-xs font-medium rounded border border-paper-200 dark:border-slate-700 transition-colors"
+                    className="px-2 py-1.5 bg-paper-200 dark:bg-slate-800 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 hover:text-indigo-700 dark:hover:text-indigo-300 text-slate-600 dark:text-slate-400 text-xs font-medium rounded-lg border border-paper-200 dark:border-slate-700 transition-colors"
                  >
                    {preset.label}
                  </button>
@@ -99,7 +97,7 @@ const ResizeModal: React.FC<ResizeModalProps> = ({ isOpen, onClose, onResize, cu
              <button onClick={onClose} className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-paper-200 dark:hover:bg-slate-800 rounded-lg transition-colors">{t.resize.cancel}</button>
              <button 
                 onClick={() => onResize(width, height)} 
-                className="px-4 py-2 text-sm font-medium bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg shadow-lg shadow-indigo-500/20 transition-all"
+                className="px-4 py-2 text-sm font-medium bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg shadow-lg shadow-indigo-500/20yb transition-all"
              >
                 {t.resize.apply}
              </button>
@@ -108,6 +106,12 @@ const ResizeModal: React.FC<ResizeModalProps> = ({ isOpen, onClose, onResize, cu
     </div>
   );
 };
+
+const Kbd: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <kbd className="px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 border-b-2 rounded-md text-[10px] sm:text-xs font-mono text-slate-600 dark:text-slate-400 min-w-[20px] inline-flex justify-center items-center mx-0.5">
+    {children}
+  </kbd>
+);
 
 interface TutorialModalProps {
   isOpen: boolean;
@@ -129,48 +133,115 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ isOpen, onClose, language
     { key: 'project', icon: <Save size={24} className="text-orange-500" /> },
   ];
 
+  const TOOL_SHORTCUTS = [
+    { label: t.tools.pencil, keys: ['1'] },
+    { label: t.tools.eraser, keys: ['2'] },
+    { label: t.tools.fill, keys: ['3'] },
+    { label: t.tools.picker, keys: ['4'] },
+  ];
+
+  const EDITOR_SHORTCUTS = [
+    { label: t.ui.undo, combinations: [['Ctrl', 'Z']] },
+    { label: t.ui.redo, combinations: [['Ctrl', 'Y'], ['Ctrl', 'Shift', 'Z']] },
+    { label: t.ui.pan, combinations: [['Space', 'Drag']] },
+    { label: t.ui.zoom, combinations: [['Ctrl', 'Scroll']] },
+  ];
+
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
        {/* Main Container - Unified layout */}
-       <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-paper-200 dark:border-slate-700 w-full max-w-3xl max-h-[90vh] flex flex-col animate-in fade-in zoom-in duration-300 overflow-hidden">
+       <div className="bg-white dark:bg-slate-900 rounded-lg shadow-2xl border border-paper-200 dark:border-slate-700 w-full max-w-4xl max-h-[90vh] flex flex-col animate-in fade-in zoom-in duration-300 overflow-hidden">
           
           {/* Header */}
-          <div className="px-8 pt-8 pb-4 flex justify-between items-start">
+          <div className="px-8 pt-8 pb-4 flex justify-between items-start flex-shrink-0">
               <div>
                 <h2 className="text-2xl font-bold text-slate-800 dark:text-white mb-2 tracking-tight">{t.tutorial.title}</h2>
-                <div className="h-1 w-12 bg-indigo-500 rounded-full"></div>
+                <div className="h-1 w-12 bg-indigo-500 rounded-lg"></div>
               </div>
-              <button onClick={onClose} className="p-1 text-slate-400 hover:text-slate-700 dark:text-slate-500 dark:hover:text-white transition-colors bg-slate-100 dark:bg-slate-800 rounded-full">
+              <button onClick={onClose} className="p-1 text-slate-400 hover:text-slate-700 dark:text-slate-500 dark:hover:text-white transition-colors bg-slate-100 dark:bg-slate-800 rounded-lg">
                   <X size={20}/>
               </button>
           </div>
 
-          {/* Content Grid */}
-          <div className="overflow-y-auto px-8 py-2 grid grid-cols-1 md:grid-cols-2 gap-4">
-             {FEATURES.map((feature) => {
-                 // @ts-ignore
-                 const section = t.tutorial.sections[feature.key];
-                 return (
-                    <div key={feature.key} className="flex items-start gap-4 p-4 rounded-xl bg-paper-100/50 dark:bg-slate-800/50 border border-transparent hover:border-indigo-200 dark:hover:border-slate-600 hover:bg-paper-100 dark:hover:bg-slate-800 transition-all group">
-                        <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-950 rounded-full shadow-sm group-hover:scale-110 transition-transform duration-300">
-                            {feature.icon}
+          <div className="overflow-y-auto px-8 pb-8 flex-1 custom-scrollbar">
+              {/* Content Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+                 {FEATURES.map((feature) => {
+                     // @ts-ignore
+                     const section = t.tutorial.sections[feature.key];
+                     return (
+                        <div key={feature.key} className="flex items-start gap-4 p-4 rounded-lg bg-paper-100/50 dark:bg-slate-800/50 border border-transparent hover:border-indigo-200 dark:hover:border-slate-600 hover:bg-paper-100 dark:hover:bg-slate-800 transition-all group">
+                            <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-950 rounded-lg shadow-sm group-hover:scale-110 transition-transform duration-300">
+                                {feature.icon}
+                            </div>
+                            <div>
+                                <h4 className="font-bold text-slate-800 dark:text-white text-sm mb-1">{section.title}</h4>
+                                <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                                    {section.desc}
+                                </p>
+                            </div>
                         </div>
-                        <div>
-                            <h4 className="font-bold text-slate-800 dark:text-white text-sm mb-1">{section.title}</h4>
-                            <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                                {section.desc}
-                            </p>
+                     )
+                 })}
+              </div>
+
+              {/* Shortcuts Section (Excalidraw Style) */}
+              <div>
+                <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
+                    <Keyboard size={20} className="text-teal-500" />
+                    {t.tutorial.sections.shortcuts.title}
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    {/* Tools Shortcuts */}
+                    <div className="bg-paper-50 dark:bg-slate-800/50 rounded-xl border border-paper-200 dark:border-slate-700 p-4">
+                        <h4 className="text-xs uppercase font-bold text-slate-500 mb-3 tracking-wider">{t.headers.tools}</h4>
+                        <div className="space-y-2">
+                            {TOOL_SHORTCUTS.map((shortcut) => (
+                                <div key={shortcut.label} className="flex items-center justify-between text-sm">
+                                    <span className="text-slate-700 dark:text-slate-300">{shortcut.label}</span>
+                                    <div className="flex items-center">
+                                        {shortcut.keys.map((k, i) => <Kbd key={i}>{k}</Kbd>)}
+                                    </div>
+                                </div>
+                            ))}
                         </div>
                     </div>
-                 )
-             })}
+
+                    {/* Editor Shortcuts */}
+                    <div className="bg-paper-50 dark:bg-slate-800/50 rounded-xl border border-paper-200 dark:border-slate-700 p-4">
+                         <h4 className="text-xs uppercase font-bold text-slate-500 mb-3 tracking-wider">Editor</h4>
+                         <div className="space-y-2">
+                            {EDITOR_SHORTCUTS.map((shortcut) => (
+                                <div key={shortcut.label} className="flex items-center justify-between text-sm">
+                                    <span className="text-slate-700 dark:text-slate-300">{shortcut.label}</span>
+                                    <div className="flex items-center gap-2">
+                                        {shortcut.combinations.map((combo, i) => (
+                                            <React.Fragment key={i}>
+                                                {i > 0 && <span className="text-xs text-slate-400">or</span>}
+                                                <div className="flex items-center gap-0.5">
+                                                    {combo.map((k, j) => (
+                                                        <React.Fragment key={j}>
+                                                            {j > 0 && <span className="text-slate-400 mx-0.5 text-[10px]">+</span>}
+                                                            <Kbd>{k}</Kbd>
+                                                        </React.Fragment>
+                                                    ))}
+                                                </div>
+                                            </React.Fragment>
+                                        ))}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+              </div>
           </div>
 
           {/* Unified Action Area */}
-          <div className="p-8 flex flex-col items-center justify-center gap-6 mt-auto">
+          <div className="p-6 flex flex-col items-center justify-center gap-6 bg-paper-50 dark:bg-slate-900 border-t border-paper-200 dark:border-slate-800 shrink-0">
                <button 
                 onClick={onClose}
-                className="w-full md:w-auto min-w-[200px] px-8 py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm rounded-full shadow-lg shadow-indigo-500/30 transition-all active:scale-95 hover:-translate-y-0.5 flex items-center justify-center gap-2"
+                className="w-full md:w-auto min-w-[200px] px-8 py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm rounded-lg shadow-lg shadow-indigo-500/30 flex items-center justify-center gap-2 transition-all active:scale-95"
               >
                   <BookOpen size={18} />
                   {t.tutorial.close}
@@ -405,7 +476,7 @@ const App: React.FC = () => {
     });
   }, []);
 
-  const handleUndo = () => {
+  const handleUndo = useCallback(() => {
     setState(prev => {
         if (prev.historyIndex > 0) {
             const newIndex = prev.historyIndex - 1;
@@ -417,9 +488,9 @@ const App: React.FC = () => {
         }
         return prev;
     });
-  };
+  }, []);
 
-  const handleRedo = () => {
+  const handleRedo = useCallback(() => {
     setState(prev => {
         if (prev.historyIndex < prev.history.length - 1) {
             const newIndex = prev.historyIndex + 1;
@@ -431,7 +502,54 @@ const App: React.FC = () => {
         }
         return prev;
     });
-  };
+  }, []);
+
+  const handleSetTool = useCallback((tool: ToolType) => {
+     setState(s => ({ ...s, tool }));
+  }, []);
+
+  // Keyboard Shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+        // Ignore shortcuts if typing in input
+        if (document.activeElement?.tagName === 'INPUT' || document.activeElement?.tagName === 'TEXTAREA') {
+            return;
+        }
+
+        const isCmdOrCtrl = e.ctrlKey || e.metaKey;
+
+        // Tool Shortcuts (1-4)
+        if (!isCmdOrCtrl && !e.altKey && !e.shiftKey) {
+            switch(e.key) {
+                case '1': handleSetTool('pencil'); break;
+                case '2': handleSetTool('eraser'); break;
+                case '3': handleSetTool('bucket'); break;
+                case '4': handleSetTool('picker'); break;
+            }
+        }
+
+        if (isCmdOrCtrl) {
+            const key = e.key.toLowerCase();
+            
+            // Redo: Ctrl+Y or Ctrl+Shift+Z
+            if (key === 'y' || (e.shiftKey && key === 'z')) {
+                e.preventDefault();
+                handleRedo();
+                return;
+            }
+
+            // Undo: Ctrl+Z (check last to avoid conflict with Shift+Z)
+            if (key === 'z') {
+                e.preventDefault();
+                handleUndo();
+                return;
+            }
+        }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleUndo, handleRedo, handleSetTool]);
 
   const handleClear = () => {
       const emptyGrid = getInitialGrid(state.config.width, state.config.height);
@@ -676,9 +794,9 @@ const App: React.FC = () => {
                {/* LEFT SIDE: Scrollable (Undo, Redo, Size, Zoom) */}
                <div className="flex items-center gap-3 overflow-x-auto no-scrollbar pb-2 pt-2 -mb-2 -mt-2">
                   <div className="h-10 flex items-center gap-1 bg-paper-50 dark:bg-slate-800 rounded-lg p-1 border border-paper-200 dark:border-slate-700 flex-shrink-0">
-                      <button onClick={handleUndo} disabled={state.historyIndex === 0} className="p-2 hover:bg-paper-200 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white text-slate-500 dark:text-slate-400 rounded disabled:opacity-30 transition-colors" title={t.ui.undo}><Undo size={18} /></button>
+                      <button onClick={handleUndo} disabled={state.historyIndex === 0} className="p-2 hover:bg-paper-200 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white text-slate-500 dark:text-slate-400 rounded-md disabled:opacity-30 transition-colors" title={`${t.ui.undo} (Ctrl + Z)`}><Undo size={18} /></button>
                       <div className="w-px h-4 bg-paper-300 dark:bg-slate-700"></div>
-                      <button onClick={handleRedo} disabled={state.historyIndex === state.history.length - 1} className="p-2 hover:bg-paper-200 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white text-slate-500 dark:text-slate-400 rounded disabled:opacity-30 transition-colors" title={t.ui.redo}><Redo size={18} /></button>
+                      <button onClick={handleRedo} disabled={state.historyIndex === state.history.length - 1} className="p-2 hover:bg-paper-200 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white text-slate-500 dark:text-slate-400 rounded-md disabled:opacity-30 transition-colors" title={`${t.ui.redo} (Ctrl + Y)`}><Redo size={18} /></button>
                   </div>
 
                   <div className="h-6 w-px bg-paper-300 dark:bg-slate-800 hidden md:block flex-shrink-0"></div>
@@ -718,7 +836,7 @@ const App: React.FC = () => {
                       <Layers size={14} className="text-slate-500 mr-1 hidden sm:block" />
                       <button 
                          onClick={() => setState(s => ({...s, showDrawingLayer: !s.showDrawingLayer}))}
-                         className={`p-1.5 rounded transition-colors ${state.showDrawingLayer ? 'text-indigo-500 dark:text-indigo-400 hover:bg-paper-200 dark:hover:bg-slate-700' : 'text-slate-400 hover:text-slate-500'}`}
+                         className={`p-1.5 rounded-md transition-colors ${state.showDrawingLayer ? 'text-indigo-500 dark:text-indigo-400 hover:bg-paper-200 dark:hover:bg-slate-700' : 'text-slate-400 hover:text-slate-500'}`}
                          title={t.ui.layers}
                       >
                          {state.showDrawingLayer ? <Eye size={18} /> : <EyeOff size={18} />}
@@ -726,7 +844,7 @@ const App: React.FC = () => {
                       <button 
                          onClick={() => setState(s => ({...s, showReferenceLayer: !s.showReferenceLayer}))}
                          disabled={!state.backgroundImage}
-                         className={`p-1.5 rounded transition-colors ${
+                         className={`p-1.5 rounded-md transition-colors ${
                             !state.backgroundImage 
                                 ? 'text-slate-300 dark:text-slate-700 cursor-not-allowed' 
                                 : state.showReferenceLayer 
@@ -849,7 +967,7 @@ const App: React.FC = () => {
         {/* Floating Help Button - Bottom Right */}
         <button 
             onClick={() => setIsTutorialOpen(true)}
-            className="absolute bottom-4 right-4 z-40 h-10 w-10 flex items-center justify-center bg-slate-800 hover:bg-slate-700 dark:bg-slate-700 dark:hover:bg-slate-600 text-white rounded-full shadow-lg transition-all hover:scale-105 active:scale-95"
+            className="absolute bottom-4 right-4 z-40 h-10 w-10 flex items-center justify-center bg-slate-800 hover:bg-slate-700 dark:bg-slate-700 dark:hover:bg-slate-600 text-white rounded-lg shadow-lg transition-all hover:scale-105 active:scale-95"
             title={t.tutorial.title}
         >
             <HelpCircle size={20} />

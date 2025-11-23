@@ -1,5 +1,3 @@
-
-
 import React, { useRef } from 'react';
 import { ToolType, DEFAULT_PALETTE, Language } from '../types';
 import { Pencil, Eraser, PaintBucket, Pipette, Download, Upload, Image as ImageIcon, Trash2, Save, FolderOpen, X } from 'lucide-react';
@@ -104,7 +102,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
             <button
               key={color}
               onClick={() => { setColor(color); if(window.innerWidth < 768) onCloseSidebar(); }}
-              className={`w-full aspect-square rounded border transition-all ${
+              className={`w-full aspect-square rounded-lg border transition-all ${
                 selectedColor === color
                   ? 'border-indigo-500 dark:border-white scale-110 shadow-md z-10'
                   : 'border-slate-700 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-white/50 hover:scale-105'
@@ -138,39 +136,40 @@ const Toolbar: React.FC<ToolbarProps> = ({
       <div className="flex flex-col gap-2 pt-4 border-t border-paper-200 dark:border-slate-800 mt-auto">
         <h3 className="text-xs uppercase font-semibold text-slate-500 tracking-wider text-left">{t.headers.actions}</h3>
         
+        {/* File Actions Grid */}
         <div className="grid grid-cols-2 gap-2">
-            <label className="cursor-pointer bg-paper-100 hover:bg-paper-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 p-2 rounded flex flex-col items-center justify-center gap-1 text-xs transition-colors h-full">
+            <label className="cursor-pointer bg-paper-100 hover:bg-paper-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 p-2 rounded-lg flex flex-col items-center justify-center gap-1 text-xs transition-colors h-full">
                 <FolderOpen size={18} />
                 <span className="text-center text-[10px] leading-tight">{t.actions.load}</span>
                 <input type="file" className="hidden" accept=".json" onChange={onLoad} />
             </label>
-            <button onClick={() => { onSave(); if(window.innerWidth < 768) onCloseSidebar(); }} className="bg-paper-100 hover:bg-paper-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 p-2 rounded flex flex-col items-center justify-center gap-1 text-xs transition-colors h-full">
+            <button onClick={() => { onSave(); if(window.innerWidth < 768) onCloseSidebar(); }} className="bg-paper-100 hover:bg-paper-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 p-2 rounded-lg flex flex-col items-center justify-center gap-1 text-xs transition-colors h-full">
                 <Save size={18} />
                 <span className="text-center text-[10px] leading-tight">{t.actions.save}</span>
             </button>
 
-            <label className="cursor-pointer bg-paper-100 hover:bg-paper-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 p-2 rounded flex flex-col items-center justify-center gap-1 text-xs transition-colors h-full">
+            <label className="cursor-pointer bg-paper-100 hover:bg-paper-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 p-2 rounded-lg flex flex-col items-center justify-center gap-1 text-xs transition-colors h-full">
                 <ImageIcon size={18} />
                 <span className="text-center text-[10px] leading-tight">{t.actions.importImg}</span>
                 <input type="file" className="hidden" accept="image/*" onChange={(e) => { onImageUpload(e, 'convert'); if(window.innerWidth < 768) onCloseSidebar(); }} />
             </label>
-            <label className="cursor-pointer bg-paper-100 hover:bg-paper-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 p-2 rounded flex flex-col items-center justify-center gap-1 text-xs transition-colors h-full">
+            <label className="cursor-pointer bg-paper-100 hover:bg-paper-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 p-2 rounded-lg flex flex-col items-center justify-center gap-1 text-xs transition-colors h-full">
                 <Upload size={18} />
                 <span className="text-center text-[10px] leading-tight">{t.actions.refLayer}</span>
                 <input type="file" className="hidden" accept="image/*" onChange={(e) => { onImageUpload(e, 'background'); if(window.innerWidth < 768) onCloseSidebar(); }} />
             </label>
-             
-             {/* Expanded Export button to take full width of remaining grid or adjust layout */}
-             <button onClick={() => { onDownload(); if(window.innerWidth < 768) onCloseSidebar(); }} className="col-span-2 bg-indigo-600 hover:bg-indigo-500 text-white p-2 rounded flex flex-row items-center justify-center gap-2 text-xs transition-colors shadow-lg shadow-indigo-500/20 h-full">
-                <Download size={18} />
-                <span className="text-center text-[10px] leading-tight font-bold">{t.actions.export}</span>
-            </button>
         </div>
+
+        {/* Primary and Destructive Actions - Stacked for consistent spacing */}
+        <button onClick={() => { onDownload(); if(window.innerWidth < 768) onCloseSidebar(); }} className="w-full bg-indigo-600 hover:bg-indigo-500 text-white p-2 rounded-lg flex flex-row items-center justify-center gap-2 text-xs transition-colors shadow-lg shadow-indigo-500/20">
+            <Download size={18} />
+            <span className="text-center text-[10px] leading-tight font-bold">{t.actions.export}</span>
+        </button>
 
         <button 
             type="button"
             onClick={() => { onClear(); if(window.innerWidth < 768) onCloseSidebar(); }}
-            className="mt-2 flex items-center justify-center gap-2 p-2 rounded-lg bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 dark:bg-red-900/20 dark:hover:bg-red-900/30 dark:border-red-800/50 dark:text-red-400 text-xs transition-all w-full font-semibold"
+            className="flex items-center justify-center gap-2 p-2 rounded-lg bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 dark:bg-red-900/20 dark:hover:bg-red-900/30 dark:border-red-800/50 dark:text-red-400 text-xs transition-all w-full font-semibold"
         >
             <Trash2 size={16} />
             {t.actions.clear}
@@ -192,7 +191,7 @@ const CustomColorSlot: React.FC<{
 
     return (
         <div 
-            className={`w-full aspect-square rounded border transition-all cursor-pointer relative group ${
+            className={`w-full aspect-square rounded-lg border transition-all cursor-pointer relative group ${
                 isSelected
                   ? 'border-indigo-500 dark:border-white scale-110 shadow-md z-10'
                   : 'border-paper-300 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-white/50 hover:scale-105'
