@@ -177,7 +177,7 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ isOpen, onClose, language
               
               <div className="flex items-center gap-6">
                 <a 
-                    href="https://github.com/google/gemini-api"
+                    href="https://github.com/chiperman/PixelCraft-Studio"
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="text-slate-400 hover:text-slate-700 dark:text-slate-500 dark:hover:text-white transition-colors flex items-center gap-2 text-xs font-medium"
