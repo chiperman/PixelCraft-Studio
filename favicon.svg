@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" shape-rendering="crispEdges">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4338ca;stop-opacity:1" /> <!-- Indigo 700 -->
+      <stop offset="100%" style="stop-color:#9333ea;stop-opacity:1" /> <!-- Purple 600 -->
+    </linearGradient>
+  </defs>
+  
+  <!-- Background Squircle -->
+  <rect x="0" y="0" width="16" height="16" rx="3" fill="url(#grad)" />
+  
+  <!-- Pixelated 'P' Letter (White) - Adjusted for perfect center (Width 8px, Margin 4px) -->
+  <!-- Vertical Stem (x:4, w:2) -->
+  <rect x="4" y="3" width="2" height="10" fill="white" />
+  <!-- Top Bar (x:6, w:4) -->
+  <rect x="6" y="3" width="4" height="2" fill="white" />
+  <!-- Right Vertical Bar (x:10, w:2) -->
+  <rect x="10" y="3" width="2" height="6" fill="white" />
+  <!-- Middle Bar (x:6, w:4) -->
+  <rect x="6" y="7" width="4" height="2" fill="white" />
+  
+  <!-- Inner hole (x:6, w:4) -->
+  <rect x="6" y="5" width="4" height="2" fill="url(#grad)" />
+
+  <!-- Decorative Pixels (Artistic Flair) -->
+  <rect x="12" y="11" width="2" height="2" fill="#fbbf24" /> <!-- Amber Pixel -->
+  <rect x="10" y="13" width="2" height="2" fill="#38bdf8" /> <!-- Sky Blue Pixel -->
+</svg>
