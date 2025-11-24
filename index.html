@@ -36,25 +36,15 @@
     </script>
     <style>
       :root {
-        --bg-color: #F9F7F3;
+        --bg-color: #F9F7F3; /* Paper 100 */
       }
       .dark {
-        --bg-color: #020617;
+        --bg-color: #020617; /* Slate 950 */
       }
       html, body {
         height: 100%;
-        margin: 0;
-        padding: 0;
-        overflow: hidden; /* Prevent native scroll, handle in app */
-      }
-      html {
         background-color: var(--bg-color);
-        transition: background-color 0.3s;
-      }
-      body {
         overscroll-behavior: none;
-        background-color: var(--bg-color);
-        transition: background-color 0.3s;
       }
       /* Custom Scrollbar */
       ::-webkit-scrollbar {
