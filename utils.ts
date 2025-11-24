@@ -1,6 +1,3 @@
-
-
-
 import { GridConfig } from './types';
 
 // Convert RGB(A) to Hex
@@ -150,7 +147,7 @@ export const TRANSLATIONS = {
       projectLoaded: 'Project loaded!',
       loadError: 'Failed to load project',
       projectSaved: 'Project saved successfully!',
-      cleared: 'Canvas and reference layer cleared',
+      cleared: 'Canvas cleared',
       converted: 'Image converted to pixel art!',
       convertError: 'Failed to convert image',
       refSet: 'Background reference set!',
@@ -235,7 +232,7 @@ export const TRANSLATIONS = {
       projectLoaded: '项目已加载！',
       loadError: '加载项目失败',
       projectSaved: '项目保存成功！',
-      cleared: '画布和参考图层已清空',
+      cleared: '画布已清空',
       converted: '图片已转换为像素画！',
       convertError: '图片转换失败',
       refSet: '背景参考图已设置！',
@@ -320,7 +317,7 @@ export const TRANSLATIONS = {
       projectLoaded: '專案已載入！',
       loadError: '無法載入專案',
       projectSaved: '專案儲存成功！',
-      cleared: '畫布和參考圖層已清空',
+      cleared: '畫布已清空',
       converted: '圖片已轉換為像素畫！',
       convertError: '圖片轉換失敗',
       refSet: '背景參考圖已設定！',
@@ -405,7 +402,7 @@ export const TRANSLATIONS = {
       projectLoaded: 'プロジェクトを読み込みました！',
       loadError: '読み込みに失敗しました',
       projectSaved: 'プロジェクトを保存しました！',
-      cleared: 'キャンバスと参照レイヤーをクリアしました',
+      cleared: 'キャンバスをクリアしました',
       converted: '画像をドット絵に変換しました！',
       convertError: '画像の変換に失敗しました',
       refSet: '背景参照画像を設定しました！',
@@ -490,7 +487,7 @@ export const TRANSLATIONS = {
       projectLoaded: '프로젝트를 불러왔습니다!',
       loadError: '불러오기 실패',
       projectSaved: '프로젝트가 저장되었습니다!',
-      cleared: '캔버스 및 참조 레이어가 지워졌습니다',
+      cleared: '캔버스 초기화 완료',
       converted: '이미지가 픽셀 아트로 변환되었습니다!',
       convertError: '이미지 변환 실패',
       refSet: '배경 참조가 설정되었습니다!',
@@ -822,7 +819,7 @@ export const TRANSLATIONS = {
       placeholder: 'Nome do projeto...',
       empty: 'Nenhum projeto salvo',
       load: 'Carregar',
-      rename: 'Renomear',
+      rename: 'Renommer',
       delete: 'Excluir',
       deleteConfirm: 'Excluir este projeto?'
     },
@@ -851,7 +848,7 @@ export const TRANSLATIONS = {
         layers: { title: 'Camadas', desc: 'Gerenciar camadas de desenho e referência.' },
         images: { title: 'Imagens', desc: 'Converter para pixels ou usar como referência.' },
         project: { title: 'Projeto', desc: 'Salvar/Carregar .json e Exportar PNG.' },
-        shortcuts: { title: 'Atalhos', desc: 'Atalhos de teclado para ferramentas e ações.' }
+        shortcuts: { title: 'Atalhos', desc: 'Atalhos de teclado para ferramentas y ações.' }
       }
     }
   },
