@@ -1,4 +1,5 @@
 
+
 export type ToolType = 'pencil' | 'eraser' | 'bucket' | 'picker';
 
 export type ThemeMode = 'light' | 'dark' | 'system';
@@ -26,6 +27,22 @@ export interface AppState {
   customPalette: string[];
   theme: ThemeMode;
   language: Language;
+}
+
+export interface StoredProject {
+  id: string;
+  name: string;
+  thumbnail: string; // Base64 data URL
+  timestamp: number;
+  // State to restore
+  grid: string[];
+  config: GridConfig;
+  customPalette: string[];
+  selectedColor: string;
+  showDrawingLayer: boolean;
+  showReferenceLayer: boolean;
+  backgroundImage: string | null;
+  backgroundOpacity: number;
 }
 
 // 25 Colors (5 rows x 5 columns)

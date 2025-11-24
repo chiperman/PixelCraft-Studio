@@ -1,5 +1,6 @@
 
 
+
 import { GridConfig } from './types';
 
 // Convert RGB(A) to Hex
@@ -108,7 +109,8 @@ export const TRANSLATIONS = {
       export: 'Export PNG',
       save: 'Save Project',
       load: 'Load Project',
-      clear: 'Clear Canvas'
+      clear: 'Clear Canvas',
+      library: 'Library'
     },
     resize: {
       title: 'Canvas Size',
@@ -134,6 +136,16 @@ export const TRANSLATIONS = {
       systemMode: 'System',
       language: 'Language'
     },
+    library: {
+      title: 'Project Library',
+      saveCurrent: 'Save Current to Library',
+      placeholder: 'Project Name...',
+      empty: 'No saved projects.',
+      load: 'Load',
+      rename: 'Rename',
+      delete: 'Delete',
+      deleteConfirm: 'Delete this project?'
+    },
     notifications: {
       projectLoaded: 'Project loaded!',
       loadError: 'Failed to load project',
@@ -143,7 +155,10 @@ export const TRANSLATIONS = {
       convertError: 'Failed to convert image',
       refSet: 'Background reference set!',
       exported: 'Image exported!',
-      resized: (w: number, h: number) => `Canvas resized to ${w}x${h}`
+      resized: (w: number, h: number) => `Canvas resized to ${w}x${h}`,
+      librarySaved: 'Project saved to library!',
+      libraryDeleted: 'Project deleted.',
+      libraryLoaded: 'Project loaded from library!'
     },
     tutorial: {
       title: 'PixelCraft Guide',
@@ -155,7 +170,7 @@ export const TRANSLATIONS = {
         nav: { title: 'Navigation', desc: 'Zoom: Slider or Ctrl+Scroll. Pan: Hold Space+Drag or Middle Mouse.' },
         layers: { title: 'Layers', desc: 'Toggle Drawing & Reference layers. Adjust Reference Opacity.' },
         images: { title: 'Images', desc: '"Import" to convert image to pixels. "Ref Layer" for tracing background.' },
-        project: { title: 'Project', desc: 'Save/Load .json projects and Export to PNG.' },
+        project: { title: 'Project', desc: 'Save/Load .json projects, Export to PNG, and use Library.' },
         shortcuts: { title: 'Shortcuts', desc: 'Key bindings for tools and actions.' }
       }
     }
@@ -179,7 +194,8 @@ export const TRANSLATIONS = {
       export: '导出 PNG',
       save: '保存项目',
       load: '加载项目',
-      clear: '清空画布'
+      clear: '清空画布',
+      library: '项目库'
     },
     resize: {
       title: '画布尺寸',
@@ -205,6 +221,16 @@ export const TRANSLATIONS = {
       systemMode: '跟随系统',
       language: '语言'
     },
+    library: {
+      title: '项目库',
+      saveCurrent: '保存当前项目',
+      placeholder: '项目名称...',
+      empty: '暂无保存的项目',
+      load: '加载',
+      rename: '重命名',
+      delete: '删除',
+      deleteConfirm: '确定要删除这个项目吗？'
+    },
     notifications: {
       projectLoaded: '项目已加载！',
       loadError: '加载项目失败',
@@ -214,7 +240,10 @@ export const TRANSLATIONS = {
       convertError: '图片转换失败',
       refSet: '背景参考图已设置！',
       exported: '图片已导出！',
-      resized: (w: number, h: number) => `画布已调整为 ${w}x${h}`
+      resized: (w: number, h: number) => `画布已调整为 ${w}x${h}`,
+      librarySaved: '项目已保存到项目库！',
+      libraryDeleted: '项目已删除。',
+      libraryLoaded: '项目已从项目库加载！'
     },
     tutorial: {
       title: '功能教程',
@@ -226,7 +255,7 @@ export const TRANSLATIONS = {
         nav: { title: '画布导航', desc: '缩放：滑块或 Ctrl+滚轮。平移：按住空格+拖拽或鼠标中键。' },
         layers: { title: '图层管理', desc: '切换绘画/参考图层显示。调整参考图透明度用于临摹。' },
         images: { title: '图片处理', desc: '“导入图片”转换像素画。“参考图层”设置背景垫图。' },
-        project: { title: '项目管理', desc: '保存/加载 .json 项目文件，导出 PNG 图片。' },
+        project: { title: '项目管理', desc: '保存/加载 .json 项目文件，导出 PNG 图片，使用项目库管理多作品。' },
         shortcuts: { title: '快捷键', desc: '工具和操作的键盘快捷方式。' }
       }
     }
@@ -250,7 +279,8 @@ export const TRANSLATIONS = {
       export: '匯出 PNG',
       save: '儲存專案',
       load: '載入專案',
-      clear: '清空畫布'
+      clear: '清空畫布',
+      library: '專案庫'
     },
     resize: {
       title: '畫布尺寸',
@@ -276,6 +306,16 @@ export const TRANSLATIONS = {
       systemMode: '跟隨系統',
       language: '語言'
     },
+    library: {
+      title: '專案庫',
+      saveCurrent: '儲存目前專案',
+      placeholder: '專案名稱...',
+      empty: '暫無儲存的專案',
+      load: '載入',
+      rename: '重新命名',
+      delete: '刪除',
+      deleteConfirm: '確定要刪除這個專案嗎？'
+    },
     notifications: {
       projectLoaded: '專案已載入！',
       loadError: '無法載入專案',
@@ -285,7 +325,10 @@ export const TRANSLATIONS = {
       convertError: '圖片轉換失敗',
       refSet: '背景參考圖已設定！',
       exported: '圖片已匯出！',
-      resized: (w: number, h: number) => `畫布已調整為 ${w}x${h}`
+      resized: (w: number, h: number) => `畫布已調整為 ${w}x${h}`,
+      librarySaved: '專案已儲存到專案庫！',
+      libraryDeleted: '專案已刪除。',
+      libraryLoaded: '專案已從專案庫載入！'
     },
     tutorial: {
       title: '功能教學',
@@ -321,7 +364,8 @@ export const TRANSLATIONS = {
       export: 'PNG出力',
       save: '保存',
       load: '開く',
-      clear: 'クリア'
+      clear: 'クリア',
+      library: 'ライブラリ'
     },
     resize: {
       title: 'キャンバスサイズ',
@@ -347,6 +391,16 @@ export const TRANSLATIONS = {
       systemMode: 'システム設定',
       language: '言語'
     },
+    library: {
+      title: 'プロジェクトライブラリ',
+      saveCurrent: 'ライブラリに保存',
+      placeholder: 'プロジェクト名...',
+      empty: '保存されたプロジェクトはありません',
+      load: '読込',
+      rename: '名前変更',
+      delete: '削除',
+      deleteConfirm: 'このプロジェクトを削除しますか？'
+    },
     notifications: {
       projectLoaded: 'プロジェクトを読み込みました！',
       loadError: '読み込みに失敗しました',
@@ -356,7 +410,10 @@ export const TRANSLATIONS = {
       convertError: '画像の変換に失敗しました',
       refSet: '背景参照画像を設定しました！',
       exported: '画像をエクスポートしました！',
-      resized: (w: number, h: number) => `キャンバスサイズを ${w}x${h} に変更しました`
+      resized: (w: number, h: number) => `キャンバスサイズを ${w}x${h} に変更しました`,
+      librarySaved: 'ライブラリに保存しました！',
+      libraryDeleted: '削除しました。',
+      libraryLoaded: 'ライブラリから読み込みました！'
     },
     tutorial: {
       title: '使い方ガイド',
@@ -392,7 +449,8 @@ export const TRANSLATIONS = {
       export: 'PNG 내보내기',
       save: '프로젝트 저장',
       load: '프로젝트 열기',
-      clear: '캔버스 지우기'
+      clear: '캔버스 지우기',
+      library: '라이브러리'
     },
     resize: {
       title: '캔버스 크기',
@@ -418,6 +476,16 @@ export const TRANSLATIONS = {
       systemMode: '시스템 설정',
       language: '언어'
     },
+    library: {
+      title: '프로젝트 라이브러리',
+      saveCurrent: '라이브러리에 저장',
+      placeholder: '프로젝트 이름...',
+      empty: '저장된 프로젝트가 없습니다',
+      load: '불러오기',
+      rename: '이름 변경',
+      delete: '삭제',
+      deleteConfirm: '이 프로젝트를 삭제하시겠습니까?'
+    },
     notifications: {
       projectLoaded: '프로젝트를 불러왔습니다!',
       loadError: '불러오기 실패',
@@ -427,7 +495,10 @@ export const TRANSLATIONS = {
       convertError: '이미지 변환 실패',
       refSet: '배경 참조가 설정되었습니다!',
       exported: '이미지가 내보내졌습니다!',
-      resized: (w: number, h: number) => `캔버스 크기가 ${w}x${h}로 조정되었습니다`
+      resized: (w: number, h: number) => `캔버스 크기가 ${w}x${h}로 조정되었습니다`,
+      librarySaved: '라이브러리에 저장되었습니다!',
+      libraryDeleted: '삭제되었습니다.',
+      libraryLoaded: '라이브러리에서 불러왔습니다!'
     },
     tutorial: {
       title: '사용 가이드',
@@ -463,7 +534,8 @@ export const TRANSLATIONS = {
       export: 'Exporter PNG',
       save: 'Sauvegarder',
       load: 'Ouvrir',
-      clear: 'Effacer'
+      clear: 'Effacer',
+      library: 'Bibliothèque'
     },
     resize: {
       title: 'Taille du canevas',
@@ -489,6 +561,16 @@ export const TRANSLATIONS = {
       systemMode: 'Système',
       language: 'Langue'
     },
+    library: {
+      title: 'Bibliothèque de projets',
+      saveCurrent: 'Enregistrer dans la bibliothèque',
+      placeholder: 'Nom du projet...',
+      empty: 'Aucun projet enregistré',
+      load: 'Charger',
+      rename: 'Renommer',
+      delete: 'Supprimer',
+      deleteConfirm: 'Supprimer ce projet ?'
+    },
     notifications: {
       projectLoaded: 'Projet chargé !',
       loadError: 'Erreur de chargement',
@@ -498,7 +580,10 @@ export const TRANSLATIONS = {
       convertError: 'Échec de conversion',
       refSet: 'Image de référence définie !',
       exported: 'Image exportée !',
-      resized: (w: number, h: number) => `Redimensionné à ${w}x${h}`
+      resized: (w: number, h: number) => `Redimensionné à ${w}x${h}`,
+      librarySaved: 'Projet enregistré !',
+      libraryDeleted: 'Projet supprimé.',
+      libraryLoaded: 'Projet chargé !'
     },
     tutorial: {
       title: 'Guide PixelCraft',
@@ -534,7 +619,8 @@ export const TRANSLATIONS = {
       export: 'Export PNG',
       save: 'Speichern',
       load: 'Öffnen',
-      clear: 'Leeren'
+      clear: 'Leeren',
+      library: 'Bibliothek'
     },
     resize: {
       title: 'Leinwandgröße',
@@ -560,6 +646,16 @@ export const TRANSLATIONS = {
       systemMode: 'System',
       language: 'Sprache'
     },
+    library: {
+      title: 'Projektbibliothek',
+      saveCurrent: 'In Bibliothek speichern',
+      placeholder: 'Projektname...',
+      empty: 'Keine gespeicherten Projekte',
+      load: 'Laden',
+      rename: 'Umbenennen',
+      delete: 'Löschen',
+      deleteConfirm: 'Dieses Projekt löschen?'
+    },
     notifications: {
       projectLoaded: 'Projekt geladen!',
       loadError: 'Ladefehler',
@@ -569,7 +665,10 @@ export const TRANSLATIONS = {
       convertError: 'Fehler bei Konvertierung',
       refSet: 'Referenzbild gesetzt!',
       exported: 'Bild exportiert!',
-      resized: (w: number, h: number) => `Größe auf ${w}x${h} geändert`
+      resized: (w: number, h: number) => `Größe auf ${w}x${h} geändert`,
+      librarySaved: 'Projekt in Bibliothek gespeichert!',
+      libraryDeleted: 'Projekt gelöscht.',
+      libraryLoaded: 'Projekt aus Bibliothek geladen!'
     },
     tutorial: {
       title: 'Anleitung',
@@ -605,7 +704,8 @@ export const TRANSLATIONS = {
       export: 'Exportar PNG',
       save: 'Guardar',
       load: 'Cargar',
-      clear: 'Limpiar'
+      clear: 'Limpiar',
+      library: 'Biblioteca'
     },
     resize: {
       title: 'Tamaño Lienzo',
@@ -631,6 +731,16 @@ export const TRANSLATIONS = {
       systemMode: 'Sistema',
       language: 'Idioma'
     },
+    library: {
+      title: 'Biblioteca',
+      saveCurrent: 'Guardar en biblioteca',
+      placeholder: 'Nombre del proyecto...',
+      empty: 'No hay proyectos guardados',
+      load: 'Cargar',
+      rename: 'Renombrar',
+      delete: 'Eliminar',
+      deleteConfirm: '¿Eliminar este proyecto?'
+    },
     notifications: {
       projectLoaded: 'Proyecto cargado!',
       loadError: 'Error de carga',
@@ -640,7 +750,10 @@ export const TRANSLATIONS = {
       convertError: 'Error al convertir',
       refSet: 'Referencia establecida!',
       exported: 'Imagen exportada!',
-      resized: (w: number, h: number) => `Redimensionado a ${w}x${h}`
+      resized: (w: number, h: number) => `Redimensionado a ${w}x${h}`,
+      librarySaved: '¡Proyecto guardado en biblioteca!',
+      libraryDeleted: 'Proyecto eliminado.',
+      libraryLoaded: '¡Proyecto cargado desde biblioteca!'
     },
     tutorial: {
       title: 'Guía',
@@ -676,7 +789,8 @@ export const TRANSLATIONS = {
       export: 'Exportar PNG',
       save: 'Salvar',
       load: 'Carregar',
-      clear: 'Limpar Tela'
+      clear: 'Limpar Tela',
+      library: 'Biblioteca'
     },
     resize: {
       title: 'Tamanho da Tela',
@@ -702,6 +816,16 @@ export const TRANSLATIONS = {
       systemMode: 'Sistema',
       language: 'Idioma'
     },
+    library: {
+      title: 'Biblioteca',
+      saveCurrent: 'Salvar na biblioteca',
+      placeholder: 'Nome do projeto...',
+      empty: 'Nenhum projeto salvo',
+      load: 'Carregar',
+      rename: 'Renomear',
+      delete: 'Excluir',
+      deleteConfirm: 'Excluir este projeto?'
+    },
     notifications: {
       projectLoaded: 'Projeto carregado!',
       loadError: 'Erro ao carregar',
@@ -711,7 +835,10 @@ export const TRANSLATIONS = {
       convertError: 'Erro na conversão',
       refSet: 'Referência definida!',
       exported: 'Imagem exportada!',
-      resized: (w: number, h: number) => `Redimensionado para ${w}x${h}`
+      resized: (w: number, h: number) => `Redimensionado para ${w}x${h}`,
+      librarySaved: 'Projeto salvo na biblioteca!',
+      libraryDeleted: 'Projeto excluído.',
+      libraryLoaded: 'Projeto carregado da biblioteca!'
     },
     tutorial: {
       title: 'Guia',
@@ -747,7 +874,8 @@ export const TRANSLATIONS = {
       export: 'Экспорт PNG',
       save: 'Сохранить',
       load: 'Открыть',
-      clear: 'Очистить'
+      clear: 'Очистить',
+      library: 'Библиотека'
     },
     resize: {
       title: 'Размер холста',
@@ -773,6 +901,16 @@ export const TRANSLATIONS = {
       systemMode: 'Системная',
       language: 'Язык'
     },
+    library: {
+      title: 'Библиотека проектов',
+      saveCurrent: 'Сохранить в библиотеку',
+      placeholder: 'Название проекта...',
+      empty: 'Нет сохраненных проектов',
+      load: 'Загрузить',
+      rename: 'Переименовать',
+      delete: 'Удалить',
+      deleteConfirm: 'Удалить этот проект?'
+    },
     notifications: {
       projectLoaded: 'Проект загружен!',
       loadError: 'Ошибка загрузки',
@@ -782,7 +920,10 @@ export const TRANSLATIONS = {
       convertError: 'Ошибка конвертации',
       refSet: 'Референс установлен!',
       exported: 'Картинка экспортирована!',
-      resized: (w: number, h: number) => `Размер изменен на ${w}x${h}`
+      resized: (w: number, h: number) => `Размер изменен на ${w}x${h}`,
+      librarySaved: 'Проект сохранен в библиотеку!',
+      libraryDeleted: 'Проект удален.',
+      libraryLoaded: 'Проект загружен из библиотеки!'
     },
     tutorial: {
       title: 'Руководство',
@@ -818,7 +959,8 @@ export const TRANSLATIONS = {
       export: 'تصدير PNG',
       save: 'حفظ المشروع',
       load: 'فتح المشروع',
-      clear: 'مسح اللوحة'
+      clear: 'مسح اللوحة',
+      library: 'المكتبة'
     },
     resize: {
       title: 'حجم اللوحة',
@@ -844,6 +986,16 @@ export const TRANSLATIONS = {
       systemMode: 'النظام',
       language: 'اللغة'
     },
+    library: {
+      title: 'مكتبة المشاريع',
+      saveCurrent: 'حفظ في المكتبة',
+      placeholder: 'اسم المشروع...',
+      empty: 'لا توجد مشاريع محفوظة',
+      load: 'تحميل',
+      rename: 'إعادة تسمية',
+      delete: 'حذف',
+      deleteConfirm: 'هل تريد حذف هذا المشروع؟'
+    },
     notifications: {
       projectLoaded: 'تم تحميل المشروع!',
       loadError: 'فشل التحميل',
@@ -853,7 +1005,10 @@ export const TRANSLATIONS = {
       convertError: 'فشل التحويل',
       refSet: 'تم تعيين المرجع!',
       exported: 'تم التصدير!',
-      resized: (w: number, h: number) => `تم تغيير الحجم إلى ${w}x${h}`
+      resized: (w: number, h: number) => `تم تغيير الحجم إلى ${w}x${h}`,
+      librarySaved: 'تم حفظ المشروع في المكتبة!',
+      libraryDeleted: 'تم حذف المشروع.',
+      libraryLoaded: 'تم تحميل المشروع من المكتبة!'
     },
     tutorial: {
       title: 'دليل الاستخدام',

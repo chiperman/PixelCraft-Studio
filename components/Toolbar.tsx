@@ -1,7 +1,8 @@
 
+
 import React, { useRef } from 'react';
 import { ToolType, DEFAULT_PALETTE, Language } from '../types';
-import { Pencil, Eraser, PaintBucket, Pipette, Download, Upload, Image as ImageIcon, Trash2, Save, FolderOpen, X } from 'lucide-react';
+import { Pencil, Eraser, PaintBucket, Pipette, Download, Upload, Image as ImageIcon, Trash2, Save, FolderOpen, X, Library } from 'lucide-react';
 import { TRANSLATIONS } from '../utils';
 
 interface ToolbarProps {
@@ -16,6 +17,7 @@ interface ToolbarProps {
   onLoad: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onClear: () => void;
   onImageUpload: (e: React.ChangeEvent<HTMLInputElement>, type: 'convert' | 'background') => void;
+  onOpenLibrary: () => void;
   language: Language;
   isSidebarOpen: boolean;
   onCloseSidebar: () => void;
@@ -33,6 +35,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
   onLoad,
   onClear,
   onImageUpload,
+  onOpenLibrary,
   language,
   isSidebarOpen,
   onCloseSidebar,
@@ -137,6 +140,14 @@ const Toolbar: React.FC<ToolbarProps> = ({
       <div className="flex flex-col gap-2 pt-4 border-t border-paper-200 dark:border-slate-800 mt-auto flex-shrink-0">
         <h3 className="text-xs uppercase font-semibold text-slate-500 tracking-wider text-left">{t.headers.actions}</h3>
         
+        <button 
+           onClick={() => { onOpenLibrary(); if(window.innerWidth < 768) onCloseSidebar(); }}
+           className="w-full bg-indigo-50 hover:bg-indigo-100 text-indigo-700 dark:bg-indigo-900/20 dark:hover:bg-indigo-900/40 dark:text-indigo-300 p-2 rounded-lg flex flex-row items-center justify-center gap-2 text-xs transition-colors border border-indigo-200 dark:border-indigo-500/30"
+        >
+            <Library size={18} />
+            <span className="font-bold">{t.actions.library}</span>
+        </button>
+
         {/* File Actions Grid */}
         <div className="grid grid-cols-2 gap-2">
             <label className="cursor-pointer bg-paper-100 hover:bg-paper-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 p-2 rounded-lg flex flex-col items-center justify-center gap-1 text-xs transition-colors h-full">

@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import CanvasBoard from './components/CanvasBoard';
 import Toolbar from './components/Toolbar';
-import { AppState, DEFAULT_PALETTE, DEFAULT_SIZE, Language, ToolType } from './types';
+import ProjectLibraryModal from './components/ProjectLibraryModal';
+import { AppState, DEFAULT_PALETTE, DEFAULT_SIZE, Language, ToolType, StoredProject } from './types';
 import { imageToPixelGrid, TRANSLATIONS } from './utils';
-import { Undo, Redo, Grid3X3, X, Settings, Eye, EyeOff, Layers, Moon, Sun, Monitor, Globe, HelpCircle, Pencil, Palette, Move, Image as ImageIcon, Save, Layers as LayersIcon, BookOpen, Menu, Keyboard, MoreVertical, Hand } from 'lucide-react';
+import { Undo, Redo, Grid3X3, X, Settings, Eye, EyeOff, Layers, Moon, Sun, Monitor, Globe, HelpCircle, Pencil, Palette, Move, Image as ImageIcon, Save, LayersIcon, BookOpen, Keyboard, MoreVertical, Hand, Menu } from 'lucide-react';
 import { SiGithub } from '@icons-pack/react-simple-icons';
 
 // Resize Modal Component
@@ -281,13 +282,11 @@ const getSystemLanguage = (): Language => {
 }
 
 const App: React.FC = () => {
-  // Initial State Logic
-  const getInitialGrid = (w: number, h: number) => Array(w * h).fill('');
   const initialCustomPalette = ['#ffffff', '#cccccc', '#999999', '#666666', '#333333'];
 
   const [state, setState] = useState<AppState>({
-    grid: getInitialGrid(DEFAULT_SIZE, DEFAULT_SIZE),
-    history: [getInitialGrid(DEFAULT_SIZE, DEFAULT_SIZE)],
+    grid: Array(DEFAULT_SIZE * DEFAULT_SIZE).fill(''),
+    history: [Array(DEFAULT_SIZE * DEFAULT_SIZE).fill('')],
     historyIndex: 0,
     config: { width: DEFAULT_SIZE, height: DEFAULT_SIZE, size: 16 },
     selectedColor: DEFAULT_PALETTE[0],
@@ -309,6 +308,10 @@ const App: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isMobileHeaderMenuOpen, setIsMobileHeaderMenuOpen] = useState(false);
   
+  // Library State
+  const [isLibraryOpen, setIsLibraryOpen] = useState(false);
+  const [savedProjects, setSavedProjects] = useState<StoredProject[]>([]);
+
   // Mobile Pan Mode
   const [isMobilePanning, setIsMobilePanning] = useState(false);
 
@@ -355,6 +358,9 @@ const App: React.FC = () => {
     mediaQuery.addEventListener('change', handleChange);
     return () => mediaQuery.removeEventListener('change', handleChange);
   }, [state.theme]);
+
+  //ZQ Helper function for blank grid
+  const AQ = (w: number, h: number) => Array(w * h).fill('');
 
   // Handle Space Key for Panning Mode
   useEffect(() => {
@@ -440,6 +446,22 @@ const App: React.FC = () => {
     if (!hasSeenTutorial) {
         setIsTutorialOpen(true);
         // Do NOT set item here. Set it when they close it.
+    }
+
+    // 3. Load Project Library
+    const savedLibrary = localStorage.getItem('pixelCraftLibrary');
+    if (savedLibrary) {
+        try {
+            const parsed = JSON.parse(savedLibrary);
+            // MIGRATION: Ensure all projects have an ID
+            if (Array.isArray(parsed)) {
+                const cleaned = parsed.map((p: any) => ({
+                    ...p,
+                    id: p.id ? String(p.id) : `gen_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`
+                }));
+                setSavedProjects(cleaned);
+            }
+        } catch(e) { console.error("Failed to load library"); }
     }
   }, []);
 
@@ -560,7 +582,7 @@ const App: React.FC = () => {
   }, [handleUndo, handleRedo, handleSetTool]);
 
   const handleClear = () => {
-      const emptyGrid = getInitialGrid(state.config.width, state.config.height);
+      const emptyGrid = AQ(state.config.width, state.config.height);
       setState(prev => ({
           ...prev,
           backgroundImage: null 
@@ -669,7 +691,7 @@ const App: React.FC = () => {
   };
 
   const handleManualResize = (w: number, h: number) => {
-      const newGrid = getInitialGrid(w, h);
+      const newGrid = AQ(w, h);
       setState(prev => ({
           ...prev,
           grid: newGrid,
@@ -688,6 +710,93 @@ const App: React.FC = () => {
           return { ...prev, customPalette: newCustom, selectedColor: color };
       });
   };
+
+  // --- LIBRARY FUNCTIONS ---
+
+  const generateThumbnail = async (): Promise<string> => {
+    const canvas = document.querySelector('canvas');
+    if (!canvas) return '';
+    
+    // Create a small offscreen canvas for thumbnail
+    const thumbCanvas = document.createElement('canvas');
+    const size = 300; // Thumbnail size
+    thumbCanvas.width = size;
+    thumbCanvas.height = size;
+    const ctx = thumbCanvas.getContext('2d');
+    if (!ctx) return '';
+
+    // Draw checkered background first (simulating transparent) or just white
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, size, size);
+
+    // Calculate aspect ratio to fit
+    const scale = Math.min(size / canvas.width, size / canvas.height);
+    const x = (size - canvas.width * scale) / 2;
+    const y = (size - canvas.height * scale) / 2;
+
+    ctx.imageSmoothingEnabled = false; // Keep pixelated look
+    ctx.drawImage(canvas, x, y, canvas.width * scale, canvas.height * scale);
+    
+    return thumbCanvas.toDataURL('image/png', 0.8);
+  };
+
+  const handleSaveToLibrary = async (name: string) => {
+    const thumb = await generateThumbnail();
+    const pk = `gen_${Date.now()}`;
+    const newProject: StoredProject = {
+      id: pk,
+      name,
+      thumbnail: thumb,
+      timestamp: Date.now(),
+      grid: state.grid,
+      config: state.config,
+      customPalette: state.customPalette,
+      selectedColor: state.selectedColor,
+      showDrawingLayer: state.showDrawingLayer,
+      showReferenceLayer: state.showReferenceLayer,
+      backgroundImage: state.backgroundImage,
+      backgroundOpacity: state.backgroundOpacity
+    };
+
+    const updatedProjects = [newProject, ...savedProjects];
+    setSavedProjects(updatedProjects);
+    localStorage.setItem('pixelCraftLibrary', JSON.stringify(updatedProjects));
+    showNotification(t.notifications.librarySaved, "success");
+  };
+
+  const handleLoadFromLibrary = (project: StoredProject) => {
+     setState(prev => ({
+        ...prev,
+        grid: project.grid,
+        config: project.config,
+        customPalette: project.customPalette,
+        selectedColor: project.selectedColor,
+        showDrawingLayer: project.showDrawingLayer,
+        showReferenceLayer: project.showReferenceLayer,
+        backgroundImage: project.backgroundImage,
+        backgroundOpacity: project.backgroundOpacity,
+        history: [project.grid],
+        historyIndex: 0
+     }));
+     showNotification(t.notifications.libraryLoaded, "success");
+  };
+
+  const handleDeleteFromLibrary = (id: string) => {
+      // Create new array excluding the target
+      const updated = savedProjects.filter(p => String(p.id) !== String(id));
+      setSavedProjects(updated);
+      localStorage.setItem('pixelCraftLibrary', JSON.stringify(updated));
+      showNotification(t.notifications.libraryDeleted, "success");
+  };
+
+  const handleRenameInLibrary = (id: string, newName: string) => {
+      setSavedProjects(currentProjects => {
+          const updated = currentProjects.map(p => p.id === id ? { ...p, name: newName } : p);
+          localStorage.setItem('pixelCraftLibrary', JSON.stringify(updated));
+          return updated;
+      });
+  };
+
 
   const showNotification = (msg: string, type: 'success' | 'error') => {
       setNotification({ msg, type });
@@ -729,8 +838,15 @@ const App: React.FC = () => {
              e.touches[0].clientY - e.touches[1].clientY
           );
           lastPinchDist.current = dist;
-      } else if (isMobilePanning || isSpacePressed) {
-          // Pan Start
+
+          // Also initialize pan position for 2 fingers
+          const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+          const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+          lastTouchPos.current = { x: midX, y: midY };
+          setIsPanning(true); // Make sure we flag panning state
+
+      } else if (e.touches.length === 1 && (isMobilePanning || isSpacePressed)) {
+           // Single finger pan if mode is active
           const touch = e.touches[0];
           setIsPanning(true);
           lastTouchPos.current = { x: touch.clientX, y: touch.clientY };
@@ -738,36 +854,53 @@ const App: React.FC = () => {
   };
 
   const handleContainerTouchMove = (e: React.TouchEvent) => {
-      // Handle Pinch Zoom
-      if (e.touches.length === 2 && lastPinchDist.current) {
-          e.preventDefault(); // Prevent native zoom
-          const dist = Math.hypot(
-             e.touches[0].clientX - e.touches[1].clientX,
-             e.touches[0].clientY - e.touches[1].clientY
-          );
-          
-          const delta = dist - lastPinchDist.current;
-          // Threshold to prevent jitter
-          if (Math.abs(delta) > 5) {
-             const zoomDirection = delta > 0 ? 1 : -1;
-             setState(s => {
-                 const newSize = Math.min(60, Math.max(4, s.config.size + zoomDirection));
-                 // Optional: Could throttle this for performance, but React 18 usually handles it ok
-                 return { ...s, config: { ...s.config, size: newSize } };
-             });
-             lastPinchDist.current = dist;
+      // Handle Pinch Zoom + Pan (2 fingers)
+      if (e.touches.length === 2) {
+          e.preventDefault(); // Prevent native browser zoom
+
+          // 1. Zoom Logic
+          if (lastPinchDist.current) {
+            const dist = Math.hypot(
+                e.touches[0].clientX - e.touches[1].clientX,
+                e.touches[0].clientY - e.touches[1].clientY
+            );
+            const ZS = dist - lastPinchDist.current;
+            if (Math.abs(ZS) > 5) {
+                const zoomDirection = ZS > 0 ? 1 : -1;
+                setState(s => {
+                    const newSize = Math.min(60, Math.max(4, s.config.size + zoomDirection));
+                    return { ...s, config: { ...s.config, size: newSize } };
+                });
+                lastPinchDist.current = dist;
+            }
+          }
+
+          // 2. Pan Logic (Two fingers center point)
+          const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+          const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+
+          if (lastTouchPos.current) {
+               const dx = midX - lastTouchPos.current.x;
+               const dy = midY - lastTouchPos.current.y;
+               setPanOffset(prev => ({ x: prev.x + dx, y: prev.y + dy }));
+               lastTouchPos.current = { x: midX, y: midY };
+          } else {
+               // Fallback if touch start didn't catch it (shouldn't happen with updated start logic)
+               lastTouchPos.current = { x: midX, y: midY };
           }
           return;
       }
 
-      // Handle Panning
-      if (isPanning && lastTouchPos.current) {
+      // Handle Single Finger Panning (Only if isMobilePanning mode is ON)
+      if (isMobilePanning && e.touches.length === 1 && lastTouchPos.current) {
+           // Prevent default to stop page scroll while panning
+           if(e.cancelable) e.preventDefault();
+           
            const touch = e.touches[0];
            const dx = touch.clientX - lastTouchPos.current.x;
            const dy = touch.clientY - lastTouchPos.current.y;
            
            setPanOffset(prev => ({ x: prev.x + dx, y: prev.y + dy }));
-           
            lastTouchPos.current = { x: touch.clientX, y: touch.clientY };
       }
   };
@@ -812,6 +945,17 @@ const App: React.FC = () => {
       <TutorialModal 
         isOpen={isTutorialOpen}
         onClose={handleCloseTutorial}
+        language={state.language}
+      />
+
+      <ProjectLibraryModal
+        isOpen={isLibraryOpen}
+        onClose={() => setIsLibraryOpen(false)}
+        projects={savedProjects}
+        onSaveCurrent={handleSaveToLibrary}
+        onLoad={handleLoadFromLibrary}
+        onDelete={handleDeleteFromLibrary}
+        onRename={handleRenameInLibrary}
         language={state.language}
       />
 
@@ -963,6 +1107,7 @@ const App: React.FC = () => {
         onLoad={handleLoadProject}
         onClear={handleClear}
         onImageUpload={handleImageUpload}
+        onOpenLibrary={() => setIsLibraryOpen(true)}
         language={state.language}
         isSidebarOpen={isSidebarOpen}
         onCloseSidebar={() => setIsSidebarOpen(false)}
@@ -1165,7 +1310,8 @@ const App: React.FC = () => {
              style={{
                  // Background dots remain static to give reference
                  backgroundImage: `radial-gradient(${computedIsDarkMode ? '#1e293b' : '#D1CEC7'} 1px, transparent 1px)`,
-                 backgroundSize: '20px 20px'
+                 backgroundSize: '20px 20px',
+                 touchAction: 'none' // Important: Disable browser default touch actions like scroll/zoom
              }}
         >
             {/* Movable/Scalable Wrapper */}
