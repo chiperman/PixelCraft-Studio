@@ -1,3 +1,4 @@
+
 import React, { useRef } from 'react';
 import { ToolType, DEFAULT_PALETTE, Language } from '../types';
 import { Pencil, Eraser, PaintBucket, Pipette, Download, Upload, Image as ImageIcon, Trash2, Save, FolderOpen, X } from 'lucide-react';
@@ -48,13 +49,13 @@ const Toolbar: React.FC<ToolbarProps> = ({
 
   return (
     <div 
-      className={`fixed inset-y-0 left-0 z-50 h-full w-72 bg-paper-50 dark:bg-slate-900 border-r border-paper-200 dark:border-slate-800 p-4 flex flex-col shadow-2xl md:shadow-none transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0 md:flex flex-shrink-0 ${
+      className={`fixed inset-y-0 left-0 z-50 h-full w-72 bg-paper-50 dark:bg-slate-900 border-r border-paper-200 dark:border-slate-800 p-4 flex flex-col shadow-2xl md:shadow-none transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0 md:flex flex-shrink-0 overflow-y-auto ${
         isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
       }`}
     >
       
       {/* Logo & Mobile Close */}
-      <div className="mb-4 mt-1 flex items-center justify-center relative w-full">
+      <div className="mb-4 mt-1 flex items-center justify-center relative w-full flex-shrink-0">
         <h1 
           className="text-lg bg-gradient-to-r from-indigo-500 to-purple-500 dark:from-purple-400 dark:to-pink-400 bg-clip-text text-transparent leading-relaxed text-center"
           style={{ fontFamily: '"Press Start 2P", cursive' }}
@@ -70,7 +71,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
       </div>
 
       {/* Tools */}
-      <div className="flex flex-col gap-2 border-t border-paper-200 dark:border-slate-800 pt-4 pb-4">
+      <div className="flex flex-col gap-2 border-t border-paper-200 dark:border-slate-800 pt-4 pb-4 flex-shrink-0">
         <h3 className="text-xs uppercase font-semibold text-slate-500 tracking-wider text-left">{t.headers.tools}</h3>
         <div className="grid grid-cols-4 gap-2">
           {tools.map((tool) => (
@@ -91,7 +92,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
       </div>
 
       {/* Palette */}
-      <div className="flex flex-col gap-2 border-t border-paper-200 dark:border-slate-800 pt-4 pb-4">
+      <div className="flex flex-col gap-2 border-t border-paper-200 dark:border-slate-800 pt-4 pb-4 flex-shrink-0">
         <h3 className="text-xs uppercase font-semibold text-slate-500 tracking-wider text-left">
           {t.headers.palette}
         </h3>
@@ -115,7 +116,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
       </div>
 
       {/* Custom Palette - Separated Block */}
-      <div className="flex flex-col gap-2 border-t border-paper-200 dark:border-slate-800 pt-4">
+      <div className="flex flex-col gap-2 border-t border-paper-200 dark:border-slate-800 pt-4 flex-shrink-0">
          <h3 className="text-xs uppercase font-semibold text-slate-500 tracking-wider text-left">
             {t.headers.custom}
          </h3>
@@ -133,7 +134,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
       </div>
 
       {/* Actions */}
-      <div className="flex flex-col gap-2 pt-4 border-t border-paper-200 dark:border-slate-800 mt-auto">
+      <div className="flex flex-col gap-2 pt-4 border-t border-paper-200 dark:border-slate-800 mt-auto flex-shrink-0">
         <h3 className="text-xs uppercase font-semibold text-slate-500 tracking-wider text-left">{t.headers.actions}</h3>
         
         {/* File Actions Grid */}
