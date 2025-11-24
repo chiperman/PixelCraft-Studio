@@ -4,8 +4,60 @@ import Toolbar from './components/Toolbar';
 import ProjectLibraryModal from './components/ProjectLibraryModal';
 import { AppState, DEFAULT_PALETTE, DEFAULT_SIZE, Language, ToolType, StoredProject } from './types';
 import { imageToPixelGrid, TRANSLATIONS } from './utils';
-import { Undo, Redo, Grid3X3, X, Settings, Eye, EyeOff, Layers, Moon, Sun, Monitor, Globe, HelpCircle, Pencil, Palette, Move, Image as ImageIcon, Save, LayersIcon, BookOpen, Keyboard, MoreVertical, Hand, Menu } from 'lucide-react';
+import { Undo, Redo, Grid3X3, X, Settings, Eye, EyeOff, Layers, Moon, Sun, Monitor, Globe, HelpCircle, Pencil, Palette, Move, Image as ImageIcon, Save, LayersIcon, BookOpen, Keyboard, MoreVertical, Hand, Menu, Check, ChevronDown } from 'lucide-react';
 import { SiGithub } from '@icons-pack/react-simple-icons';
+
+// Custom Select Component for Language
+const CustomSelect = ({ value, onChange, options, isDarkMode }: { value: string, onChange: (val: string) => void, options: {code: string, label: string}[], isDarkMode: boolean }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+        if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+            setIsOpen(false);
+        }
+    }
+    if (isOpen) document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [isOpen]);
+
+  const selectedLabel = options.find((o) => o.code === value)?.label || value;
+
+  return (
+    <div className="relative flex-1 min-w-0" ref={containerRef}>
+        <button 
+            onClick={() => setIsOpen(!isOpen)}
+            className="w-full h-12 flex items-center justify-between px-3 bg-white/50 dark:bg-white/5 rounded-xl border border-white/20 dark:border-white/5 text-slate-700 dark:text-slate-200 transition-all active:scale-[0.98] hover:bg-white/70 dark:hover:bg-white/10"
+        >
+            <span className="flex items-center gap-2 truncate pr-2">
+                <Globe size={16} className="opacity-70 shrink-0" />
+                <span className="text-sm font-medium truncate">{selectedLabel}</span>
+            </span>
+            <ChevronDown size={16} className={`opacity-50 shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+        </button>
+        
+        {isOpen && (
+            <div className="absolute top-full left-0 right-0 mt-2 p-1 bg-white/90 dark:bg-[#1c1c1e]/90 backdrop-blur-xl border border-white/20 dark:border-white/5 rounded-xl shadow-xl z-50 max-h-64 overflow-y-auto custom-scrollbar animate-in fade-in zoom-in-95 duration-200">
+                {options.map((opt) => (
+                    <button
+                        key={opt.code}
+                        onClick={() => { onChange(opt.code); setIsOpen(false); }}
+                        className={`w-full text-left px-3 py-2.5 text-sm rounded-lg transition-colors flex items-center justify-between group ${
+                            value === opt.code 
+                            ? 'bg-indigo-500 text-white shadow-md' 
+                            : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10'
+                        }`}
+                    >
+                        <span>{opt.label}</span>
+                        {value === opt.code && <Check size={14} />}
+                    </button>
+                ))}
+            </div>
+        )}
+    </div>
+  )
+}
 
 // Resize Modal Component
 interface ResizeModalProps {
@@ -42,26 +94,26 @@ const ResizeModal: React.FC<ResizeModalProps> = ({ isOpen, onClose, onResize, cu
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
-       <div className="bg-paper-50 dark:bg-slate-900 p-6 rounded-lg shadow-2xl border border-paper-200 dark:border-slate-700 w-full max-w-sm animate-in fade-in zoom-in duration-200">
-          <div className="flex justify-between items-center mb-4">
-             <h3 className="text-lg font-bold text-slate-800 dark:text-white">{t.resize.title}</h3>
-             <button onClick={onClose} className="text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white"><X size={20}/></button>
+    <div className="fixed inset-0 bg-black/20 dark:bg-black/50 backdrop-blur-md flex items-center justify-center z-[100] p-4 animate-in fade-in duration-200">
+       <div className="glass-panel p-6 rounded-cupertino w-full max-w-sm animate-in zoom-in-95 duration-200">
+          <div className="flex justify-between items-center mb-6">
+             <h3 className="text-lg font-bold text-slate-900 dark:text-white">{t.resize.title}</h3>
+             <button onClick={onClose} className="p-1 rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition-colors"><X size={20}/></button>
           </div>
           
-          <div className="bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 text-amber-700 dark:text-amber-200 text-xs p-3 rounded-lg mb-4">
+          <div className="bg-orange-50/80 dark:bg-orange-500/10 border border-orange-200/50 dark:border-orange-500/20 text-orange-700 dark:text-orange-200 text-xs p-3.5 rounded-2xl mb-6 backdrop-blur-sm">
              {t.resize.warning}
           </div>
 
           {/* Presets */}
-          <div className="mb-4">
-             <label className="block text-xs uppercase text-slate-500 font-bold mb-2">{t.resize.presets}</label>
+          <div className="mb-6">
+             <label className="block text-[11px] uppercase text-slate-500 font-semibold mb-2.5 tracking-wide pl-1">{t.resize.presets}</label>
              <div className="grid grid-cols-3 gap-2">
                {PRESETS.map((preset) => (
                  <button
                     key={preset.label}
                     onClick={() => { setWidth(preset.w); setHeight(preset.h); }}
-                    className="px-2 py-1.5 bg-paper-200 dark:bg-slate-800 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 hover:text-indigo-700 dark:hover:text-indigo-300 text-slate-600 dark:text-slate-400 text-xs font-medium rounded-lg border border-paper-200 dark:border-slate-700 transition-colors"
+                    className="px-2 py-2.5 bg-white/60 dark:bg-white/5 hover:bg-indigo-50 dark:hover:bg-indigo-500/20 hover:text-indigo-600 dark:hover:text-indigo-300 text-slate-600 dark:text-slate-400 text-xs font-medium rounded-xl transition-all"
                  >
                    {preset.label}
                  </button>
@@ -69,25 +121,25 @@ const ResizeModal: React.FC<ResizeModalProps> = ({ isOpen, onClose, onResize, cu
              </div>
           </div>
           
-          <div className="grid grid-cols-2 gap-4 mb-6">
+          <div className="grid grid-cols-2 gap-4 mb-8">
             <div>
-              <label className="block text-xs uppercase text-slate-500 font-bold mb-2">{t.resize.width}</label>
+              <label className="block text-[11px] uppercase text-slate-500 font-semibold mb-2.5 tracking-wide pl-1">{t.resize.width}</label>
               <input 
                 type="number" 
                 value={width} 
                 onChange={e => setWidth(Math.min(128, Math.max(1, parseInt(e.target.value) || 0)))} 
-                className="w-full bg-paper-100 dark:bg-slate-950 border border-paper-300 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all" 
+                className="w-full bg-white/60 dark:bg-black/20 border border-transparent focus:border-indigo-500/30 rounded-xl px-3 py-2.5 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500/50 outline-none transition-all shadow-sm" 
                 min="1" 
                 max="128" 
               />
             </div>
             <div>
-              <label className="block text-xs uppercase text-slate-500 font-bold mb-2">{t.resize.height}</label>
+              <label className="block text-[11px] uppercase text-slate-500 font-semibold mb-2.5 tracking-wide pl-1">{t.resize.height}</label>
               <input 
                 type="number" 
                 value={height} 
                 onChange={e => setHeight(Math.min(128, Math.max(1, parseInt(e.target.value) || 0)))} 
-                className="w-full bg-paper-100 dark:bg-slate-950 border border-paper-300 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all" 
+                className="w-full bg-white/60 dark:bg-black/20 border border-transparent focus:border-indigo-500/30 rounded-xl px-3 py-2.5 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500/50 outline-none transition-all shadow-sm" 
                 min="1" 
                 max="128" 
               />
@@ -95,10 +147,10 @@ const ResizeModal: React.FC<ResizeModalProps> = ({ isOpen, onClose, onResize, cu
           </div>
 
           <div className="flex justify-end gap-3">
-             <button onClick={onClose} className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-paper-200 dark:hover:bg-slate-800 rounded-lg transition-colors">{t.resize.cancel}</button>
+             <button onClick={onClose} className="px-5 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-black/5 dark:hover:bg-white/10 rounded-2xl transition-colors">{t.resize.cancel}</button>
              <button 
                 onClick={() => onResize(width, height)} 
-                className="px-4 py-2 text-sm font-medium bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg shadow-lg shadow-indigo-500/20yb transition-all"
+                className="px-6 py-2.5 text-sm font-semibold bg-indigo-500 hover:bg-indigo-600 text-white rounded-2xl shadow-lg shadow-indigo-500/20 transition-all active:scale-95"
              >
                 {t.resize.apply}
              </button>
@@ -109,7 +161,7 @@ const ResizeModal: React.FC<ResizeModalProps> = ({ isOpen, onClose, onResize, cu
 };
 
 const Kbd: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <kbd className="px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 border-b-2 rounded-md text-[10px] sm:text-xs font-mono text-slate-600 dark:text-slate-400 min-w-[20px] inline-flex justify-center items-center mx-0.5">
+  <kbd className="px-2 py-1 bg-white/60 dark:bg-white/10 border-b-2 border-slate-200/60 dark:border-white/10 rounded-lg text-[10px] sm:text-xs font-mono text-slate-500 dark:text-slate-300 min-w-[20px] inline-flex justify-center items-center mx-0.5 shadow-sm">
     {children}
   </kbd>
 );
@@ -149,17 +201,17 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ isOpen, onClose, language
   ];
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
+    <div className="fixed inset-0 bg-black/30 dark:bg-black/60 backdrop-blur-md flex items-center justify-center z-[100] p-4 animate-in fade-in duration-300">
        {/* Main Container - Unified layout */}
-       <div className="bg-white dark:bg-slate-900 rounded-lg shadow-2xl border border-paper-200 dark:border-slate-700 w-full max-w-4xl max-h-[90vh] flex flex-col animate-in fade-in zoom-in duration-300 overflow-hidden">
+       <div className="glass-panel rounded-cupertino w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300">
           
           {/* Header */}
           <div className="px-8 pt-8 pb-4 flex justify-between items-start flex-shrink-0">
               <div>
-                <h2 className="text-2xl font-bold text-slate-800 dark:text-white mb-2 tracking-tight">{t.tutorial.title}</h2>
-                <div className="h-1 w-12 bg-indigo-500 rounded-lg"></div>
+                <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight">{t.tutorial.title}</h2>
+                <div className="h-1.5 w-16 bg-indigo-500 rounded-full shadow-sm"></div>
               </div>
-              <button onClick={onClose} className="p-1 text-slate-400 hover:text-slate-700 dark:text-slate-500 dark:hover:text-white transition-colors bg-slate-100 dark:bg-slate-800 rounded-lg">
+              <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-900 dark:text-slate-500 dark:hover:text-white transition-colors bg-white/50 dark:bg-white/5 hover:bg-white/80 dark:hover:bg-white/10 rounded-full backdrop-blur-sm">
                   <X size={20}/>
               </button>
           </div>
@@ -171,13 +223,13 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ isOpen, onClose, language
                      // @ts-ignore
                      const section = t.tutorial.sections[feature.key];
                      return (
-                        <div key={feature.key} className="flex items-start gap-4 p-4 rounded-lg bg-paper-100/50 dark:bg-slate-800/50 border border-transparent hover:border-indigo-200 dark:hover:border-slate-600 hover:bg-paper-100 dark:hover:bg-slate-800 transition-all group">
-                            <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-950 rounded-lg shadow-sm group-hover:scale-110 transition-transform duration-300">
+                        <div key={feature.key} className="flex items-start gap-4 p-5 rounded-2xl bg-white/40 dark:bg-white/5 border border-white/20 dark:border-white/5 hover:bg-white/60 dark:hover:bg-white/10 transition-all hover:scale-[1.02] shadow-sm">
+                            <div className="flex-shrink-0 w-12 h-12 flex items-center justify-center bg-white dark:bg-[#2c2c2e] rounded-2xl shadow-sm">
                                 {feature.icon}
                             </div>
                             <div>
-                                <h4 className="font-bold text-slate-800 dark:text-white text-sm mb-1">{section.title}</h4>
-                                <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                                <h4 className="font-bold text-slate-900 dark:text-white text-sm mb-1">{section.title}</h4>
+                                <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
                                     {section.desc}
                                 </p>
                             </div>
@@ -186,20 +238,20 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ isOpen, onClose, language
                  })}
               </div>
 
-              {/* Shortcuts Section (Excalidraw Style) */}
+              {/* Shortcuts Section */}
               <div>
-                <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-                    <Keyboard size={20} className="text-teal-500" />
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
+                    <Keyboard size={24} className="text-teal-500" />
                     {t.tutorial.sections.shortcuts.title}
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Tools Shortcuts */}
-                    <div className="bg-paper-50 dark:bg-slate-800/50 rounded-xl border border-paper-200 dark:border-slate-700 p-4">
-                        <h4 className="text-xs uppercase font-bold text-slate-500 mb-3 tracking-wider">{t.headers.tools}</h4>
-                        <div className="space-y-2">
+                    <div className="bg-white/40 dark:bg-white/5 rounded-2xl border border-white/20 dark:border-white/5 p-6 backdrop-blur-sm shadow-sm">
+                        <h4 className="text-[11px] uppercase font-bold text-slate-400 mb-4 tracking-wider">{t.headers.tools}</h4>
+                        <div className="space-y-3">
                             {TOOL_SHORTCUTS.map((shortcut) => (
                                 <div key={shortcut.label} className="flex items-center justify-between text-sm">
-                                    <span className="text-slate-700 dark:text-slate-300">{shortcut.label}</span>
+                                    <span className="text-slate-700 dark:text-slate-300 font-medium">{shortcut.label}</span>
                                     <div className="flex items-center">
                                         {shortcut.keys.map((k, i) => <Kbd key={i}>{k}</Kbd>)}
                                     </div>
@@ -209,12 +261,12 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ isOpen, onClose, language
                     </div>
 
                     {/* Editor Shortcuts */}
-                    <div className="bg-paper-50 dark:bg-slate-800/50 rounded-xl border border-paper-200 dark:border-slate-700 p-4">
-                         <h4 className="text-xs uppercase font-bold text-slate-500 mb-3 tracking-wider">Editor</h4>
-                         <div className="space-y-2">
+                    <div className="bg-white/40 dark:bg-white/5 rounded-2xl border border-white/20 dark:border-white/5 p-6 backdrop-blur-sm shadow-sm">
+                         <h4 className="text-[11px] uppercase font-bold text-slate-400 mb-4 tracking-wider">Editor</h4>
+                         <div className="space-y-3">
                             {EDITOR_SHORTCUTS.map((shortcut) => (
                                 <div key={shortcut.label} className="flex items-center justify-between text-sm">
-                                    <span className="text-slate-700 dark:text-slate-300">{shortcut.label}</span>
+                                    <span className="text-slate-700 dark:text-slate-300 font-medium">{shortcut.label}</span>
                                     <div className="flex items-center gap-2">
                                         {shortcut.combinations.map((combo, i) => (
                                             <React.Fragment key={i}>
@@ -239,10 +291,10 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ isOpen, onClose, language
           </div>
 
           {/* Unified Action Area */}
-          <div className="p-6 flex flex-col items-center justify-center gap-6 bg-paper-50 dark:bg-slate-900 border-t border-paper-200 dark:border-slate-800 shrink-0">
+          <div className="p-6 flex flex-col items-center justify-center gap-6 bg-white/40 dark:bg-[#1c1c1e]/50 border-t border-white/20 dark:border-white/5 shrink-0 backdrop-blur-xl">
                <button 
                 onClick={onClose}
-                className="w-full md:w-auto min-w-[200px] px-8 py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm rounded-lg shadow-lg shadow-indigo-500/30 flex items-center justify-center gap-2 transition-all active:scale-95"
+                className="w-full md:w-auto min-w-[200px] px-8 py-3.5 bg-indigo-500 hover:bg-indigo-600 text-white font-bold text-sm rounded-2xl shadow-lg shadow-indigo-500/30 flex items-center justify-center gap-2 transition-all active:scale-95"
               >
                   <BookOpen size={18} />
                   {t.tutorial.close}
@@ -253,7 +305,7 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ isOpen, onClose, language
                     href="https://github.com/chiperman/PixelCraft-Studio"
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="text-slate-400 hover:text-slate-700 dark:text-slate-500 dark:hover:text-white transition-colors flex items-center gap-2 text-xs font-medium"
+                    className="text-slate-400 hover:text-slate-800 dark:text-slate-500 dark:hover:text-white transition-colors flex items-center gap-2 text-xs font-medium"
                     title={t.tutorial.github}
                 >
                     <SiGithub color="currentColor" size={20} />
@@ -280,6 +332,20 @@ const getSystemLanguage = (): Language => {
     if (lang.startsWith('ar')) return 'ar';
     return 'en';
 }
+
+const SUPPORTED_LANGUAGES = [
+    { code: 'en', label: '🇺🇸 English' },
+    { code: 'zh-CN', label: '🇨🇳 简体中文' },
+    { code: 'zh-HK', label: '🇭🇰 繁體中文' },
+    { code: 'ja', label: '🇯🇵 日本語' },
+    { code: 'ko', label: '🇰🇷 한국어' },
+    { code: 'fr', label: '🇫🇷 Français' },
+    { code: 'de', label: '🇩🇪 Deutsch' },
+    { code: 'es', label: '🇪🇸 Español' },
+    { code: 'pt-BR', label: '🇧🇷 Português' },
+    { code: 'ru', label: '🇷🇺 Русский' },
+    { code: 'ar', label: '🇸🇦 العربية' }
+];
 
 const App: React.FC = () => {
   const initialCustomPalette = ['#ffffff', '#cccccc', '#999999', '#666666', '#333333'];
@@ -350,8 +416,7 @@ const App: React.FC = () => {
       // Update Meta Theme Color for Mobile Browsers
       const metaThemeColor = document.querySelector('meta[name="theme-color"]');
       if (metaThemeColor) {
-          // Dark: Slate-900 (#0f172a) matches Header, Light: Paper-50 (#FFFFFF) matches Header
-          metaThemeColor.setAttribute('content', isDark ? '#0f172a' : '#ffffff');
+          metaThemeColor.setAttribute('content', isDark ? '#000000' : '#fbfbfd');
       }
     };
 
@@ -366,7 +431,7 @@ const App: React.FC = () => {
     return () => mediaQuery.removeEventListener('change', handleChange);
   }, [state.theme]);
 
-  //ZQ Helper function for blank grid
+  // Helper function for blank grid
   const AQ = (w: number, h: number) => Array(w * h).fill('');
 
   // Handle Space Key for Panning Mode
@@ -810,9 +875,8 @@ const App: React.FC = () => {
       setTimeout(() => setNotification(null), 3000);
   };
 
-  // Panning Event Handlers (for Container) - Refactored to use panOffset state
+  // Panning Event Handlers (for Container)
   const handleContainerMouseDown = (e: React.MouseEvent) => {
-      // Middle mouse (button 1) or Space + Left Click (button 0) or Mobile Pan Mode
       if (e.button === 1 || (isSpacePressed && e.button === 0) || isMobilePanning) {
           e.preventDefault();
           setIsPanning(true);
@@ -824,9 +888,7 @@ const App: React.FC = () => {
       if (isPanning && lastMousePos.current) {
           const dx = e.clientX - lastMousePos.current.x;
           const dy = e.clientY - lastMousePos.current.y;
-          
           setPanOffset(prev => ({ x: prev.x + dx, y: prev.y + dy }));
-          
           lastMousePos.current = { x: e.clientX, y: e.clientY };
       }
   };
@@ -839,21 +901,16 @@ const App: React.FC = () => {
   // Touch Panning & Pinch Zoom Handlers (Mobile)
   const handleContainerTouchStart = (e: React.TouchEvent) => {
       if (e.touches.length === 2) {
-          // Pinch Zoom Start
           const dist = Math.hypot(
              e.touches[0].clientX - e.touches[1].clientX,
              e.touches[0].clientY - e.touches[1].clientY
           );
           lastPinchDist.current = dist;
-
-          // Also initialize pan position for 2 fingers
           const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
           const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
           lastTouchPos.current = { x: midX, y: midY };
-          setIsPanning(true); // Make sure we flag panning state
-
+          setIsPanning(true);
       } else if (e.touches.length === 1 && (isMobilePanning || isSpacePressed)) {
-           // Single finger pan if mode is active
           const touch = e.touches[0];
           setIsPanning(true);
           lastTouchPos.current = { x: touch.clientX, y: touch.clientY };
@@ -861,11 +918,8 @@ const App: React.FC = () => {
   };
 
   const handleContainerTouchMove = (e: React.TouchEvent) => {
-      // Handle Pinch Zoom + Pan (2 fingers)
       if (e.touches.length === 2) {
-          e.preventDefault(); // Prevent native browser zoom
-
-          // 1. Zoom Logic
+          e.preventDefault();
           if (lastPinchDist.current) {
             const dist = Math.hypot(
                 e.touches[0].clientX - e.touches[1].clientX,
@@ -881,32 +935,23 @@ const App: React.FC = () => {
                 lastPinchDist.current = dist;
             }
           }
-
-          // 2. Pan Logic (Two fingers center point)
           const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
           const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
-
           if (lastTouchPos.current) {
                const dx = midX - lastTouchPos.current.x;
                const dy = midY - lastTouchPos.current.y;
                setPanOffset(prev => ({ x: prev.x + dx, y: prev.y + dy }));
                lastTouchPos.current = { x: midX, y: midY };
           } else {
-               // Fallback if touch start didn't catch it (shouldn't happen with updated start logic)
                lastTouchPos.current = { x: midX, y: midY };
           }
           return;
       }
-
-      // Handle Single Finger Panning (Only if isMobilePanning mode is ON)
       if (isMobilePanning && e.touches.length === 1 && lastTouchPos.current) {
-           // Prevent default to stop page scroll while panning
            if(e.cancelable) e.preventDefault();
-           
            const touch = e.touches[0];
            const dx = touch.clientX - lastTouchPos.current.x;
            const dy = touch.clientY - lastTouchPos.current.y;
-           
            setPanOffset(prev => ({ x: prev.x + dx, y: prev.y + dy }));
            lastTouchPos.current = { x: touch.clientX, y: touch.clientY };
       }
@@ -938,7 +983,7 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="flex h-[100dvh] w-full bg-paper-100 dark:bg-slate-950 text-slate-800 dark:text-slate-200 font-sans overflow-hidden transition-colors" dir={state.language === 'ar' ? 'rtl' : 'ltr'}>
+    <div className="flex h-[100dvh] w-full bg-slate-50 dark:bg-black text-slate-900 dark:text-slate-100 font-sans overflow-hidden transition-colors selection:bg-indigo-500/30" dir={state.language === 'ar' ? 'rtl' : 'ltr'}>
       
       <ResizeModal 
         isOpen={isResizeModalOpen} 
@@ -969,7 +1014,7 @@ const App: React.FC = () => {
       {/* Mobile Sidebar Overlay */}
       {isSidebarOpen && (
         <div 
-            className="fixed inset-0 bg-black/50 z-40 md:hidden backdrop-blur-sm transition-opacity" 
+            className="fixed inset-0 bg-black/20 dark:bg-black/50 z-40 md:hidden backdrop-blur-sm transition-opacity" 
             onClick={() => setIsSidebarOpen(false)} 
         />
       )}
@@ -977,30 +1022,30 @@ const App: React.FC = () => {
       {/* Mobile Header Menu Overlay */}
       {isMobileHeaderMenuOpen && (
         <div 
-            className="fixed inset-0 bg-black/50 z-40 md:hidden backdrop-blur-sm transition-opacity" 
+            className="fixed inset-0 bg-black/20 dark:bg-black/50 z-40 md:hidden backdrop-blur-sm transition-opacity" 
             onClick={() => setIsMobileHeaderMenuOpen(false)} 
         />
       )}
 
-       {/* MOBILE DROPDOWN MENU PANEL (Moved to Root Level for Correct Z-Index Stacking) */}
+       {/* MOBILE DROPDOWN MENU PANEL */}
        {isMobileHeaderMenuOpen && (
-           <div className="fixed top-16 left-0 right-0 bg-paper-50 dark:bg-slate-900 border-b border-paper-200 dark:border-slate-800 shadow-2xl z-40 p-4 flex flex-col gap-4 animate-in slide-in-from-top-2 md:hidden max-h-[80vh] overflow-y-auto">
+           <div className="fixed top-24 left-4 right-4 glass-panel rounded-cupertino shadow-2xl z-50 p-5 flex flex-col gap-4 animate-in slide-in-from-top-2 md:hidden max-h-[70vh] overflow-y-auto">
                 
                 {/* Size & Grid Row */}
                 <div className="flex gap-3">
                      <button 
                         onClick={() => { setIsResizeModalOpen(true); setIsMobileHeaderMenuOpen(false); }}
-                        className="flex-1 h-12 flex items-center justify-center gap-2 bg-paper-100 dark:bg-slate-800 hover:bg-paper-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg border border-paper-200 dark:border-slate-700 font-medium text-sm"
+                        className="flex-1 h-12 flex items-center justify-center gap-2 bg-white/50 hover:bg-white dark:bg-white/5 dark:hover:bg-white/10 text-slate-700 dark:text-slate-200 rounded-xl border border-white/20 dark:border-white/5 font-medium text-sm transition-colors active:scale-95"
                     >
                         <Grid3X3 size={18} className="text-indigo-500"/>
                         {state.config.width} × {state.config.height}
                     </button>
                     <button 
                         onClick={() => setState(s => ({ ...s, showGrid: !s.showGrid }))}
-                        className={`flex-1 h-12 flex items-center justify-center gap-2 rounded-lg border text-sm font-medium ${
+                        className={`flex-1 h-12 flex items-center justify-center gap-2 rounded-xl border border-white/20 dark:border-white/5 text-sm font-medium transition-colors active:scale-95 ${
                             state.showGrid 
-                            ? 'bg-indigo-50 border-indigo-200 text-indigo-600 dark:bg-indigo-500/10 dark:border-indigo-500/50 dark:text-indigo-400' 
-                            : 'bg-paper-100 dark:bg-slate-800 border-paper-200 dark:border-slate-700 text-slate-500'
+                            ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/20 border-transparent' 
+                            : 'bg-white/50 dark:bg-white/5 text-slate-500 dark:text-slate-400'
                         }`}
                     >
                         {state.showGrid ? t.ui.gridOn : t.ui.gridOff}
@@ -1008,27 +1053,27 @@ const App: React.FC = () => {
                 </div>
 
                 {/* Zoom Row */}
-                <div className="bg-paper-100 dark:bg-slate-800 p-3 rounded-lg border border-paper-200 dark:border-slate-700">
-                     <div className="flex justify-between mb-2">
-                         <label className="text-xs font-bold text-slate-500 uppercase">{t.ui.zoom}</label>
-                         <span className="text-xs font-mono text-slate-500">{state.config.size}px</span>
+                <div className="bg-white/40 dark:bg-white/5 p-4 rounded-2xl border border-white/20 dark:border-white/5 shadow-sm">
+                     <div className="flex justify-between mb-3">
+                         <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{t.ui.zoom}</label>
+                         <span className="text-[10px] font-mono text-slate-500">{state.config.size}px</span>
                      </div>
                      <input 
                         type="range" 
                         min="4" max="60" 
                         value={state.config.size} 
                         onChange={(e) => setState(s => ({ ...s, config: { ...s.config, size: parseInt(e.target.value) } }))}
-                        className="w-full accent-indigo-500 h-2 bg-paper-300 dark:bg-slate-700 rounded-lg appearance-none"
+                        className="w-full accent-indigo-500 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer"
                      />
                 </div>
 
                 {/* Layers Row */}
-                <div className="bg-paper-100 dark:bg-slate-800 p-3 rounded-lg border border-paper-200 dark:border-slate-700">
-                    <label className="text-xs font-bold text-slate-500 uppercase mb-3 block">{t.ui.layers}</label>
-                    <div className="flex gap-2 mb-3">
+                <div className="bg-white/40 dark:bg-white/5 p-4 rounded-2xl border border-white/20 dark:border-white/5 shadow-sm">
+                    <label className="text-[10px] font-bold text-slate-500 uppercase mb-3 block tracking-widest">{t.ui.layers}</label>
+                    <div className="flex gap-2 mb-4">
                          <button 
                             onClick={() => setState(s => ({...s, showDrawingLayer: !s.showDrawingLayer}))}
-                            className={`flex-1 py-2 px-3 rounded-lg text-sm flex items-center justify-center gap-2 transition-colors ${state.showDrawingLayer ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300' : 'bg-paper-200 dark:bg-slate-700 text-slate-500'}`}
+                            className={`flex-1 py-2.5 px-3 rounded-xl text-sm flex items-center justify-center gap-2 transition-colors active:scale-95 ${state.showDrawingLayer ? 'bg-indigo-500 text-white shadow-md' : 'bg-slate-200/50 dark:bg-white/5 text-slate-500'}`}
                          >
                              {state.showDrawingLayer ? <Eye size={16} /> : <EyeOff size={16} />}
                              {t.ui.layers}
@@ -1036,12 +1081,12 @@ const App: React.FC = () => {
                          <button 
                             onClick={() => setState(s => ({...s, showReferenceLayer: !s.showReferenceLayer}))}
                             disabled={!state.backgroundImage}
-                            className={`flex-1 py-2 px-3 rounded-lg text-sm flex items-center justify-center gap-2 transition-colors ${
+                            className={`flex-1 py-2.5 px-3 rounded-xl text-sm flex items-center justify-center gap-2 transition-colors active:scale-95 ${
                                 !state.backgroundImage 
-                                    ? 'opacity-50 cursor-not-allowed bg-paper-200 dark:bg-slate-700 text-slate-400' 
+                                    ? 'opacity-50 cursor-not-allowed bg-slate-200/50 dark:bg-white/5 text-slate-400' 
                                     : state.showReferenceLayer 
-                                        ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' 
-                                        : 'bg-paper-200 dark:bg-slate-700 text-slate-500'
+                                        ? 'bg-green-500 text-white shadow-md' 
+                                        : 'bg-slate-200/50 dark:bg-white/5 text-slate-500'
                             }`}
                          >
                              {state.showReferenceLayer ? <Eye size={16} /> : <EyeOff size={16} />}
@@ -1049,16 +1094,16 @@ const App: React.FC = () => {
                          </button>
                     </div>
                     {state.backgroundImage && state.showReferenceLayer && (
-                        <div className="pt-2 border-t border-slate-200 dark:border-slate-700">
+                        <div className="pt-3 border-t border-slate-200/50 dark:border-white/10">
                              <div className="flex justify-between mb-2">
-                                 <span className="text-xs text-slate-500">{t.ui.refOpacity}</span>
-                                 <span className="text-xs font-mono text-slate-500">{Math.round(state.backgroundOpacity * 100)}%</span>
+                                 <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{t.ui.refOpacity}</span>
+                                 <span className="text-[10px] font-mono text-slate-500">{Math.round(state.backgroundOpacity * 100)}%</span>
                              </div>
                              <input 
                                  type="range" min="0" max="1" step="0.1"
                                  value={state.backgroundOpacity}
                                  onChange={(e) => setState(s => ({ ...s, backgroundOpacity: parseFloat(e.target.value) }))}
-                                 className="w-full accent-green-500 h-2 bg-paper-300 dark:bg-slate-700 rounded-lg appearance-none"
+                                 className="w-full accent-green-500 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer"
                              />
                         </div>
                     )}
@@ -1066,33 +1111,16 @@ const App: React.FC = () => {
 
                 {/* Theme & Language Row */}
                 <div className="flex gap-3">
-                     <div className="flex-1 bg-paper-100 dark:bg-slate-800 rounded-lg border border-paper-200 dark:border-slate-700 overflow-hidden relative">
-                         <select 
-                            value={state.language}
-                            onChange={(e) => setState(s => ({...s, language: e.target.value as Language}))}
-                            className="w-full h-12 pl-3 pr-8 bg-paper-100 dark:bg-slate-800 text-sm text-slate-700 dark:text-slate-200 outline-none appearance-none z-10 relative"
-                            style={{ colorScheme: computedIsDarkMode ? 'dark' : 'light' }}
-                         >
-                             <option value="en" className="bg-paper-100 dark:bg-slate-800 text-slate-900 dark:text-white">English</option>
-                             <option value="zh-CN" className="bg-paper-100 dark:bg-slate-800 text-slate-900 dark:text-white">简体中文</option>
-                             <option value="zh-HK" className="bg-paper-100 dark:bg-slate-800 text-slate-900 dark:text-white">繁體中文</option>
-                             <option value="ja" className="bg-paper-100 dark:bg-slate-800 text-slate-900 dark:text-white">日本語</option>
-                             <option value="ko" className="bg-paper-100 dark:bg-slate-800 text-slate-900 dark:text-white">한국어</option>
-                             <option value="fr" className="bg-paper-100 dark:bg-slate-800 text-slate-900 dark:text-white">Français</option>
-                             <option value="de" className="bg-paper-100 dark:bg-slate-800 text-slate-900 dark:text-white">Deutsch</option>
-                             <option value="es" className="bg-paper-100 dark:bg-slate-800 text-slate-900 dark:text-white">Español</option>
-                             <option value="pt-BR" className="bg-paper-100 dark:bg-slate-800 text-slate-900 dark:text-white">Português</option>
-                             <option value="ru" className="bg-paper-100 dark:bg-slate-800 text-slate-900 dark:text-white">Русский</option>
-                             <option value="ar" className="bg-paper-100 dark:bg-slate-800 text-slate-900 dark:text-white">العربية</option>
-                         </select>
-                         <div className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none z-0">
-                             <Globe size={16} />
-                         </div>
-                     </div>
+                     <CustomSelect 
+                        value={state.language}
+                        onChange={(val) => setState(s => ({...s, language: val as Language}))}
+                        options={SUPPORTED_LANGUAGES}
+                        isDarkMode={computedIsDarkMode}
+                     />
 
                      <button 
                          onClick={() => setState(s => ({...s, theme: state.theme === 'dark' ? 'light' : 'dark'}))} 
-                         className="h-12 w-12 flex-shrink-0 flex items-center justify-center bg-paper-100 dark:bg-slate-800 rounded-lg border border-paper-200 dark:border-slate-700 text-slate-700 dark:text-slate-200"
+                         className="h-12 w-12 flex-shrink-0 flex items-center justify-center bg-white/50 dark:bg-white/5 rounded-xl border border-white/20 dark:border-white/5 text-slate-700 dark:text-slate-200 active:scale-95 transition-all shadow-sm"
                      >
                          {state.theme === 'dark' || (state.theme === 'system' && computedIsDarkMode) ? <Moon size={20} /> : <Sun size={20} />}
                      </button>
@@ -1123,185 +1151,169 @@ const App: React.FC = () => {
       {/* Main Area */}
       <main className="flex-1 flex flex-col relative min-w-0">
         
-        {/* Top Bar - Increased z-index to stay above overlay (z-40) */}
-        <header className="h-16 bg-paper-50 dark:bg-slate-900 border-b border-paper-200 dark:border-slate-800 flex items-center px-4 md:px-6 flex-shrink-0 z-40 transition-colors gap-4 relative">
-           
-           {/* MOBILE LAYOUT: Simple bar with Menu, Panning, Undo/Redo, and More */}
-           <div className="flex md:hidden items-center justify-between w-full h-full">
-                <div className="flex items-center gap-2">
+        {/* Top Bar (Floating Glass) */}
+        <div className="absolute top-0 left-0 right-0 z-40 p-4 pt-[calc(1rem+env(safe-area-inset-top))] pointer-events-none">
+            <header className="h-16 glass-panel rounded-cupertino flex items-center px-4 md:px-6 pointer-events-auto justify-between shadow-sm transition-all animate-in slide-in-from-top-4 duration-500">
+            
+            {/* MOBILE LAYOUT */}
+            <div className="flex md:hidden items-center justify-between w-full h-full">
+                    <div className="flex items-center gap-2">
+                        <button 
+                            onClick={() => setIsSidebarOpen(true)}
+                            className="p-2.5 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white rounded-xl hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
+                        >
+                            <Menu size={20} />
+                        </button>
+                        
+                        <div className="h-5 w-px bg-slate-200/50 dark:bg-white/10 mx-1"></div>
+                        
+                        <button 
+                            onClick={() => setIsMobilePanning(!isMobilePanning)}
+                            className={`p-2.5 rounded-xl transition-all ${isMobilePanning ? 'bg-indigo-500 text-white shadow-md' : 'text-slate-500 dark:text-slate-400 hover:bg-black/5 dark:hover:bg-white/10'}`}
+                            title={t.ui.pan}
+                        >
+                            <Hand size={20} />
+                        </button>
+
+                        <div className="flex items-center gap-1">
+                            <button onClick={handleUndo} disabled={state.historyIndex === 0} className="p-2.5 hover:bg-black/5 dark:hover:bg-white/10 text-slate-500 dark:text-slate-400 rounded-xl disabled:opacity-30 transition-colors"><Undo size={20} /></button>
+                            <button onClick={handleRedo} disabled={state.historyIndex === state.history.length - 1} className="p-2.5 hover:bg-black/5 dark:hover:bg-white/10 text-slate-500 dark:text-slate-400 rounded-xl disabled:opacity-30 transition-colors"><Redo size={20} /></button>
+                        </div>
+                    </div>
+
                     <button 
-                        onClick={() => setIsSidebarOpen(true)}
-                        className="p-2 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white rounded-lg"
+                        onClick={() => setIsMobileHeaderMenuOpen(!isMobileHeaderMenuOpen)}
+                        className={`p-2.5 rounded-xl transition-colors ${isMobileHeaderMenuOpen ? 'bg-indigo-500 text-white' : 'text-slate-500 dark:text-slate-400 hover:bg-black/5 dark:hover:bg-white/10'}`}
                     >
-                        <Menu size={24} />
+                        <MoreVertical size={20} />
                     </button>
-                    
-                    <div className="h-6 w-px bg-paper-300 dark:bg-slate-700 mx-1"></div>
-                    
-                    {/* Mobile Pan Toggle */}
+            </div>
+
+
+            {/* DESKTOP LAYOUT */}
+            <div className="hidden md:flex flex-1 items-center justify-between min-w-0 gap-4">
+                
+                {/* LEFT SIDE: Undo/Redo & Size */}
+                <div className="flex items-center gap-4">
+                    <div className="flex items-center bg-white/50 dark:bg-white/5 rounded-xl p-1 border border-white/20 dark:border-white/5 shadow-sm">
+                        <button onClick={handleUndo} disabled={state.historyIndex === 0} className="p-2 hover:bg-white dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white text-slate-500 dark:text-slate-400 rounded-lg disabled:opacity-30 transition-all shadow-sm hover:shadow" title={`${t.ui.undo} (Ctrl + Z)`}><Undo size={18} /></button>
+                        <div className="w-px h-4 bg-slate-300/50 dark:bg-white/10 mx-1"></div>
+                        <button onClick={handleRedo} disabled={state.historyIndex === state.history.length - 1} className="p-2 hover:bg-white dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white text-slate-500 dark:text-slate-400 rounded-lg disabled:opacity-30 transition-all shadow-sm hover:shadow" title={`${t.ui.redo} (Ctrl + Y)`}><Redo size={18} /></button>
+                    </div>
+
                     <button 
-                        onClick={() => setIsMobilePanning(!isMobilePanning)}
-                        className={`p-2 rounded-lg transition-colors ${isMobilePanning ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800' : 'text-slate-500 dark:text-slate-400'}`}
-                        title={t.ui.pan}
+                        onClick={() => setIsResizeModalOpen(true)}
+                        className="h-10 flex items-center gap-2 bg-white/50 dark:bg-white/5 hover:bg-white dark:hover:bg-white/10 text-slate-600 dark:text-slate-300 px-4 rounded-xl border border-white/20 dark:border-white/5 transition-all group hover:shadow-sm"
                     >
-                        <Hand size={22} />
+                        <Grid3X3 size={18} className="text-indigo-500 group-hover:scale-110 transition-transform"/>
+                        <span className="text-sm font-semibold hidden sm:inline">
+                            {state.config.width} × {state.config.height}
+                        </span>
+                        <Settings size={14} className="ml-1 opacity-50 group-hover:opacity-100"/>
                     </button>
 
-                    <div className="flex items-center gap-1">
-                        <button onClick={handleUndo} disabled={state.historyIndex === 0} className="p-2 hover:bg-paper-200 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 rounded-lg disabled:opacity-30"><Undo size={22} /></button>
-                        <button onClick={handleRedo} disabled={state.historyIndex === state.history.length - 1} className="p-2 hover:bg-paper-200 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 rounded-lg disabled:opacity-30"><Redo size={22} /></button>
+                    <div className="h-10 flex items-center gap-3 bg-white/50 dark:bg-white/5 px-4 rounded-xl border border-white/20 dark:border-white/5 shadow-sm">
+                        <label className="text-[10px] text-slate-500 font-bold uppercase tracking-widest hidden sm:block">{t.ui.zoom}</label>
+                        <input 
+                            type="range" 
+                            min="4" max="60" 
+                            value={state.config.size} 
+                            onChange={(e) => setState(s => ({ ...s, config: { ...s.config, size: parseInt(e.target.value) } }))}
+                            onWheel={handleZoomWheel}
+                            className="w-24 accent-indigo-500 h-1.5 bg-slate-200 dark:bg-slate-600 rounded-full appearance-none cursor-pointer"
+                        />
                     </div>
                 </div>
 
-                <button 
-                    onClick={() => setIsMobileHeaderMenuOpen(!isMobileHeaderMenuOpen)}
-                    className={`p-2 rounded-lg transition-colors ${isMobileHeaderMenuOpen ? 'bg-indigo-50 text-indigo-600 dark:bg-slate-800 dark:text-indigo-400' : 'text-slate-500 dark:text-slate-400'}`}
-                >
-                    <MoreVertical size={24} />
-                </button>
-           </div>
+                {/*ZG RIGHT SIDE: Layers, Grid, Theme */}
+                <div className="flex items-center gap-3 pl-2">
+                    
+                    {/* Layers Control */}
+                    <div className="h-10 flex items-center gap-1 bg-white/50 dark:bg-white/5 px-2 rounded-xl border border-white/20 dark:border-white/5 shadow-sm">
+                        <Layers size={16} className="text-slate-400 mx-2 hidden sm:block" />
+                        <button 
+                            onClick={() => setState(s => ({...s, showDrawingLayer: !s.showDrawingLayer}))}
+                            className={`p-1.5 rounded-lg transition-all ${state.showDrawingLayer ? 'bg-white dark:bg-white/20 text-indigo-500 dark:text-indigo-400 shadow-sm' : 'text-slate-400 hover:text-slate-500'}`}
+                            title={t.ui.layers}
+                        >
+                            {state.showDrawingLayer ? <Eye size={18} /> : <EyeOff size={18} />}
+                        </button>
+                        <button 
+                            onClick={() => setState(s => ({...s, showReferenceLayer: !s.showReferenceLayer}))}
+                            disabled={!state.backgroundImage}
+                            className={`p-1.5 rounded-lg transition-all ${
+                                !state.backgroundImage 
+                                    ? 'text-slate-300 dark:text-slate-600 cursor-not-allowed' 
+                                    : state.showReferenceLayer 
+                                        ? 'bg-white dark:bg-white/20 text-green-500 shadow-sm' 
+                                        : 'text-slate-400 hover:text-slate-500'
+                            }`}
+                            title={t.ui.refLayer}
+                        >
+                            {state.showReferenceLayer ? <Eye size={18} /> : <EyeOff size={18} />}
+                        </button>
+                    </div>
 
+                    {state.backgroundImage && state.showReferenceLayer && (
+                        <div className="h-10 flex items-center gap-3 bg-white/50 dark:bg-white/5 px-3 rounded-xl border border-white/20 dark:border-white/5 animate-in fade-in slide-in-from-right-2 shadow-sm">
+                            <span className="text-[10px] text-slate-500 font-bold uppercase hidden sm:block tracking-widest">{t.ui.refOpacity}</span>
+                            <input 
+                                type="range" min="0" max="1" step="0.1"
+                                value={state.backgroundOpacity}
+                                onChange={(e) => setState(s => ({ ...s, backgroundOpacity: parseFloat(e.target.value) }))}
+                                onWheel={handleOpacityWheel}
+                                className="w-16 sm:w-20 accent-green-500 h-1.5 bg-slate-200 dark:bg-slate-600 rounded-full appearance-none cursor-pointer"
+                            />
+                        </div>
+                    )}
+                    <button 
+                        onClick={() => setState(s => ({ ...s, showGrid: !s.showGrid }))}
+                        className={`h-10 px-3 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all border flex items-center justify-center ${
+                            state.showGrid 
+                            ? 'bg-indigo-500 text-white border-transparent shadow-md shadow-indigo-500/20' 
+                            : 'bg-white/50 dark:bg-white/5 border-white/20 dark:border-white/5 text-slate-500 hover:bg-white dark:hover:bg-white/10 shadow-sm'
+                        }`}
+                    >
+                        {state.showGrid ? t.ui.gridOn : t.ui.gridOff}
+                    </button>
 
-           {/* DESKTOP LAYOUT: Full detailed controls */}
-           <div className="hidden md:flex flex-1 items-center justify-between min-w-0 gap-4">
-               
-               {/* LEFT SIDE: Scrollable (Undo, Redo, Size, Zoom) */}
-               <div className="flex items-center gap-3 overflow-x-auto no-scrollbar pb-2 pt-2 -mb-2 -mt-2">
-                  <div className="h-10 flex items-center gap-1 bg-paper-50 dark:bg-slate-800 rounded-lg p-1 border border-paper-200 dark:border-slate-700 flex-shrink-0">
-                      <button onClick={handleUndo} disabled={state.historyIndex === 0} className="p-2 hover:bg-paper-200 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white text-slate-500 dark:text-slate-400 rounded-md disabled:opacity-30 transition-colors" title={`${t.ui.undo} (Ctrl + Z)`}><Undo size={18} /></button>
-                      <div className="w-px h-4 bg-paper-300 dark:bg-slate-700"></div>
-                      <button onClick={handleRedo} disabled={state.historyIndex === state.history.length - 1} className="p-2 hover:bg-paper-200 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white text-slate-500 dark:text-slate-400 rounded-md disabled:opacity-30 transition-colors" title={`${t.ui.redo} (Ctrl + Y)`}><Redo size={18} /></button>
-                  </div>
+                    {/* Language Switcher */}
+                    <div className="relative group z-50 w-40">
+                         <CustomSelect 
+                            value={state.language}
+                            onChange={(val) => setState(s => ({...s, language: val as Language}))}
+                            options={SUPPORTED_LANGUAGES}
+                            isDarkMode={computedIsDarkMode}
+                        />
+                    </div>
 
-                  <div className="h-6 w-px bg-paper-300 dark:bg-slate-800 hidden md:block flex-shrink-0"></div>
+                    {/* Theme Toggle */}
+                    <div className="relative group z-50">
+                        <button className="h-10 w-10 flex items-center justify-center bg-white/50 dark:bg-white/5 rounded-xl border border-white/20 dark:border-white/5 text-slate-500 hover:text-indigo-500 dark:text-slate-400 dark:hover:text-white transition-colors hover:bg-white dark:hover:bg-white/10 shadow-sm">
+                            {state.theme === 'light' && <Sun size={18} />}
+                            {state.theme === 'dark' && <Moon size={18} />}
+                            {state.theme === 'system' && <Monitor size={18} />}
+                        </button>
+                        <div className="absolute right-0 top-full pt-2 w-40 hidden group-hover:block">
+                            <div className="glass-panel rounded-xl shadow-2xl border border-white/20 dark:border-white/10 overflow-hidden p-1">
+                                <button onClick={() => setState(s => ({...s, theme: 'light'}))} className={`w-full text-left px-3 py-2 text-sm rounded-lg flex items-center gap-2 transition-colors ${state.theme === 'light' ? 'bg-indigo-500 text-white' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10'}`}>
+                                    <Sun size={16} /> {t.ui.lightMode}
+                                </button>
+                                <button onClick={() => setState(s => ({...s, theme: 'dark'}))} className={`w-full text-left px-3 py-2 text-sm rounded-lg flex items-center gap-2 transition-colors ${state.theme === 'dark' ? 'bg-indigo-500 text-white' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10'}`}>
+                                    <Moon size={16} /> {t.ui.darkMode}
+                                </button>
+                                <button onClick={() => setState(s => ({...s, theme: 'system'}))} className={`w-full text-left px-3 py-2 text-sm rounded-lg flex items-center gap-2 transition-colors ${state.theme === 'system' ? 'bg-indigo-500 text-white' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10'}`}>
+                                    <Monitor size={16} /> {t.ui.systemMode}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </header>
+        </div>
 
-                  <button 
-                    onClick={() => setIsResizeModalOpen(true)}
-                    className="h-10 flex-shrink-0 flex items-center gap-2 bg-paper-50 dark:bg-slate-800 hover:bg-paper-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 px-3 rounded-lg border border-paper-200 dark:border-slate-700 transition-all group"
-                  >
-                      <Grid3X3 size={18} className="text-indigo-500 dark:text-indigo-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-300"/>
-                      <span className="text-sm font-medium hidden sm:inline">
-                          {state.config.width} × {state.config.height}
-                      </span>
-                      <span className="text-sm font-medium sm:hidden">
-                          {state.config.width}
-                      </span>
-                      <Settings size={14} className="ml-1 opacity-50 group-hover:opacity-100"/>
-                  </button>
-
-                   <div className="h-10 flex-shrink-0 flex items-center gap-3 bg-paper-50 dark:bg-slate-800 px-3 rounded-lg border border-paper-200 dark:border-slate-700">
-                      <label className="text-xs text-slate-500 font-bold uppercase tracking-wider hidden sm:block">{t.ui.zoom}</label>
-                      <input 
-                        type="range" 
-                        min="4" max="60" 
-                        value={state.config.size} 
-                        onChange={(e) => setState(s => ({ ...s, config: { ...s.config, size: parseInt(e.target.value) } }))}
-                        onWheel={handleZoomWheel}
-                        className="w-20 sm:w-24 accent-indigo-500 h-1.5 bg-paper-300 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer hover:bg-paper-400 dark:hover:bg-slate-600 transition-colors"
-                      />
-                  </div>
-               </div>
-
-               {/* RIGHT SIDE: Fixed (No Overflow for Dropdowns) */}
-               <div className="flex items-center gap-3 flex-shrink-0 pl-2">
-                   
-                   {/* Layers Control */}
-                   <div className="h-10 flex items-center gap-2 bg-paper-50 dark:bg-slate-800 px-3 rounded-lg border border-paper-200 dark:border-slate-700">
-                      <Layers size={14} className="text-slate-500 mr-1 hidden sm:block" />
-                      <button 
-                         onClick={() => setState(s => ({...s, showDrawingLayer: !s.showDrawingLayer}))}
-                         className={`p-1.5 rounded-md transition-colors ${state.showDrawingLayer ? 'text-indigo-500 dark:text-indigo-400 hover:bg-paper-200 dark:hover:bg-slate-700' : 'text-slate-400 hover:text-slate-500'}`}
-                         title={t.ui.layers}
-                      >
-                         {state.showDrawingLayer ? <Eye size={18} /> : <EyeOff size={18} />}
-                      </button>
-                      <button 
-                         onClick={() => setState(s => ({...s, showReferenceLayer: !s.showReferenceLayer}))}
-                         disabled={!state.backgroundImage}
-                         className={`p-1.5 rounded-md transition-colors ${
-                            !state.backgroundImage 
-                                ? 'text-slate-300 dark:text-slate-700 cursor-not-allowed' 
-                                : state.showReferenceLayer 
-                                    ? 'text-green-500 dark:text-green-400 hover:bg-paper-200 dark:hover:bg-slate-700' 
-                                    : 'text-slate-400 hover:text-slate-500'
-                         }`}
-                         title={t.ui.refLayer}
-                      >
-                         {state.showReferenceLayer ? <Eye size={18} /> : <EyeOff size={18} />}
-                      </button>
-                   </div>
-
-                   {state.backgroundImage && state.showReferenceLayer && (
-                       <div className="h-10 flex items-center gap-3 bg-paper-50 dark:bg-slate-800 px-3 rounded-lg border border-paper-200 dark:border-slate-800">
-                           <span className="text-xs text-slate-500 font-bold uppercase hidden sm:block">{t.ui.refOpacity}</span>
-                           <input 
-                             type="range" min="0" max="1" step="0.1"
-                             value={state.backgroundOpacity}
-                             onChange={(e) => setState(s => ({ ...s, backgroundOpacity: parseFloat(e.target.value) }))}
-                             onWheel={handleOpacityWheel}
-                             className="w-16 sm:w-20 accent-green-500 h-1.5 bg-paper-300 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer"
-                           />
-                       </div>
-                   )}
-                   <button 
-                     onClick={() => setState(s => ({ ...s, showGrid: !s.showGrid }))}
-                     className={`h-10 px-3 rounded-lg text-xs font-bold uppercase tracking-wide transition-all border flex items-center justify-center ${
-                         state.showGrid 
-                         ? 'bg-indigo-50 border-indigo-200 text-indigo-600 dark:bg-indigo-500/10 dark:border-indigo-500/50 dark:text-indigo-400' 
-                         : 'bg-paper-50 dark:bg-slate-800 border-paper-200 dark:border-slate-700 text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
-                     }`}
-                   >
-                       {state.showGrid ? t.ui.gridOn : t.ui.gridOff}
-                   </button>
-
-                   {/* Language Switcher */}
-                   <div className="relative group z-50">
-                      <button className="h-10 w-10 flex items-center justify-center bg-paper-50 dark:bg-slate-800 rounded-lg border border-paper-200 dark:border-slate-700 text-slate-500 hover:text-indigo-500 dark:text-slate-400 dark:hover:text-indigo-400 transition-colors">
-                          <Globe size={18} />
-                      </button>
-                      <div className="absolute right-0 top-full pt-2 w-48 hidden group-hover:block">
-                          <div className="bg-paper-50 dark:bg-slate-800 rounded-lg shadow-xl border border-paper-200 dark:border-slate-700 overflow-hidden max-h-80 overflow-y-auto">
-                            <button onClick={() => setState(s => ({...s, language: 'en'}))} className={`w-full text-left px-4 py-2 text-sm hover:bg-paper-100 dark:hover:bg-slate-700 ${state.language === 'en' ? 'text-indigo-500 font-bold' : 'text-slate-600 dark:text-slate-300'}`}>🇺🇸 English (US)</button>
-                            <button onClick={() => setState(s => ({...s, language: 'zh-CN'}))} className={`w-full text-left px-4 py-2 text-sm hover:bg-paper-100 dark:hover:bg-slate-700 ${state.language === 'zh-CN' ? 'text-indigo-500 font-bold' : 'text-slate-600 dark:text-slate-300'}`}>🇨🇳 中文 (简体)</button>
-                            <button onClick={() => setState(s => ({...s, language: 'zh-HK'}))} className={`w-full text-left px-4 py-2 text-sm hover:bg-paper-100 dark:hover:bg-slate-700 ${state.language === 'zh-HK' ? 'text-indigo-500 font-bold' : 'text-slate-600 dark:text-slate-300'}`}>🇭🇰 中文 (繁體)</button>
-                            <button onClick={() => setState(s => ({...s, language: 'ja'}))} className={`w-full text-left px-4 py-2 text-sm hover:bg-paper-100 dark:hover:bg-slate-700 ${state.language === 'ja' ? 'text-indigo-500 font-bold' : 'text-slate-600 dark:text-slate-300'}`}>🇯🇵 日本語</button>
-                            <button onClick={() => setState(s => ({...s, language: 'ko'}))} className={`w-full text-left px-4 py-2 text-sm hover:bg-paper-100 dark:hover:bg-slate-700 ${state.language === 'ko' ? 'text-indigo-500 font-bold' : 'text-slate-600 dark:text-slate-300'}`}>🇰🇷 한국어</button>
-                            <button onClick={() => setState(s => ({...s, language: 'fr'}))} className={`w-full text-left px-4 py-2 text-sm hover:bg-paper-100 dark:hover:bg-slate-700 ${state.language === 'fr' ? 'text-indigo-500 font-bold' : 'text-slate-600 dark:text-slate-300'}`}>🇫🇷 Français</button>
-                            <button onClick={() => setState(s => ({...s, language: 'de'}))} className={`w-full text-left px-4 py-2 text-sm hover:bg-paper-100 dark:hover:bg-slate-700 ${state.language === 'de' ? 'text-indigo-500 font-bold' : 'text-slate-600 dark:text-slate-300'}`}>🇩🇪 Deutsch</button>
-                            <button onClick={() => setState(s => ({...s, language: 'es'}))} className={`w-full text-left px-4 py-2 text-sm hover:bg-paper-100 dark:hover:bg-slate-700 ${state.language === 'es' ? 'text-indigo-500 font-bold' : 'text-slate-600 dark:text-slate-300'}`}>🇪🇸 Español (ES)</button>
-                            <button onClick={() => setState(s => ({...s, language: 'pt-BR'}))} className={`w-full text-left px-4 py-2 text-sm hover:bg-paper-100 dark:hover:bg-slate-700 ${state.language === 'pt-BR' ? 'text-indigo-500 font-bold' : 'text-slate-600 dark:text-slate-300'}`}>🇧🇷 Português (BR)</button>
-                            <button onClick={() => setState(s => ({...s, language: 'ru'}))} className={`w-full text-left px-4 py-2 text-sm hover:bg-paper-100 dark:hover:bg-slate-700 ${state.language === 'ru' ? 'text-indigo-500 font-bold' : 'text-slate-600 dark:text-slate-300'}`}>🇷🇺 Русский</button>
-                            <button onClick={() => setState(s => ({...s, language: 'ar'}))} className={`w-full text-left px-4 py-2 text-sm hover:bg-paper-100 dark:hover:bg-slate-700 ${state.language === 'ar' ? 'text-indigo-500 font-bold' : 'text-slate-600 dark:text-slate-300'}`}>🇸🇦 العربية</button>
-                          </div>
-                      </div>
-                   </div>
-
-                   {/* Theme Toggle - Dropdown */}
-                   <div className="relative group z-50">
-                      <button className="h-10 w-10 flex items-center justify-center bg-paper-50 dark:bg-slate-800 rounded-lg border border-paper-200 dark:border-slate-700 text-slate-500 hover:text-indigo-500 dark:text-slate-400 dark:hover:text-indigo-400 transition-colors">
-                          {state.theme === 'light' && <Sun size={18} />}
-                          {state.theme === 'dark' && <Moon size={18} />}
-                          {state.theme === 'system' && <Monitor size={18} />}
-                      </button>
-                      <div className="absolute right-0 top-full pt-2 w-40 hidden group-hover:block">
-                          <div className="bg-paper-50 dark:bg-slate-800 rounded-lg shadow-xl border border-paper-200 dark:border-slate-700 overflow-hidden">
-                            <button onClick={() => setState(s => ({...s, theme: 'light'}))} className={`w-full text-left px-4 py-2 text-sm hover:bg-paper-100 dark:hover:bg-slate-700 flex items-center gap-2 ${state.theme === 'light' ? 'text-indigo-500 font-bold' : 'text-slate-600 dark:text-slate-300'}`}>
-                                <Sun size={16} /> {t.ui.lightMode}
-                            </button>
-                            <button onClick={() => setState(s => ({...s, theme: 'dark'}))} className={`w-full text-left px-4 py-2 text-sm hover:bg-paper-100 dark:hover:bg-slate-700 flex items-center gap-2 ${state.theme === 'dark' ? 'text-indigo-500 font-bold' : 'text-slate-600 dark:text-slate-300'}`}>
-                                <Moon size={16} /> {t.ui.darkMode}
-                            </button>
-                            <button onClick={() => setState(s => ({...s, theme: 'system'}))} className={`w-full text-left px-4 py-2 text-sm hover:bg-paper-100 dark:hover:bg-slate-700 flex items-center gap-2 ${state.theme === 'system' ? 'text-indigo-500 font-bold' : 'text-slate-600 dark:text-slate-300'}`}>
-                                <Monitor size={16} /> {t.ui.systemMode}
-                            </button>
-                          </div>
-                      </div>
-                   </div>
-               </div>
-           </div>
-        </header>
-
-        {/* Canvas Container - Refactored for Pan/Zoom with Transforms */}
+        {/* Canvas Container */}
         <div 
              ref={canvasContainerRef}
              onMouseDown={handleContainerMouseDown}
@@ -1311,14 +1323,15 @@ const App: React.FC = () => {
              onTouchStart={handleContainerTouchStart}
              onTouchMove={handleContainerTouchMove}
              onTouchEnd={handleContainerTouchEnd}
-             className={`flex-1 bg-paper-100 dark:bg-slate-950 overflow-hidden relative transition-colors ${
+             className={`flex-1 overflow-hidden relative transition-colors ${
                 isPanning || isMobilePanning ? 'cursor-grabbing' : isSpacePressed ? 'cursor-grab' : 'cursor-default'
              }`}
              style={{
-                 // Background dots remain static to give reference
-                 backgroundImage: `radial-gradient(${computedIsDarkMode ? '#1e293b' : '#D1CEC7'} 1px, transparent 1px)`,
-                 backgroundSize: '20px 20px',
-                 touchAction: 'none' // Important: Disable browser default touch actions like scroll/zoom
+                 // Clean dot pattern - Cupertino Style
+                 backgroundImage: `radial-gradient(${computedIsDarkMode ? '#3a3a3c' : '#d1d1d6'} 1px, transparent 1px)`,
+                 backgroundSize: '24px 24px',
+                 backgroundColor: computedIsDarkMode ? '#000000' : '#f5f5f7',
+                 touchAction: 'none'
              }}
         >
             {/* Movable/Scalable Wrapper */}
@@ -1328,7 +1341,7 @@ const App: React.FC = () => {
                     transform: `translate(-50%, -50%) translate(${panOffset.x}px, ${panOffset.y}px)` 
                 }}
             >
-                <div className="shadow-2xl shadow-black/10 dark:shadow-black/50 pointer-events-auto">
+                <div className="shadow-2xl shadow-black/20 dark:shadow-black/50 pointer-events-auto rounded-none">
                     <CanvasBoard 
                         grid={state.grid}
                         config={state.config}
@@ -1348,24 +1361,24 @@ const App: React.FC = () => {
             </div>
         </div>
 
-        {/* Floating Help Button - Bottom Right */}
+        {/* Floating Help Button */}
         <button 
             onClick={() => setIsTutorialOpen(true)}
-            className="absolute bottom-4 right-4 z-40 h-10 w-10 flex items-center justify-center bg-slate-800 hover:bg-slate-700 dark:bg-slate-700 dark:hover:bg-slate-600 text-white rounded-lg shadow-lg transition-all hover:scale-105 active:scale-95"
+            className="absolute bottom-6 right-6 z-40 h-12 w-12 flex items-center justify-center bg-white/75 dark:bg-[#1c1c1e]/75 hover:bg-white dark:hover:bg-[#2c2c2e] text-slate-600 dark:text-slate-300 rounded-full shadow-lg backdrop-blur-md transition-all hover:scale-110 active:scale-95 border border-white/20 dark:border-white/10"
             title={t.tutorial.title}
         >
-            <HelpCircle size={20} />
+            <HelpCircle size={24} />
         </button>
 
         {/* Notification Toast */}
         {isNotificationVisible && (
-            <div className={`fixed bottom-8 left-1/2 md:left-[calc(50%+9rem)] transform -translate-x-1/2 px-6 py-3 rounded-lg shadow-xl border flex items-center gap-3 z-[100] w-max max-w-[90vw] ${
+            <div className={`fixed bottom-10 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-2xl shadow-2xl border flex items-center gap-3 z-[100] w-max max-w-[90vw] whitespace-nowrap glass-panel animate-in slide-in-from-bottom-5 fade-in duration-300 backdrop-blur-xl ${
                 isNotificationVisible.type === 'success' 
-                ? 'bg-paper-50 dark:bg-slate-900 border-green-200 dark:border-green-500/30 text-green-600 dark:text-green-400' 
-                : 'bg-paper-50 dark:bg-slate-900 border-red-200 dark:border-red-500/30 text-red-600 dark:text-red-400'
-            } transition-all`}>
-                <div className={`w-2 h-2 rounded-full flex-shrink-0 ${isNotificationVisible.type === 'success' ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                <span className="font-medium text-sm whitespace-nowrap">{isNotificationVisible.msg}</span>
+                ? 'border-green-500/20 text-green-600 dark:text-green-400' 
+                : 'border-red-500/20 text-red-600 dark:text-red-400'
+            }`}>
+                <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 shadow-sm ${isNotificationVisible.type === 'success' ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                <span className="font-semibold text-sm">{isNotificationVisible.msg}</span>
             </div>
         )}
 

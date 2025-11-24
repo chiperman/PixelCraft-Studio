@@ -3,31 +3,61 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <meta name="theme-color" content="#ffffff" />
+    <meta name="theme-color" content="#fbfbfd" />
     <title>PixelCraft Studio</title>
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Press+Start+2P&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
         darkMode: 'class',
         theme: {
           extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+            },
+            borderRadius: {
+              'cupertino': '1.25rem', // 20px
+            },
             colors: {
-              slate: {
-                850: '#1e293b',
-                900: '#0f172a',
-                950: '#020617',
+              // Remap 'indigo' to Apple Primary Blue to replace purple throughout the app automatically
+              indigo: {
+                50: '#f2f8ff',
+                100: '#e6f2ff',
+                200: '#bfdeff',
+                300: '#8cc4ff',
+                400: '#4da0ff',
+                500: '#0071e3', // Light Mode Primary
+                600: '#006edb',
+                700: '#0062c3', // Dark Mode Primary Hover
+                800: '#0a84ff', // Dark Mode Primary (using 800 slot for easy mapping if needed, or just overrides)
+                900: '#004fac',
+                950: '#00337a',
               },
-              // Anthropic-inspired warm palette (Refined for a warmer pale yellow/beige look)
+              // Remap 'slate' to Apple Neutrals
+              slate: {
+                50: '#fbfbfd',
+                100: '#f5f5f7',
+                200: '#e5e5ea',
+                300: '#d1d1d6',
+                400: '#aeaeb2',
+                500: '#86868b', // Secondary Text
+                600: '#636366',
+                700: '#48484a',
+                800: '#2c2c2e', // Dark Tertiary
+                850: '#1c1c1e', // Dark Secondary (Modals)
+                900: '#1c1c1e',
+                950: '#000000', // Dark Background
+              },
+              // Remap 'paper' to System Backgrounds
               paper: {
-                50: '#FFFFFF', // Pure white for panels/headers
-                100: '#F9F7F3', // Warmer pale yellow/beige (Main Background)
-                200: '#E6E4DD', // Warm borders
-                300: '#D1CEC7', // Darker borders/Hovers
-                400: '#A8A29E', // Text placeholders
+                50: '#ffffff', // Surface
+                100: '#f5f5f7', // Main BG Light
+                200: '#e5e5ea', // Borders Light
+                300: '#d1d1d6',
+                400: '#86868b',
               }
             }
           }
@@ -36,15 +66,18 @@
     </script>
     <style>
       :root {
-        --bg-color: #F9F7F3; /* Paper 100 */
+        --bg-color: #fbfbfd;
       }
       .dark {
-        --bg-color: #020617; /* Slate 950 */
+        --bg-color: #000000;
       }
       html, body {
         height: 100%;
         background-color: var(--bg-color);
         overscroll-behavior: none;
+        font-family: 'Inter', sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
       }
       /* Custom Scrollbar */
       ::-webkit-scrollbar {
@@ -55,17 +88,30 @@
         background: transparent;
       }
       ::-webkit-scrollbar-thumb {
-        background: #D1CEC7; /* Paper 300 */
+        background: rgba(134, 134, 139, 0.3);
         border-radius: 4px;
       }
-      .dark ::-webkit-scrollbar-track {
-        background: #1e293b;
-      }
       .dark ::-webkit-scrollbar-thumb {
-        background: #475569;
+        background: rgba(255, 255, 255, 0.2);
       }
       .dark ::-webkit-scrollbar-thumb:hover {
-        background: #64748b;
+        background: rgba(255, 255, 255, 0.3);
+      }
+      
+      /* Glass Utilities - Enhanced Cupertino Style */
+      .glass-panel {
+        background: rgba(251, 251, 253, 0.85); /* Slightly more opaque for better contrast */
+        backdrop-filter: blur(40px) saturate(180%); /* Stronger blur */
+        -webkit-backdrop-filter: blur(40px) saturate(180%);
+        box-shadow: 0 8px 32px rgba(0,0,0,0.04);
+        border: 1px solid rgba(255,255,255,0.4);
+      }
+      .dark .glass-panel {
+        background: rgba(30, 30, 32, 0.75);
+        backdrop-filter: blur(40px) saturate(180%);
+        -webkit-backdrop-filter: blur(40px) saturate(180%);
+        box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+        border: 1px solid rgba(255,255,255,0.1);
       }
     </style>
 <script type="importmap">

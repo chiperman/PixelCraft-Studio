@@ -63,10 +63,10 @@ const CanvasBoard: React.FC<CanvasBoardProps> = ({
         });
     }
 
-    // Draw Grid Lines
+    // Draw Grid Lines - Updated for subtlety
     if (showGrid) {
-      // Adjust grid color based on theme for visibility
-      ctx.strokeStyle = isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+      // Adjust grid color based on theme for visibility but subtle
+      ctx.strokeStyle = isDarkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)';
       ctx.lineWidth = 1;
       ctx.beginPath();
       for (let x = 0; x <= width; x++) {
@@ -168,7 +168,7 @@ const CanvasBoard: React.FC<CanvasBoardProps> = ({
   }
 
   return (
-    <div className={`relative shadow-2xl rounded-lg bg-white dark:bg-slate-800 select-none border border-paper-300 dark:border-slate-700 transition-colors ${cursorStyle}`}>
+    <div className={`relative bg-white dark:bg-[#1c1c1e] select-none transition-colors ${cursorStyle} shadow-sm`}>
       {backgroundImage && showReferenceLayer && (
         <div 
           className="absolute inset-0 pointer-events-none bg-no-repeat bg-cover z-0"
