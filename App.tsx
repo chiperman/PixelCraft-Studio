@@ -1352,11 +1352,11 @@ const App: React.FC = () => {
 
         {/* Notification Toast */}
         {isNotificationVisible && (
-            <div className={`absolute bottom-8 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-lg shadow-xl border flex items-center gap-3 z-50 ${
+            <div className={`fixed bottom-8 left-1/2 md:left-[calc(50%+9rem)] transform -translate-x-1/2 px-6 py-3 rounded-lg shadow-xl border flex items-center gap-3 z-[100] ${
                 isNotificationVisible.type === 'success' 
                 ? 'bg-paper-50 dark:bg-slate-900 border-green-200 dark:border-green-500/30 text-green-600 dark:text-green-400' 
                 : 'bg-paper-50 dark:bg-slate-900 border-red-200 dark:border-red-500/30 text-red-600 dark:text-red-400'
-            } transition-all animate-bounce`}>
+            } transition-all`}>
                 <div className={`w-2 h-2 rounded-full ${isNotificationVisible.type === 'success' ? 'bg-green-500' : 'bg-red-500'}`}></div>
                 <span className="font-medium text-sm">{isNotificationVisible.msg}</span>
             </div>
