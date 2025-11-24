@@ -346,6 +346,13 @@ const App: React.FC = () => {
         root.classList.remove('dark');
       }
       setComputedIsDarkMode(isDark);
+
+      // Update Meta Theme Color for Mobile Browsers
+      const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+      if (metaThemeColor) {
+          // Header Color: Dark = Slate-900 (#0f172a), Light = Paper-50 (#FFFFFF)
+          metaThemeColor.setAttribute('content', isDark ? '#0f172a' : '#ffffff');
+      }
     };
 
     applyTheme();
@@ -588,363 +595,313 @@ const App: React.FC = () => {
           backgroundImage: null 
       }));
       updateGrid(emptyGrid);
-      showNotification(t.notifications.cleared, "success");
-  };
-
-  const handleGridChangeFromCanvas = (newGrid: string[]) => {
-     updateGrid(newGrid);
-  };
-
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: 'convert' | 'background') => {
-      const file = e.target.files?.[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = async (event) => {
-          const src = event.target?.result as string;
-          if (type === 'convert') {
-            try {
-                const img = new Image();
-                img.src = src;
-                img.onload = async () => {
-                     const newGrid = await imageToPixelGrid(src, state.config.width, state.config.height);
-                     updateGrid(newGrid);
-                     showNotification(t.notifications.converted, "success");
-                }
-            } catch (err) {
-                showNotification(t.notifications.convertError, "error");
-            }
-          } else {
-             setState(prev => ({ ...prev, backgroundImage: src, showReferenceLayer: true }));
-             showNotification(t.notifications.refSet, "success");
-          }
-      };
-      reader.readAsDataURL(file);
-  };
-
-  const handleExport = () => {
-      const canvas = document.querySelector('canvas');
-      if (canvas) {
-          const link = document.createElement('a');
-          link.download = 'pixel-art.png';
-          link.href = canvas.toDataURL('image/png');
-          link.click();
-          showNotification(t.notifications.exported, "success");
-      }
-  };
-
-  const handleSaveProject = () => {
-      const projectData = {
-        grid: state.grid,
-        config: state.config,
-        customPalette: state.customPalette,
-        selectedColor: state.selectedColor,
-        backgroundImage: state.backgroundImage,
-        backgroundOpacity: state.backgroundOpacity,
-        showDrawingLayer: state.showDrawingLayer,
-        showReferenceLayer: state.showReferenceLayer,
-        showGrid: state.showGrid,
-        theme: state.theme,
-        language: state.language,
-        version: '1.0'
-      };
-      
-      const blob = new Blob([JSON.stringify(projectData)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `pixelcraft-project-${new Date().toISOString().slice(0,10)}.json`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      showNotification(t.notifications.projectSaved, "success");
-  };
-
-  const handleLoadProject = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        try {
-          const json = JSON.parse(event.target?.result as string);
-          if (json.grid && json.config) {
-             setState(prev => ({
-                 ...prev,
-                 ...json,
-                 history: [json.grid],
-                 historyIndex: 0,
-                 theme: json.theme || prev.theme,
-                 language: json.language || prev.language
-             }));
-             showNotification(t.notifications.projectLoaded, "success");
-          } else {
-             showNotification(t.notifications.loadError, "error");
-          }
-        } catch (err) {
-          showNotification(t.notifications.loadError, "error");
-        }
-        e.target.value = ''; // Reset input
-      };
-      reader.readAsText(file);
-  };
-
-  const handleManualResize = (w: number, h: number) => {
-      const newGrid = AQ(w, h);
-      setState(prev => ({
-          ...prev,
-          grid: newGrid,
-          history: [newGrid],
-          historyIndex: 0,
-          config: { ...prev.config, width: w, height: h }
-      }));
-      setIsResizeModalOpen(false);
-      showNotification(t.notifications.resized(w, h), "success");
-  };
-
-  const handleUpdateCustomColor = (index: number, color: string) => {
-      setState(prev => {
-          const newCustom = [...prev.customPalette];
-          newCustom[index] = color;
-          return { ...prev, customPalette: newCustom, selectedColor: color };
-      });
-  };
-
-  // --- LIBRARY FUNCTIONS ---
-
-  const generateThumbnail = async (): Promise<string> => {
-    const canvas = document.querySelector('canvas');
-    if (!canvas) return '';
-    
-    // Create a small offscreen canvas for thumbnail
-    const thumbCanvas = document.createElement('canvas');
-    const size = 300; // Thumbnail size
-    thumbCanvas.width = size;
-    thumbCanvas.height = size;
-    const ctx = thumbCanvas.getContext('2d');
-    if (!ctx) return '';
-
-    // Draw checkered background first (simulating transparent) or just white
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, size, size);
-
-    // Calculate aspect ratio to fit
-    const scale = Math.min(size / canvas.width, size / canvas.height);
-    const x = (size - canvas.width * scale) / 2;
-    const y = (size - canvas.height * scale) / 2;
-
-    ctx.imageSmoothingEnabled = false; // Keep pixelated look
-    ctx.drawImage(canvas, x, y, canvas.width * scale, canvas.height * scale);
-    
-    return thumbCanvas.toDataURL('image/png', 0.8);
-  };
-
-  const handleSaveToLibrary = async (name: string) => {
-    const thumb = await generateThumbnail();
-    const pk = `gen_${Date.now()}`;
-    const newProject: StoredProject = {
-      id: pk,
-      name,
-      thumbnail: thumb,
-      timestamp: Date.now(),
-      grid: state.grid,
-      config: state.config,
-      customPalette: state.customPalette,
-      selectedColor: state.selectedColor,
-      showDrawingLayer: state.showDrawingLayer,
-      showReferenceLayer: state.showReferenceLayer,
-      backgroundImage: state.backgroundImage,
-      backgroundOpacity: state.backgroundOpacity
-    };
-
-    const updatedProjects = [newProject, ...savedProjects];
-    setSavedProjects(updatedProjects);
-    localStorage.setItem('pixelCraftLibrary', JSON.stringify(updatedProjects));
-    showNotification(t.notifications.librarySaved, "success");
-  };
-
-  const handleLoadFromLibrary = (project: StoredProject) => {
-     setState(prev => ({
-        ...prev,
-        grid: project.grid,
-        config: project.config,
-        customPalette: project.customPalette,
-        selectedColor: project.selectedColor,
-        showDrawingLayer: project.showDrawingLayer,
-        showReferenceLayer: project.showReferenceLayer,
-        backgroundImage: project.backgroundImage,
-        backgroundOpacity: project.backgroundOpacity,
-        history: [project.grid],
-        historyIndex: 0
-     }));
-     showNotification(t.notifications.libraryLoaded, "success");
-  };
-
-  const handleDeleteFromLibrary = (id: string) => {
-      // Create new array excluding the target
-      const updated = savedProjects.filter(p => String(p.id) !== String(id));
-      setSavedProjects(updated);
-      localStorage.setItem('pixelCraftLibrary', JSON.stringify(updated));
-      showNotification(t.notifications.libraryDeleted, "success");
-  };
-
-  const handleRenameInLibrary = (id: string, newName: string) => {
-      setSavedProjects(currentProjects => {
-          const updated = currentProjects.map(p => p.id === id ? { ...p, name: newName } : p);
-          localStorage.setItem('pixelCraftLibrary', JSON.stringify(updated));
-          return updated;
-      });
-  };
-
-
-  const showNotification = (msg: string, type: 'success' | 'error') => {
-      setNotification({ msg, type });
+      setNotification({ msg: t.notifications.cleared, type: 'success' });
       setTimeout(() => setNotification(null), 3000);
   };
 
-  // Panning Event Handlers (for Container) - Refactored to use panOffset state
-  const handleContainerMouseDown = (e: React.MouseEvent) => {
-      // Middle mouse (button 1) or Space + Left Click (button 0) or Mobile Pan Mode
-      if (e.button === 1 || (isSpacePressed && e.button === 0) || isMobilePanning) {
-          e.preventDefault();
+  // Import Image Logic
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: 'convert' | 'background') => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      const src = event.target?.result as string;
+      if (type === 'convert') {
+          try {
+            const newGrid = await imageToPixelGrid(src, state.config.width, state.config.height);
+            updateGrid(newGrid);
+            setNotification({ msg: t.notifications.converted, type: 'success' });
+          } catch (error) {
+            setNotification({ msg: t.notifications.convertError, type: 'error' });
+          }
+      } else {
+          // Reference Layer
+          setState(prev => ({ ...prev, backgroundImage: src }));
+          setNotification({ msg: t.notifications.refSet, type: 'success' });
+      }
+      setTimeout(() => setNotification(null), 3000);
+    };
+    reader.readAsDataURL(file);
+    
+    // Clear input to allow same file selection
+    e.target.value = '';
+  };
+
+  const handleExport = () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = state.config.width * state.config.size;
+    canvas.height = state.config.height * state.config.size;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Draw pixels
+    state.grid.forEach((color, i) => {
+      if (color) {
+        const x = (i % state.config.width) * state.config.size;
+        const y = Math.floor(i / state.config.width) * state.config.size;
+        ctx.fillStyle = color;
+        ctx.fillRect(x, y, state.config.size, state.config.size);
+      }
+    });
+
+    const link = document.createElement('a');
+    link.download = `pixel-art-${Date.now()}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    setNotification({ msg: t.notifications.exported, type: 'success' });
+    setTimeout(() => setNotification(null), 3000);
+  };
+
+  const handleResize = (w: number, h: number) => {
+      setState(prev => ({
+          ...prev,
+          config: { ...prev.config, width: w, height: h },
+          grid: AQ(w, h), // Clear grid on resize
+          history: [AQ(w, h)],
+          historyIndex: 0
+      }));
+      setIsResizeModalOpen(false);
+      setNotification({ msg: t.notifications.resized(w, h), type: 'success' });
+      setTimeout(() => setNotification(null), 3000);
+  }
+  
+  const handleEyeDropper = (color: string) => {
+      setState(s => ({ ...s, selectedColor: color, tool: 'pencil' })); // Auto switch back to pencil
+  };
+
+  const handleCustomColorUpdate = (index: number, color: string) => {
+      const newPalette = [...state.customPalette];
+      newPalette[index] = color;
+      setState(s => ({ ...s, customPalette: newPalette, selectedColor: color }));
+  }
+
+  const handleSaveProject = () => {
+      // Open Library Modal in Save Mode? Or simple save?
+      // Let's trigger Library Modal
+      openLibrary();
+  }
+  
+  const openLibrary = () => {
+      // Load library again to be sure
+      const saved = localStorage.getItem('pixelCraftLibrary');
+      if (saved) {
+         try {
+             const parsed = JSON.parse(saved);
+              // MIGRATION: Ensure all projects have an ID
+            if (Array.isArray(parsed)) {
+                const cleaned = parsed.map((p: any) => ({
+                    ...p,
+                    id: p.id ? String(p.id) : `gen_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`
+                }));
+                setSavedProjects(cleaned);
+            }
+         } catch(e) {}
+      }
+      setIsLibraryOpen(true);
+  }
+
+  const saveCurrentToLibrary = (name: string) => {
+      const newProject: StoredProject = {
+          id: `proj_${Date.now()}_${Math.random().toString(36).substring(2,9)}`,
+          name: name,
+          timestamp: Date.now(),
+          thumbnail: '', // Generate thumbnail
+          grid: state.grid,
+          config: state.config,
+          customPalette: state.customPalette,
+          selectedColor: state.selectedColor,
+          showDrawingLayer: state.showDrawingLayer,
+          showReferenceLayer: state.showReferenceLayer,
+          backgroundImage: state.backgroundImage,
+          backgroundOpacity: state.backgroundOpacity
+      };
+
+      // Generate Thumbnail
+      const canvas = document.createElement('canvas');
+      canvas.width = state.config.width; // Save small
+      canvas.height = state.config.height;
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+          state.grid.forEach((color, i) => {
+            if (color) {
+                const x = i % state.config.width;
+                const y = Math.floor(i / state.config.width);
+                ctx.fillStyle = color;
+                ctx.fillRect(x, y, 1, 1);
+            }
+          });
+          newProject.thumbnail = canvas.toDataURL();
+      }
+
+      const updatedLibrary = [newProject, ...savedProjects];
+      setSavedProjects(updatedLibrary);
+      localStorage.setItem('pixelCraftLibrary', JSON.stringify(updatedLibrary));
+      setNotification({ msg: t.notifications.librarySaved, type: 'success' });
+      setTimeout(() => setNotification(null), 3000);
+  }
+
+  const loadProjectFromLibrary = (project: StoredProject) => {
+      setState(prev => ({
+          ...prev,
+          grid: project.grid,
+          config: project.config,
+          customPalette: project.customPalette || prev.customPalette,
+          selectedColor: project.selectedColor || prev.selectedColor,
+          showDrawingLayer: project.showDrawingLayer ?? true,
+          showReferenceLayer: project.showReferenceLayer ?? true,
+          backgroundImage: project.backgroundImage || null,
+          backgroundOpacity: project.backgroundOpacity || 0.5,
+          history: [project.grid],
+          historyIndex: 0
+      }));
+      setNotification({ msg: t.notifications.libraryLoaded, type: 'success' });
+      setTimeout(() => setNotification(null), 3000);
+  }
+
+  const deleteProject = (id: string) => {
+      const updated = savedProjects.filter(p => p.id !== id);
+      setSavedProjects(updated);
+      localStorage.setItem('pixelCraftLibrary', JSON.stringify(updated));
+      setNotification({ msg: t.notifications.libraryDeleted, type: 'success' });
+      setTimeout(() => setNotification(null), 3000);
+  }
+
+  const renameProject = (id: string, newName: string) => {
+      const updated = savedProjects.map(p => p.id === id ? { ...p, name: newName } : p);
+      setSavedProjects(updated);
+      localStorage.setItem('pixelCraftLibrary', JSON.stringify(updated));
+  }
+
+  const handleFileLoad = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+        try {
+            const parsed = JSON.parse(ev.target?.result as string);
+            if (parsed.grid && parsed.config) {
+                setState(prev => ({
+                    ...prev,
+                    ...parsed,
+                    history: [parsed.grid],
+                    historyIndex: 0
+                }));
+                setNotification({ msg: t.notifications.projectLoaded, type: 'success' });
+            }
+        } catch (err) {
+            setNotification({ msg: t.notifications.loadError, type: 'error' });
+        }
+        setTimeout(() => setNotification(null), 3000);
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  };
+
+  const handleFileSave = () => {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
+      const downloadAnchorNode = document.createElement('a');
+      downloadAnchorNode.setAttribute("href", dataStr);
+      downloadAnchorNode.setAttribute("download", "pixel-craft-project.json");
+      document.body.appendChild(downloadAnchorNode);
+      downloadAnchorNode.click();
+      downloadAnchorNode.remove();
+      setNotification({ msg: t.notifications.projectSaved, type: 'success' });
+      setTimeout(() => setNotification(null), 3000);
+  };
+
+  // --- PAN & ZOOM HANDLERS ---
+  const handleMouseDown = (e: React.MouseEvent | React.TouchEvent) => {
+      // Middle mouse or Space+Left
+      const isMiddle = 'button' in e && e.button === 1;
+      if (isSpacePressed || isMiddle || isMobilePanning) {
           setIsPanning(true);
-          lastMousePos.current = { x: e.clientX, y: e.clientY };
+          const clientX = 'touches' in e ? e.touches[0].clientX : (e as React.MouseEvent).clientX;
+          const clientY = 'touches' in e ? e.touches[0].clientY : (e as React.MouseEvent).clientY;
+          lastMousePos.current = { x: clientX, y: clientY };
       }
   };
 
-  const handleContainerMouseMove = (e: React.MouseEvent) => {
+  const handleMouseMove = (e: React.MouseEvent | React.TouchEvent) => {
       if (isPanning && lastMousePos.current) {
-          const dx = e.clientX - lastMousePos.current.x;
-          const dy = e.clientY - lastMousePos.current.y;
+          const clientX = 'touches' in e ? e.touches[0].clientX : (e as React.MouseEvent).clientX;
+          const clientY = 'touches' in e ? e.touches[0].clientY : (e as React.MouseEvent).clientY;
+          
+          const dx = clientX - lastMousePos.current.x;
+          const dy = clientY - lastMousePos.current.y;
           
           setPanOffset(prev => ({ x: prev.x + dx, y: prev.y + dy }));
-          
-          lastMousePos.current = { x: e.clientX, y: e.clientY };
+          lastMousePos.current = { x: clientX, y: clientY };
       }
   };
 
-  const handleContainerMouseUp = () => {
+  const handleMouseUp = () => {
       setIsPanning(false);
       lastMousePos.current = null;
   };
-  
-  // Touch Panning & Pinch Zoom Handlers (Mobile)
-  const handleContainerTouchStart = (e: React.TouchEvent) => {
+
+  // Touch Zoom (Pinch)
+  const handleTouchStart = (e: React.TouchEvent) => {
       if (e.touches.length === 2) {
-          // Pinch Zoom Start
           const dist = Math.hypot(
-             e.touches[0].clientX - e.touches[1].clientX,
-             e.touches[0].clientY - e.touches[1].clientY
+              e.touches[0].clientX - e.touches[1].clientX,
+              e.touches[0].clientY - e.touches[1].clientY
           );
           lastPinchDist.current = dist;
-
-          // Also initialize pan position for 2 fingers
-          const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
-          const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
-          lastTouchPos.current = { x: midX, y: midY };
-          setIsPanning(true); // Make sure we flag panning state
-
-      } else if (e.touches.length === 1 && (isMobilePanning || isSpacePressed)) {
-           // Single finger pan if mode is active
-          const touch = e.touches[0];
-          setIsPanning(true);
-          lastTouchPos.current = { x: touch.clientX, y: touch.clientY };
+      } else if (e.touches.length === 1) {
+          handleMouseDown(e);
       }
   };
 
-  const handleContainerTouchMove = (e: React.TouchEvent) => {
-      // Handle Pinch Zoom + Pan (2 fingers)
-      if (e.touches.length === 2) {
-          e.preventDefault(); // Prevent native browser zoom
-
-          // 1. Zoom Logic
-          if (lastPinchDist.current) {
-            const dist = Math.hypot(
-                e.touches[0].clientX - e.touches[1].clientX,
-                e.touches[0].clientY - e.touches[1].clientY
-            );
-            const ZS = dist - lastPinchDist.current;
-            if (Math.abs(ZS) > 5) {
-                const zoomDirection = ZS > 0 ? 1 : -1;
-                setState(s => {
-                    const newSize = Math.min(60, Math.max(4, s.config.size + zoomDirection));
-                    return { ...s, config: { ...s.config, size: newSize } };
-                });
-                lastPinchDist.current = dist;
-            }
-          }
-
-          // 2. Pan Logic (Two fingers center point)
-          const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
-          const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
-
-          if (lastTouchPos.current) {
-               const dx = midX - lastTouchPos.current.x;
-               const dy = midY - lastTouchPos.current.y;
-               setPanOffset(prev => ({ x: prev.x + dx, y: prev.y + dy }));
-               lastTouchPos.current = { x: midX, y: midY };
-          } else {
-               // Fallback if touch start didn't catch it (shouldn't happen with updated start logic)
-               lastTouchPos.current = { x: midX, y: midY };
-          }
-          return;
-      }
-
-      // Handle Single Finger Panning (Only if isMobilePanning mode is ON)
-      if (isMobilePanning && e.touches.length === 1 && lastTouchPos.current) {
-           // Prevent default to stop page scroll while panning
-           if(e.cancelable) e.preventDefault();
-           
-           const touch = e.touches[0];
-           const dx = touch.clientX - lastTouchPos.current.x;
-           const dy = touch.clientY - lastTouchPos.current.y;
-           
-           setPanOffset(prev => ({ x: prev.x + dx, y: prev.y + dy }));
-           lastTouchPos.current = { x: touch.clientX, y: touch.clientY };
-      }
-  };
-
-  const handleContainerTouchEnd = () => {
-      setIsPanning(false);
-      lastTouchPos.current = null;
-      lastPinchDist.current = null;
-  };
-
-
-  const handleZoomWheel = (e: React.WheelEvent) => {
-      const direction = e.deltaY < 0 ? 1 : -1;
-      setState(s => {
-          const newSize = Math.min(60, Math.max(4, s.config.size + direction * 2));
-          return { ...s, config: { ...s.config, size: newSize } };
+  const handleTouchMove = (e: React.TouchEvent) => {
+      if (e.touches.length === 2 && lastPinchDist.current !== null) {
+          const dist = Math.hypot(
+              e.touches[0].clientX - e.touches[1].clientX,
+              e.touches[0].clientY - e.touches[1].clientY
+          );
+          const delta = dist - lastPinchDist.current;
+          
+          // Sensitivity factor
+          if (Math.abs(delta) > 10) {
+              const direction = delta > 0 ? 1 : -1;
+               setState(s => {
+                  const newSize = Math.min(60, Math.max(4, s.config.size + direction));
+                  return { ...s, config: { ...s.config, size: newSize } };
               });
+              lastPinchDist.current = dist;
+          }
+      } else if (e.touches.length === 1) {
+          handleMouseMove(e);
+      }
   };
 
-  const handleOpacityWheel = (e: React.WheelEvent) => {
-      const direction = e.deltaY < 0 ? 1 : -1;
-      setState(s => {
-          let newVal = s.backgroundOpacity + (direction * 0.1);
-          newVal = Math.min(1, Math.max(0, newVal));
-          newVal = Math.round(newVal * 10) / 10;
-          return { ...s, backgroundOpacity: newVal };
-      });
+  const handleTouchEnd = () => {
+      lastPinchDist.current = null;
+      handleMouseUp();
   };
+
 
   return (
-    <div className="flex h-screen w-full bg-paper-100 dark:bg-slate-950 text-slate-800 dark:text-slate-200 font-sans overflow-hidden transition-colors" dir={state.language === 'ar' ? 'rtl' : 'ltr'}>
+    <div 
+        className="flex h-[100dvh] w-full bg-paper-100 dark:bg-slate-950 text-slate-800 dark:text-slate-200 font-sans overflow-hidden transition-colors" 
+        dir={state.language === 'ar' ? 'rtl' : 'ltr'}
+        onMouseUp={handleMouseUp}
+        onTouchEnd={handleTouchEnd}
+    >
       
+      {/* Modals */}
       <ResizeModal 
         isOpen={isResizeModalOpen} 
         onClose={() => setIsResizeModalOpen(false)} 
-        onResize={handleManualResize}
-        currentWidth={state.config.width}
+        onResize={handleResize} 
+        currentWidth={state.config.width} 
         currentHeight={state.config.height}
         language={state.language}
       />
 
       <TutorialModal 
-        isOpen={isTutorialOpen}
-        onClose={handleCloseTutorial}
+        isOpen={isTutorialOpen} 
+        onClose={handleCloseTutorial} 
         language={state.language}
       />
 
@@ -952,417 +909,271 @@ const App: React.FC = () => {
         isOpen={isLibraryOpen}
         onClose={() => setIsLibraryOpen(false)}
         projects={savedProjects}
-        onSaveCurrent={handleSaveToLibrary}
-        onLoad={handleLoadFromLibrary}
-        onDelete={handleDeleteFromLibrary}
-        onRename={handleRenameInLibrary}
+        onSaveCurrent={saveCurrentToLibrary}
+        onLoad={loadProjectFromLibrary}
+        onDelete={deleteProject}
+        onRename={renameProject}
         language={state.language}
       />
 
-      {/* Mobile Sidebar Overlay */}
-      {isSidebarOpen && (
-        <div 
-            className="fixed inset-0 bg-black/50 z-40 md:hidden backdrop-blur-sm transition-opacity" 
-            onClick={() => setIsSidebarOpen(false)} 
-        />
-      )}
-
-      {/* Mobile Header Menu Overlay */}
-      {isMobileHeaderMenuOpen && (
-        <div 
-            className="fixed inset-0 bg-black/50 z-40 md:hidden backdrop-blur-sm transition-opacity" 
-            onClick={() => setIsMobileHeaderMenuOpen(false)} 
-        />
-      )}
-
-       {/* MOBILE DROPDOWN MENU PANEL (Moved to Root Level for Correct Z-Index Stacking) */}
-       {isMobileHeaderMenuOpen && (
-           <div className="fixed top-16 left-0 right-0 bg-paper-50 dark:bg-slate-900 border-b border-paper-200 dark:border-slate-800 shadow-2xl z-40 p-4 flex flex-col gap-4 animate-in slide-in-from-top-2 md:hidden max-h-[80vh] overflow-y-auto">
-                
-                {/* Size & Grid Row */}
-                <div className="flex gap-3">
-                     <button 
-                        onClick={() => { setIsResizeModalOpen(true); setIsMobileHeaderMenuOpen(false); }}
-                        className="flex-1 h-12 flex items-center justify-center gap-2 bg-paper-100 dark:bg-slate-800 hover:bg-paper-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg border border-paper-200 dark:border-slate-700 font-medium text-sm"
-                    >
-                        <Grid3X3 size={18} className="text-indigo-500"/>
-                        {state.config.width} × {state.config.height}
-                    </button>
-                    <button 
-                        onClick={() => setState(s => ({ ...s, showGrid: !s.showGrid }))}
-                        className={`flex-1 h-12 flex items-center justify-center gap-2 rounded-lg border text-sm font-medium ${
-                            state.showGrid 
-                            ? 'bg-indigo-50 border-indigo-200 text-indigo-600 dark:bg-indigo-500/10 dark:border-indigo-500/50 dark:text-indigo-400' 
-                            : 'bg-paper-100 dark:bg-slate-800 border-paper-200 dark:border-slate-700 text-slate-500'
-                        }`}
-                    >
-                        {state.showGrid ? t.ui.gridOn : t.ui.gridOff}
-                    </button>
-                </div>
-
-                {/* Zoom Row */}
-                <div className="bg-paper-100 dark:bg-slate-800 p-3 rounded-lg border border-paper-200 dark:border-slate-700">
-                     <div className="flex justify-between mb-2">
-                         <label className="text-xs font-bold text-slate-500 uppercase">{t.ui.zoom}</label>
-                         <span className="text-xs font-mono text-slate-500">{state.config.size}px</span>
-                     </div>
-                     <input 
-                        type="range" 
-                        min="4" max="60" 
-                        value={state.config.size} 
-                        onChange={(e) => setState(s => ({ ...s, config: { ...s.config, size: parseInt(e.target.value) } }))}
-                        className="w-full accent-indigo-500 h-2 bg-paper-300 dark:bg-slate-700 rounded-lg appearance-none"
-                     />
-                </div>
-
-                {/* Layers Row */}
-                <div className="bg-paper-100 dark:bg-slate-800 p-3 rounded-lg border border-paper-200 dark:border-slate-700">
-                    <label className="text-xs font-bold text-slate-500 uppercase mb-3 block">{t.ui.layers}</label>
-                    <div className="flex gap-2 mb-3">
-                         <button 
-                            onClick={() => setState(s => ({...s, showDrawingLayer: !s.showDrawingLayer}))}
-                            className={`flex-1 py-2 px-3 rounded-lg text-sm flex items-center justify-center gap-2 transition-colors ${state.showDrawingLayer ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300' : 'bg-paper-200 dark:bg-slate-700 text-slate-500'}`}
-                         >
-                             {state.showDrawingLayer ? <Eye size={16} /> : <EyeOff size={16} />}
-                             {t.ui.layers}
-                         </button>
-                         <button 
-                            onClick={() => setState(s => ({...s, showReferenceLayer: !s.showReferenceLayer}))}
-                            disabled={!state.backgroundImage}
-                            className={`flex-1 py-2 px-3 rounded-lg text-sm flex items-center justify-center gap-2 transition-colors ${
-                                !state.backgroundImage 
-                                    ? 'opacity-50 cursor-not-allowed bg-paper-200 dark:bg-slate-700 text-slate-400' 
-                                    : state.showReferenceLayer 
-                                        ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' 
-                                        : 'bg-paper-200 dark:bg-slate-700 text-slate-500'
-                            }`}
-                         >
-                             {state.showReferenceLayer ? <Eye size={16} /> : <EyeOff size={16} />}
-                             {t.ui.refLayer}
-                         </button>
-                    </div>
-                    {state.backgroundImage && state.showReferenceLayer && (
-                        <div className="pt-2 border-t border-slate-200 dark:border-slate-700">
-                             <div className="flex justify-between mb-2">
-                                 <span className="text-xs text-slate-500">{t.ui.refOpacity}</span>
-                                 <span className="text-xs font-mono text-slate-500">{Math.round(state.backgroundOpacity * 100)}%</span>
-                             </div>
-                             <input 
-                                 type="range" min="0" max="1" step="0.1"
-                                 value={state.backgroundOpacity}
-                                 onChange={(e) => setState(s => ({ ...s, backgroundOpacity: parseFloat(e.target.value) }))}
-                                 className="w-full accent-green-500 h-2 bg-paper-300 dark:bg-slate-700 rounded-lg appearance-none"
-                             />
-                        </div>
-                    )}
-                </div>
-
-                {/* Theme & Language Row */}
-                <div className="flex gap-3">
-                     <div className="flex-1 bg-paper-100 dark:bg-slate-800 rounded-lg border border-paper-200 dark:border-slate-700 overflow-hidden relative">
-                         <select 
-                            value={state.language}
-                            onChange={(e) => setState(s => ({...s, language: e.target.value as Language}))}
-                            className="w-full h-12 pl-3 pr-8 bg-paper-100 dark:bg-slate-800 text-sm text-slate-700 dark:text-slate-200 outline-none appearance-none z-10 relative"
-                            style={{ colorScheme: computedIsDarkMode ? 'dark' : 'light' }}
-                         >
-                             <option value="en" className="bg-paper-100 dark:bg-slate-800 text-slate-900 dark:text-white">English</option>
-                             <option value="zh-CN" className="bg-paper-100 dark:bg-slate-800 text-slate-900 dark:text-white">简体中文</option>
-                             <option value="zh-HK" className="bg-paper-100 dark:bg-slate-800 text-slate-900 dark:text-white">繁體中文</option>
-                             <option value="ja" className="bg-paper-100 dark:bg-slate-800 text-slate-900 dark:text-white">日本語</option>
-                             <option value="ko" className="bg-paper-100 dark:bg-slate-800 text-slate-900 dark:text-white">한국어</option>
-                             <option value="fr" className="bg-paper-100 dark:bg-slate-800 text-slate-900 dark:text-white">Français</option>
-                             <option value="de" className="bg-paper-100 dark:bg-slate-800 text-slate-900 dark:text-white">Deutsch</option>
-                             <option value="es" className="bg-paper-100 dark:bg-slate-800 text-slate-900 dark:text-white">Español</option>
-                             <option value="pt-BR" className="bg-paper-100 dark:bg-slate-800 text-slate-900 dark:text-white">Português</option>
-                             <option value="ru" className="bg-paper-100 dark:bg-slate-800 text-slate-900 dark:text-white">Русский</option>
-                             <option value="ar" className="bg-paper-100 dark:bg-slate-800 text-slate-900 dark:text-white">العربية</option>
-                         </select>
-                         <div className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none z-0">
-                             <Globe size={16} />
-                         </div>
-                     </div>
-
-                     <button 
-                         onClick={() => setState(s => ({...s, theme: state.theme === 'dark' ? 'light' : 'dark'}))} 
-                         className="h-12 w-12 flex-shrink-0 flex items-center justify-center bg-paper-100 dark:bg-slate-800 rounded-lg border border-paper-200 dark:border-slate-700 text-slate-700 dark:text-slate-200"
-                     >
-                         {state.theme === 'dark' || (state.theme === 'system' && computedIsDarkMode) ? <Moon size={20} /> : <Sun size={20} />}
-                     </button>
-                </div>
-
-           </div>
-      )}
-
-      {/* Sidebar */}
+      {/* Sidebar (Desktop & Mobile Drawer) */}
       <Toolbar 
-        activeTool={state.tool}
-        setTool={(t) => setState(s => ({ ...s, tool: t }))}
+        activeTool={state.tool} 
+        setTool={handleSetTool}
         selectedColor={state.selectedColor}
-        setColor={(c) => setState(s => ({ ...s, selectedColor: c }))}
+        setColor={(c) => setState(s => ({ ...s, selectedColor: c, tool: 'pencil' }))}
         customPalette={state.customPalette}
-        onUpdateCustomColor={handleUpdateCustomColor}
+        onUpdateCustomColor={handleCustomColorUpdate}
         onDownload={handleExport}
-        onSave={handleSaveProject}
-        onLoad={handleLoadProject}
+        onSave={handleFileSave}
+        onLoad={handleFileLoad}
         onClear={handleClear}
         onImageUpload={handleImageUpload}
-        onOpenLibrary={() => setIsLibraryOpen(true)}
+        onOpenLibrary={openLibrary}
         language={state.language}
         isSidebarOpen={isSidebarOpen}
         onCloseSidebar={() => setIsSidebarOpen(false)}
       />
 
-      {/* Main Area */}
-      <main className="flex-1 flex flex-col relative min-w-0">
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col h-full relative min-w-0">
         
-        {/* Top Bar - Increased z-index to stay above overlay (z-40) */}
-        <header className="h-16 bg-paper-50 dark:bg-slate-900 border-b border-paper-200 dark:border-slate-800 flex items-center px-4 md:px-6 flex-shrink-0 z-40 transition-colors gap-4 relative">
-           
-           {/* MOBILE LAYOUT: Simple bar with Menu, Panning, Undo/Redo, and More */}
-           <div className="flex md:hidden items-center justify-between w-full h-full">
-                <div className="flex items-center gap-2">
-                    <button 
-                        onClick={() => setIsSidebarOpen(true)}
-                        className="p-2 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white rounded-lg"
-                    >
-                        <Menu size={24} />
-                    </button>
-                    
-                    <div className="h-6 w-px bg-paper-300 dark:bg-slate-700 mx-1"></div>
-                    
-                    {/* Mobile Pan Toggle */}
-                    <button 
-                        onClick={() => setIsMobilePanning(!isMobilePanning)}
-                        className={`p-2 rounded-lg transition-colors ${isMobilePanning ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800' : 'text-slate-500 dark:text-slate-400'}`}
-                        title={t.ui.pan}
-                    >
-                        <Hand size={22} />
-                    </button>
+        {/* Header */}
+        <header className="h-16 bg-paper-50 dark:bg-slate-900 border-b border-paper-200 dark:border-slate-800 flex items-center justify-between px-4 flex-shrink-0 z-40 relative">
+            <div className="flex items-center gap-3">
+                <button 
+                  onClick={() => setIsSidebarOpen(!isSidebarOpen)} 
+                  className="md:hidden p-2 text-slate-600 dark:text-slate-300 hover:bg-paper-100 dark:hover:bg-slate-800 rounded-lg"
+                >
+                    <Menu size={20} />
+                </button>
 
-                    <div className="flex items-center gap-1">
-                        <button onClick={handleUndo} disabled={state.historyIndex === 0} className="p-2 hover:bg-paper-200 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 rounded-lg disabled:opacity-30"><Undo size={22} /></button>
-                        <button onClick={handleRedo} disabled={state.historyIndex === state.history.length - 1} className="p-2 hover:bg-paper-200 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 rounded-lg disabled:opacity-30"><Redo size={22} /></button>
-                    </div>
+                <div className="hidden md:flex items-center gap-2">
+                    <button onClick={handleUndo} className="p-2 text-slate-600 dark:text-slate-400 hover:bg-paper-100 dark:hover:bg-slate-800 rounded-lg" title={t.ui.undo}>
+                        <Undo size={20} />
+                    </button>
+                    <button onClick={handleRedo} className="p-2 text-slate-600 dark:text-slate-400 hover:bg-paper-100 dark:hover:bg-slate-800 rounded-lg" title={t.ui.redo}>
+                        <Redo size={20} />
+                    </button>
                 </div>
 
-                <button 
-                    onClick={() => setIsMobileHeaderMenuOpen(!isMobileHeaderMenuOpen)}
-                    className={`p-2 rounded-lg transition-colors ${isMobileHeaderMenuOpen ? 'bg-indigo-50 text-indigo-600 dark:bg-slate-800 dark:text-indigo-400' : 'text-slate-500 dark:text-slate-400'}`}
-                >
-                    <MoreVertical size={24} />
-                </button>
-           </div>
+                 {/* Mobile Hand Tool Toggle */}
+                 <button 
+                    onClick={() => setIsMobilePanning(!isMobilePanning)}
+                    className={`md:hidden p-2 rounded-lg transition-colors ${
+                        isMobilePanning 
+                        ? 'bg-indigo-100 text-indigo-600 dark:bg-indigo-900/50 dark:text-indigo-300' 
+                        : 'text-slate-600 dark:text-slate-400 hover:bg-paper-100 dark:hover:bg-slate-800'
+                    }`}
+                 >
+                    <Hand size={20} />
+                 </button>
+            </div>
 
+            {/* Mobile Title */}
+            <h1 
+              className="md:hidden text-sm font-bold bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent" 
+              style={{ fontFamily: '"Press Start 2P", cursive' }}
+            >
+                PixelCraft
+            </h1>
 
-           {/* DESKTOP LAYOUT: Full detailed controls */}
-           <div className="hidden md:flex flex-1 items-center justify-between min-w-0 gap-4">
-               
-               {/* LEFT SIDE: Scrollable (Undo, Redo, Size, Zoom) */}
-               <div className="flex items-center gap-3 overflow-x-auto no-scrollbar pb-2 pt-2 -mb-2 -mt-2">
-                  <div className="h-10 flex items-center gap-1 bg-paper-50 dark:bg-slate-800 rounded-lg p-1 border border-paper-200 dark:border-slate-700 flex-shrink-0">
-                      <button onClick={handleUndo} disabled={state.historyIndex === 0} className="p-2 hover:bg-paper-200 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white text-slate-500 dark:text-slate-400 rounded-md disabled:opacity-30 transition-colors" title={`${t.ui.undo} (Ctrl + Z)`}><Undo size={18} /></button>
-                      <div className="w-px h-4 bg-paper-300 dark:bg-slate-700"></div>
-                      <button onClick={handleRedo} disabled={state.historyIndex === state.history.length - 1} className="p-2 hover:bg-paper-200 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white text-slate-500 dark:text-slate-400 rounded-md disabled:opacity-30 transition-colors" title={`${t.ui.redo} (Ctrl + Y)`}><Redo size={18} /></button>
-                  </div>
+            <div className="flex items-center gap-2">
+                 {/* Mobile Menu Toggle */}
+                 <button 
+                   onClick={() => setIsMobileHeaderMenuOpen(!isMobileHeaderMenuOpen)}
+                   className="md:hidden p-2 text-slate-600 dark:text-slate-300 hover:bg-paper-100 dark:hover:bg-slate-800 rounded-lg"
+                 >
+                    <MoreVertical size={20} />
+                 </button>
 
-                  <div className="h-6 w-px bg-paper-300 dark:bg-slate-800 hidden md:block flex-shrink-0"></div>
+                 {/* Desktop Header Actions */}
+                 <div className="hidden md:flex items-center gap-2">
+                    {/* Settings Group */}
+                    <div className="flex items-center bg-paper-100 dark:bg-slate-800 rounded-lg p-1 border border-paper-200 dark:border-slate-700">
+                        <button 
+                            onClick={() => setState(s => ({ ...s, showGrid: !s.showGrid }))}
+                            className={`p-1.5 rounded-md transition-all ${state.showGrid ? 'bg-white dark:bg-slate-600 text-indigo-600 dark:text-white shadow-sm' : 'text-slate-500 hover:text-slate-800 dark:text-slate-400'}`}
+                            title={state.showGrid ? t.ui.gridOn : t.ui.gridOff}
+                        >
+                            <Grid3X3 size={16} />
+                        </button>
+                        <div className="w-px h-4 bg-slate-300 dark:bg-slate-600 mx-1"></div>
+                        <button 
+                            onClick={() => setState(s => ({ ...s, showDrawingLayer: !s.showDrawingLayer }))}
+                            className={`p-1.5 rounded-md transition-all ${!state.showDrawingLayer ? 'text-slate-400' : 'text-indigo-600 dark:text-indigo-400'}`}
+                            title={t.ui.layers}
+                        >
+                            {state.showDrawingLayer ? <Eye size={16} /> : <EyeOff size={16} />}
+                        </button>
+                        <button 
+                            onClick={() => setState(s => ({ ...s, showReferenceLayer: !s.showReferenceLayer }))}
+                             className={`p-1.5 rounded-md transition-all ${!state.showReferenceLayer ? 'text-slate-400' : 'text-green-600 dark:text-green-400'}`}
+                            title={t.ui.refLayer}
+                        >
+                            {state.showReferenceLayer ? <ImageIcon size={16} /> : <EyeOff size={16} />}
+                        </button>
+                    </div>
+                    
+                    {/* Size Button */}
+                     <button 
+                        onClick={() => setIsResizeModalOpen(true)}
+                        className="p-2 text-slate-600 dark:text-slate-300 hover:bg-paper-100 dark:hover:bg-slate-800 rounded-lg flex items-center gap-2 text-xs font-medium border border-transparent hover:border-paper-200 dark:hover:border-slate-700"
+                    >
+                        <Settings size={16} />
+                        <span>{state.config.width}x{state.config.height}</span>
+                    </button>
 
-                  <button 
-                    onClick={() => setIsResizeModalOpen(true)}
-                    className="h-10 flex-shrink-0 flex items-center gap-2 bg-paper-50 dark:bg-slate-800 hover:bg-paper-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 px-3 rounded-lg border border-paper-200 dark:border-slate-700 transition-all group"
-                  >
-                      <Grid3X3 size={18} className="text-indigo-500 dark:text-indigo-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-300"/>
-                      <span className="text-sm font-medium hidden sm:inline">
-                          {state.config.width} × {state.config.height}
-                      </span>
-                      <span className="text-sm font-medium sm:hidden">
-                          {state.config.width}
-                      </span>
-                      <Settings size={14} className="ml-1 opacity-50 group-hover:opacity-100"/>
-                  </button>
+                    {/* Theme Toggle */}
+                     <button 
+                        onClick={() => setState(s => ({ ...s, theme: s.theme === 'light' ? 'dark' : s.theme === 'dark' ? 'system' : 'light' }))}
+                        className="p-2 text-slate-600 dark:text-slate-300 hover:bg-paper-100 dark:hover:bg-slate-800 rounded-lg"
+                        title={`Theme: ${state.theme}`}
+                    >
+                        {state.theme === 'light' ? <Sun size={20} /> : state.theme === 'dark' ? <Moon size={20} /> : <Monitor size={20} />}
+                    </button>
+                     
+                     {/* Language */}
+                     <button 
+                        onClick={() => {
+                             const langs: Language[] = ['en', 'zh-CN', 'zh-HK', 'ja', 'ko', 'fr', 'de', 'es', 'pt-BR', 'ru', 'ar'];
+                             const idx = langs.indexOf(state.language);
+                             const next = langs[(idx + 1) % langs.length];
+                             setState(s => ({ ...s, language: next }));
+                        }}
+                        className="p-2 text-slate-600 dark:text-slate-300 hover:bg-paper-100 dark:hover:bg-slate-800 rounded-lg font-bold text-xs"
+                    >
+                        {state.language.split('-')[0].toUpperCase()}
+                    </button>
 
-                   <div className="h-10 flex-shrink-0 flex items-center gap-3 bg-paper-50 dark:bg-slate-800 px-3 rounded-lg border border-paper-200 dark:border-slate-700">
-                      <label className="text-xs text-slate-500 font-bold uppercase tracking-wider hidden sm:block">{t.ui.zoom}</label>
-                      <input 
-                        type="range" 
-                        min="4" max="60" 
-                        value={state.config.size} 
-                        onChange={(e) => setState(s => ({ ...s, config: { ...s.config, size: parseInt(e.target.value) } }))}
-                        onWheel={handleZoomWheel}
-                        className="w-20 sm:w-24 accent-indigo-500 h-1.5 bg-paper-300 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer hover:bg-paper-400 dark:hover:bg-slate-600 transition-colors"
-                      />
-                  </div>
-               </div>
-
-               {/* RIGHT SIDE: Fixed (No Overflow for Dropdowns) */}
-               <div className="flex items-center gap-3 flex-shrink-0 pl-2">
-                   
-                   {/* Layers Control */}
-                   <div className="h-10 flex items-center gap-2 bg-paper-50 dark:bg-slate-800 px-3 rounded-lg border border-paper-200 dark:border-slate-700">
-                      <Layers size={14} className="text-slate-500 mr-1 hidden sm:block" />
-                      <button 
-                         onClick={() => setState(s => ({...s, showDrawingLayer: !s.showDrawingLayer}))}
-                         className={`p-1.5 rounded-md transition-colors ${state.showDrawingLayer ? 'text-indigo-500 dark:text-indigo-400 hover:bg-paper-200 dark:hover:bg-slate-700' : 'text-slate-400 hover:text-slate-500'}`}
-                         title={t.ui.layers}
-                      >
-                         {state.showDrawingLayer ? <Eye size={18} /> : <EyeOff size={18} />}
-                      </button>
-                      <button 
-                         onClick={() => setState(s => ({...s, showReferenceLayer: !s.showReferenceLayer}))}
-                         disabled={!state.backgroundImage}
-                         className={`p-1.5 rounded-md transition-colors ${
-                            !state.backgroundImage 
-                                ? 'text-slate-300 dark:text-slate-700 cursor-not-allowed' 
-                                : state.showReferenceLayer 
-                                    ? 'text-green-500 dark:text-green-400 hover:bg-paper-200 dark:hover:bg-slate-700' 
-                                    : 'text-slate-400 hover:text-slate-500'
-                         }`}
-                         title={t.ui.refLayer}
-                      >
-                         {state.showReferenceLayer ? <Eye size={18} /> : <EyeOff size={18} />}
-                      </button>
-                   </div>
-
-                   {state.backgroundImage && state.showReferenceLayer && (
-                       <div className="h-10 flex items-center gap-3 bg-paper-50 dark:bg-slate-800 px-3 rounded-lg border border-paper-200 dark:border-slate-800">
-                           <span className="text-xs text-slate-500 font-bold uppercase hidden sm:block">{t.ui.refOpacity}</span>
-                           <input 
-                             type="range" min="0" max="1" step="0.1"
-                             value={state.backgroundOpacity}
-                             onChange={(e) => setState(s => ({ ...s, backgroundOpacity: parseFloat(e.target.value) }))}
-                             onWheel={handleOpacityWheel}
-                             className="w-16 sm:w-20 accent-green-500 h-1.5 bg-paper-300 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer"
-                           />
-                       </div>
-                   )}
-                   <button 
-                     onClick={() => setState(s => ({ ...s, showGrid: !s.showGrid }))}
-                     className={`h-10 px-3 rounded-lg text-xs font-bold uppercase tracking-wide transition-all border flex items-center justify-center ${
-                         state.showGrid 
-                         ? 'bg-indigo-50 border-indigo-200 text-indigo-600 dark:bg-indigo-500/10 dark:border-indigo-500/50 dark:text-indigo-400' 
-                         : 'bg-paper-50 dark:bg-slate-800 border-paper-200 dark:border-slate-700 text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
-                     }`}
-                   >
-                       {state.showGrid ? t.ui.gridOn : t.ui.gridOff}
-                   </button>
-
-                   {/* Language Switcher */}
-                   <div className="relative group z-50">
-                      <button className="h-10 w-10 flex items-center justify-center bg-paper-50 dark:bg-slate-800 rounded-lg border border-paper-200 dark:border-slate-700 text-slate-500 hover:text-indigo-500 dark:text-slate-400 dark:hover:text-indigo-400 transition-colors">
-                          <Globe size={18} />
-                      </button>
-                      <div className="absolute right-0 top-full pt-2 w-48 hidden group-hover:block">
-                          <div className="bg-paper-50 dark:bg-slate-800 rounded-lg shadow-xl border border-paper-200 dark:border-slate-700 overflow-hidden max-h-80 overflow-y-auto">
-                            <button onClick={() => setState(s => ({...s, language: 'en'}))} className={`w-full text-left px-4 py-2 text-sm hover:bg-paper-100 dark:hover:bg-slate-700 ${state.language === 'en' ? 'text-indigo-500 font-bold' : 'text-slate-600 dark:text-slate-300'}`}>🇺🇸 English (US)</button>
-                            <button onClick={() => setState(s => ({...s, language: 'zh-CN'}))} className={`w-full text-left px-4 py-2 text-sm hover:bg-paper-100 dark:hover:bg-slate-700 ${state.language === 'zh-CN' ? 'text-indigo-500 font-bold' : 'text-slate-600 dark:text-slate-300'}`}>🇨🇳 中文 (简体)</button>
-                            <button onClick={() => setState(s => ({...s, language: 'zh-HK'}))} className={`w-full text-left px-4 py-2 text-sm hover:bg-paper-100 dark:hover:bg-slate-700 ${state.language === 'zh-HK' ? 'text-indigo-500 font-bold' : 'text-slate-600 dark:text-slate-300'}`}>🇭🇰 中文 (繁體)</button>
-                            <button onClick={() => setState(s => ({...s, language: 'ja'}))} className={`w-full text-left px-4 py-2 text-sm hover:bg-paper-100 dark:hover:bg-slate-700 ${state.language === 'ja' ? 'text-indigo-500 font-bold' : 'text-slate-600 dark:text-slate-300'}`}>🇯🇵 日本語</button>
-                            <button onClick={() => setState(s => ({...s, language: 'ko'}))} className={`w-full text-left px-4 py-2 text-sm hover:bg-paper-100 dark:hover:bg-slate-700 ${state.language === 'ko' ? 'text-indigo-500 font-bold' : 'text-slate-600 dark:text-slate-300'}`}>🇰🇷 한국어</button>
-                            <button onClick={() => setState(s => ({...s, language: 'fr'}))} className={`w-full text-left px-4 py-2 text-sm hover:bg-paper-100 dark:hover:bg-slate-700 ${state.language === 'fr' ? 'text-indigo-500 font-bold' : 'text-slate-600 dark:text-slate-300'}`}>🇫🇷 Français</button>
-                            <button onClick={() => setState(s => ({...s, language: 'de'}))} className={`w-full text-left px-4 py-2 text-sm hover:bg-paper-100 dark:hover:bg-slate-700 ${state.language === 'de' ? 'text-indigo-500 font-bold' : 'text-slate-600 dark:text-slate-300'}`}>🇩🇪 Deutsch</button>
-                            <button onClick={() => setState(s => ({...s, language: 'es'}))} className={`w-full text-left px-4 py-2 text-sm hover:bg-paper-100 dark:hover:bg-slate-700 ${state.language === 'es' ? 'text-indigo-500 font-bold' : 'text-slate-600 dark:text-slate-300'}`}>🇪🇸 Español (ES)</button>
-                            <button onClick={() => setState(s => ({...s, language: 'pt-BR'}))} className={`w-full text-left px-4 py-2 text-sm hover:bg-paper-100 dark:hover:bg-slate-700 ${state.language === 'pt-BR' ? 'text-indigo-500 font-bold' : 'text-slate-600 dark:text-slate-300'}`}>🇧🇷 Português (BR)</button>
-                            <button onClick={() => setState(s => ({...s, language: 'ru'}))} className={`w-full text-left px-4 py-2 text-sm hover:bg-paper-100 dark:hover:bg-slate-700 ${state.language === 'ru' ? 'text-indigo-500 font-bold' : 'text-slate-600 dark:text-slate-300'}`}>🇷🇺 Русский</button>
-                            <button onClick={() => setState(s => ({...s, language: 'ar'}))} className={`w-full text-left px-4 py-2 text-sm hover:bg-paper-100 dark:hover:bg-slate-700 ${state.language === 'ar' ? 'text-indigo-500 font-bold' : 'text-slate-600 dark:text-slate-300'}`}>🇸🇦 العربية</button>
-                          </div>
-                      </div>
-                   </div>
-
-                   {/* Theme Toggle - Dropdown */}
-                   <div className="relative group z-50">
-                      <button className="h-10 w-10 flex items-center justify-center bg-paper-50 dark:bg-slate-800 rounded-lg border border-paper-200 dark:border-slate-700 text-slate-500 hover:text-indigo-500 dark:text-slate-400 dark:hover:text-indigo-400 transition-colors">
-                          {state.theme === 'light' && <Sun size={18} />}
-                          {state.theme === 'dark' && <Moon size={18} />}
-                          {state.theme === 'system' && <Monitor size={18} />}
-                      </button>
-                      <div className="absolute right-0 top-full pt-2 w-40 hidden group-hover:block">
-                          <div className="bg-paper-50 dark:bg-slate-800 rounded-lg shadow-xl border border-paper-200 dark:border-slate-700 overflow-hidden">
-                            <button onClick={() => setState(s => ({...s, theme: 'light'}))} className={`w-full text-left px-4 py-2 text-sm hover:bg-paper-100 dark:hover:bg-slate-700 flex items-center gap-2 ${state.theme === 'light' ? 'text-indigo-500 font-bold' : 'text-slate-600 dark:text-slate-300'}`}>
-                                <Sun size={16} /> {t.ui.lightMode}
-                            </button>
-                            <button onClick={() => setState(s => ({...s, theme: 'dark'}))} className={`w-full text-left px-4 py-2 text-sm hover:bg-paper-100 dark:hover:bg-slate-700 flex items-center gap-2 ${state.theme === 'dark' ? 'text-indigo-500 font-bold' : 'text-slate-600 dark:text-slate-300'}`}>
-                                <Moon size={16} /> {t.ui.darkMode}
-                            </button>
-                            <button onClick={() => setState(s => ({...s, theme: 'system'}))} className={`w-full text-left px-4 py-2 text-sm hover:bg-paper-100 dark:hover:bg-slate-700 flex items-center gap-2 ${state.theme === 'system' ? 'text-indigo-500 font-bold' : 'text-slate-600 dark:text-slate-300'}`}>
-                                <Monitor size={16} /> {t.ui.systemMode}
-                            </button>
-                          </div>
-                      </div>
-                   </div>
-               </div>
-           </div>
+                     <button 
+                        onClick={() => setIsTutorialOpen(true)}
+                        className="p-2 text-slate-600 dark:text-slate-300 hover:bg-paper-100 dark:hover:bg-slate-800 rounded-lg"
+                    >
+                        <HelpCircle size={20} />
+                    </button>
+                 </div>
+            </div>
         </header>
 
-        {/* Canvas Container - Refactored for Pan/Zoom with Transforms */}
-        <div 
-             ref={canvasContainerRef}
-             onMouseDown={handleContainerMouseDown}
-             onMouseMove={handleContainerMouseMove}
-             onMouseUp={handleContainerMouseUp}
-             onMouseLeave={handleContainerMouseUp}
-             onTouchStart={handleContainerTouchStart}
-             onTouchMove={handleContainerTouchMove}
-             onTouchEnd={handleContainerTouchEnd}
-             className={`flex-1 bg-paper-100 dark:bg-slate-950 overflow-hidden relative transition-colors ${
-                isPanning || isMobilePanning ? 'cursor-grabbing' : isSpacePressed ? 'cursor-grab' : 'cursor-default'
-             }`}
-             style={{
-                 // Background dots remain static to give reference
-                 backgroundImage: `radial-gradient(${computedIsDarkMode ? '#1e293b' : '#D1CEC7'} 1px, transparent 1px)`,
-                 backgroundSize: '20px 20px',
-                 touchAction: 'none' // Important: Disable browser default touch actions like scroll/zoom
-             }}
-        >
-            {/* Movable/Scalable Wrapper */}
-            <div 
-                className="absolute top-1/2 left-1/2"
-                style={{ 
-                    transform: `translate(-50%, -50%) translate(${panOffset.x}px, ${panOffset.y}px)` 
-                }}
-            >
-                <div className="shadow-2xl shadow-black/10 dark:shadow-black/50 pointer-events-auto">
-                    <CanvasBoard 
-                        grid={state.grid}
-                        config={state.config}
-                        tool={state.tool}
-                        selectedColor={state.selectedColor}
-                        showGrid={state.showGrid}
-                        showDrawingLayer={state.showDrawingLayer}
-                        showReferenceLayer={state.showReferenceLayer}
-                        backgroundImage={state.backgroundImage}
-                        backgroundOpacity={state.backgroundOpacity}
-                        isDarkMode={computedIsDarkMode}
-                        onGridChange={handleGridChangeFromCanvas}
-                        onEyeDropper={(c) => setState(s => ({ ...s, selectedColor: c, tool: 'pencil' }))}
-                        isSpacePressed={isSpacePressed || isMobilePanning}
-                    />
-                </div>
-            </div>
-        </div>
+        {/* Mobile Header Menu Dropdown */}
+        {isMobileHeaderMenuOpen && (
+            <div className="md:hidden absolute top-16 left-0 right-0 bg-paper-50 dark:bg-slate-900 border-b border-paper-200 dark:border-slate-800 shadow-2xl z-30 p-4 flex flex-col gap-4 animate-in slide-in-from-top-5">
+                 {/* Mobile Actions Grid */}
+                 <div className="grid grid-cols-4 gap-4">
+                    <button onClick={handleUndo} className="flex flex-col items-center gap-1 text-slate-600 dark:text-slate-300">
+                        <div className="p-2 bg-paper-100 dark:bg-slate-800 rounded-lg"><Undo size={20} /></div>
+                        <span className="text-[10px]">{t.ui.undo}</span>
+                    </button>
+                     <button onClick={handleRedo} className="flex flex-col items-center gap-1 text-slate-600 dark:text-slate-300">
+                        <div className="p-2 bg-paper-100 dark:bg-slate-800 rounded-lg"><Redo size={20} /></div>
+                        <span className="text-[10px]">{t.ui.redo}</span>
+                    </button>
+                    <button onClick={() => { setIsResizeModalOpen(true); setIsMobileHeaderMenuOpen(false); }} className="flex flex-col items-center gap-1 text-slate-600 dark:text-slate-300">
+                        <div className="p-2 bg-paper-100 dark:bg-slate-800 rounded-lg"><Settings size={20} /></div>
+                        <span className="text-[10px]">{t.resize.title}</span>
+                    </button>
+                    <button onClick={() => { setIsTutorialOpen(true); setIsMobileHeaderMenuOpen(false); }} className="flex flex-col items-center gap-1 text-slate-600 dark:text-slate-300">
+                         <div className="p-2 bg-paper-100 dark:bg-slate-800 rounded-lg"><HelpCircle size={20} /></div>
+                        <span className="text-[10px]">Help</span>
+                    </button>
+                 </div>
 
-        {/* Floating Help Button - Bottom Right */}
-        <button 
-            onClick={() => setIsTutorialOpen(true)}
-            className="absolute bottom-4 right-4 z-40 h-10 w-10 flex items-center justify-center bg-slate-800 hover:bg-slate-700 dark:bg-slate-700 dark:hover:bg-slate-600 text-white rounded-lg shadow-lg transition-all hover:scale-105 active:scale-95"
-            title={t.tutorial.title}
-        >
-            <HelpCircle size={20} />
-        </button>
+                 <div className="h-px bg-paper-200 dark:bg-slate-800 w-full"></div>
 
-        {/* Notification Toast */}
-        {isNotificationVisible && (
-            <div className={`fixed bottom-8 left-1/2 md:left-[calc(50%+9rem)] transform -translate-x-1/2 px-6 py-3 rounded-lg shadow-xl border flex items-center gap-3 z-[100] ${
-                isNotificationVisible.type === 'success' 
-                ? 'bg-paper-50 dark:bg-slate-900 border-green-200 dark:border-green-500/30 text-green-600 dark:text-green-400' 
-                : 'bg-paper-50 dark:bg-slate-900 border-red-200 dark:border-red-500/30 text-red-600 dark:text-red-400'
-            } transition-all`}>
-                <div className={`w-2 h-2 rounded-full ${isNotificationVisible.type === 'success' ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                <span className="font-medium text-sm">{isNotificationVisible.msg}</span>
+                 {/* Toggles */}
+                 <div className="flex justify-between items-center">
+                    <span className="text-sm text-slate-600 dark:text-slate-400">{t.ui.gridOn}</span>
+                    <button 
+                        onClick={() => setState(s => ({ ...s, showGrid: !s.showGrid }))}
+                        className={`w-12 h-6 rounded-full transition-colors relative ${state.showGrid ? 'bg-indigo-500' : 'bg-slate-300 dark:bg-slate-700'}`}
+                    >
+                        <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform ${state.showGrid ? 'left-7' : 'left-1'}`}></div>
+                    </button>
+                 </div>
+
+                 <div className="flex justify-between items-center">
+                    <span className="text-sm text-slate-600 dark:text-slate-400">Dark Mode</span>
+                     <button 
+                        onClick={() => setState(s => ({ ...s, theme: s.theme === 'dark' ? 'light' : 'dark' }))}
+                        className="p-2 bg-paper-100 dark:bg-slate-800 rounded-lg text-slate-600 dark:text-slate-300"
+                    >
+                        {state.theme === 'dark' ? <Moon size={18} /> : <Sun size={18} />}
+                    </button>
+                 </div>
             </div>
         )}
 
-      </main>
+        {/* Canvas Area */}
+        <main 
+            className="flex-1 overflow-hidden relative bg-paper-100 dark:bg-slate-950 cursor-default touch-none"
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseLeave={handleMouseUp}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+        >
+           {/* Pixel Grid Background Pattern */}
+           <div 
+             className="absolute inset-0 opacity-20 pointer-events-none"
+             style={{
+                backgroundImage: `radial-gradient(${computedIsDarkMode ? '#1e293b' : '#D1CEC7'} 1px, transparent 1px)`,
+                backgroundSize: '20px 20px',
+                transform: `translate(${panOffset.x}px, ${panOffset.y}px)`
+             }}
+           />
+
+           <div 
+             ref={canvasContainerRef}
+             className="w-full h-full flex items-center justify-center p-8"
+             style={{
+                 transform: `translate(${panOffset.x}px, ${panOffset.y}px)`
+             }}
+           >
+              <CanvasBoard
+                grid={state.grid}
+                config={state.config}
+                tool={state.tool}
+                selectedColor={state.selectedColor}
+                showGrid={state.showGrid}
+                showDrawingLayer={state.showDrawingLayer}
+                showReferenceLayer={state.showReferenceLayer}
+                backgroundImage={state.backgroundImage}
+                backgroundOpacity={state.backgroundOpacity}
+                isDarkMode={computedIsDarkMode}
+                onGridChange={(newGrid) => updateGrid(newGrid)}
+                onEyeDropper={handleEyeDropper}
+                isSpacePressed={isSpacePressed || isMobilePanning}
+              />
+           </div>
+        </main>
+
+        {/* Floating Action Button (Help) - Only on Mobile */}
+        <button 
+           onClick={() => setIsTutorialOpen(true)}
+           className="md:hidden fixed bottom-6 right-6 w-12 h-12 bg-indigo-600 text-white rounded-full shadow-xl flex items-center justify-center z-40 hover:bg-indigo-500 transition-transform active:scale-90"
+        >
+           <HelpCircle size={24} />
+        </button>
+
+      </div>
+
+      {/* Toast Notification */}
+      {isNotificationVisible && (
+        <div className={`fixed bottom-8 left-1/2 md:left-[calc(50%+9rem)] transform -translate-x-1/2 px-6 py-3 rounded-lg shadow-xl border flex items-center gap-3 z-[100] ${
+            isNotificationVisible.type === 'success' 
+             ? 'bg-paper-50 dark:bg-slate-900 border-green-200 dark:border-green-500/30 text-green-600 dark:text-green-400' 
+             : 'bg-paper-50 dark:bg-slate-900 border-red-200 dark:border-red-500/30 text-red-600 dark:text-red-400'
+        } transition-all animate-in slide-in-from-bottom-5 fade-in duration-300`}>
+           {isNotificationVisible.type === 'success' ? (
+               <div className="w-2 h-2 rounded-full bg-green-500"></div>
+           ) : (
+               <div className="w-2 h-2 rounded-full bg-red-500"></div>
+           )}
+           <span className="font-medium text-sm">{isNotificationVisible.msg}</span>
+        </div>
+      )}
+
     </div>
   );
 };
