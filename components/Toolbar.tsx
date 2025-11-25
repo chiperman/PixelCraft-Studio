@@ -75,7 +75,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
           </div>
 
           {/* Tools */}
-          <div className="flex flex-col gap-1.5 flex-shrink-0">
+          <div className="flex flex-col gap-1.5 flex-shrink-0 pb-2">
             <h3 className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 tracking-wider text-left pl-1">{t.headers.tools}</h3>
             <div className="grid grid-cols-4 gap-2 place-items-center">
               {tools.map((tool) => (
@@ -98,7 +98,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
           </div>
 
           {/* Palette Container */}
-          <div className="flex flex-col gap-3 flex-shrink-0">
+          <div className="flex flex-col gap-3 flex-shrink-0 pt-3 border-t border-slate-200/50 dark:border-white/5">
             
             {/* Presets */}
             <div className="flex flex-col gap-1.5">
@@ -106,7 +106,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
                 {t.headers.palette}
               </h3>
               
-              <div className="grid grid-cols-5 gap-2 justify-items-center">
+              <div className="grid grid-cols-5 gap-3 w-fit mx-auto">
                 {DEFAULT_PALETTE.map((color) => (
                   <button
                     key={color}
@@ -128,7 +128,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
               <h3 className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 tracking-wider text-left pl-1">
                   {t.headers.custom}
               </h3>
-              <div className="grid grid-cols-5 gap-2 justify-items-center">
+              <div className="grid grid-cols-5 gap-3 w-fit mx-auto">
                   {customPalette.map((color, idx) => (
                     <CustomColorSlot 
                         key={idx} 
