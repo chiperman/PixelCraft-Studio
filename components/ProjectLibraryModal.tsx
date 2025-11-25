@@ -58,12 +58,13 @@ const ProjectLibraryModal: React.FC<ProjectLibraryModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black/30 dark:bg-black/60 backdrop-blur-md flex items-center justify-center z-[100] p-4 animate-in fade-in duration-300">
-      <div className="glass-panel rounded-cupertino w-full max-w-4xl max-h-[85vh] flex flex-col overflow-hidden relative border border-white/20 dark:border-white/5 shadow-2xl animate-in zoom-in-95 duration-300">
+      <div className="glass-panel rounded-cupertino w-full max-w-4xl max-h-[85vh] flex flex-col overflow-hidden relative shadow-2xl animate-in zoom-in-95 duration-300">
         
         {/* Delete Confirmation Overlay */}
         {deletingId && (
-           <div className="absolute inset-0 z-50 bg-white/60 dark:bg-black/60 flex flex-col items-center justify-center p-6 text-center animate-in fade-in duration-200 backdrop-blur-md">
-                <div className="glass-panel p-8 rounded-cupertino shadow-2xl border border-white/40 dark:border-white/10 max-w-sm w-full bg-white/80 dark:bg-[#1c1c1e]/80">
+           <div className="absolute inset-0 z-50 flex flex-col items-center justify-center p-6 text-center animate-in fade-in duration-200">
+                <div className="absolute inset-0 bg-black/20 dark:bg-black/50 backdrop-blur-sm" onClick={() => setDeletingId(null)}></div>
+                <div className="glass-panel p-8 rounded-cupertino shadow-2xl border border-white/40 dark:border-white/10 max-w-sm w-full relative z-10">
                     <div className="w-16 h-16 bg-red-100 dark:bg-red-500/10 text-red-600 dark:text-red-400 rounded-full flex items-center justify-center mx-auto mb-4">
                         <Trash2 size={32} />
                     </div>
@@ -88,7 +89,7 @@ const ProjectLibraryModal: React.FC<ProjectLibraryModalProps> = ({
         )}
 
         {/* Header */}
-        <div className="p-6 border-b border-slate-200/50 dark:border-white/5 flex justify-between items-center bg-white/40 dark:bg-white/5 backdrop-blur-xl z-10">
+        <div className="p-6 border-b border-slate-200/50 dark:border-white/5 flex justify-between items-center z-10">
            <h2 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-3 tracking-tight">
              <span className="text-3xl">📚</span> {t.library.title}
            </h2>
@@ -98,7 +99,7 @@ const ProjectLibraryModal: React.FC<ProjectLibraryModalProps> = ({
         </div>
 
         {/* Save Current Section */}
-        <div className="p-6 bg-slate-50/50 dark:bg-black/20 border-b border-slate-200/50 dark:border-white/5 flex flex-col sm:flex-row gap-4 items-center backdrop-blur-sm z-10">
+        <div className="p-6 border-b border-slate-200/50 dark:border-white/5 flex flex-col sm:flex-row gap-4 items-center z-10">
             <input 
               type="text" 
               value={newProjectName}
@@ -116,7 +117,7 @@ const ProjectLibraryModal: React.FC<ProjectLibraryModalProps> = ({
         </div>
 
         {/* Projects Grid */}
-        <div className="flex-1 overflow-y-auto p-6 custom-scrollbar bg-slate-50/30 dark:bg-black/20">
+        <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
            {projects.length === 0 ? (
              <div className="h-full flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 gap-6">
                 <div className="w-32 h-32 bg-white/50 dark:bg-white/5 rounded-full flex items-center justify-center border border-dashed border-slate-300 dark:border-slate-700">
