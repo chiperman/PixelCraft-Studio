@@ -28,7 +28,7 @@ const CustomSelect = ({ value, onChange, options, isDarkMode, className = "h-12"
     <div className="relative flex-1 min-w-0" ref={containerRef}>
         <button 
             onClick={() => setIsOpen(!isOpen)}
-            className={`w-full flex items-center justify-between px-3 bg-white/50 dark:bg-white/5 rounded-xl border border-white/20 dark:border-white/5 text-slate-700 dark:text-slate-200 transition-all active:scale-[0.98] hover:bg-white/70 dark:hover:bg-white/10 ${className}`}
+            className={`w-full flex items-center justify-between px-3 bg-white/50 dark:bg-white/5 rounded-xl border border-white/20 dark:border-white/5 text-slate-700 dark:text-slate-200 transition-all active:scale-[0.98] hover:bg-white/70 dark:hover:bg-white/10 glass-panel ${className}`}
         >
             <span className="flex items-center gap-2 truncate pr-2">
                 <Globe size={16} className="opacity-70 shrink-0" />
