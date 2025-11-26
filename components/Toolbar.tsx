@@ -147,7 +147,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
 
         {/* Tools */}
         <div className="flex flex-col gap-1.5 flex-shrink-0 pb-2">
-          <h3 className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 tracking-wider text-left pl-1">{t.headers.tools}</h3>
+          <h3 className="text-xs uppercase font-bold text-slate-400 dark:text-slate-500 tracking-wider text-left pl-1">{t.headers.tools}</h3>
           <div className="grid grid-cols-4 gap-2 place-items-center">
             {tools.map((tool) => (
               <button
@@ -172,7 +172,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
 
           {/* Presets */}
           <div className="flex flex-col gap-1.5">
-            <h3 className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 tracking-wider text-left pl-1">
+            <h3 className="text-xs uppercase font-bold text-slate-400 dark:text-slate-500 tracking-wider text-left pl-1">
               {t.headers.palette}
             </h3>
 
@@ -194,7 +194,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
 
           {/* Custom Palette */}
           <div className="flex flex-col gap-1.5">
-            <h3 className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 tracking-wider text-left pl-1">
+            <h3 className="text-xs uppercase font-bold text-slate-400 dark:text-slate-500 tracking-wider text-left pl-1">
               {t.headers.custom}
             </h3>
             <div className="grid grid-cols-5 gap-3 w-fit mx-auto">
@@ -213,7 +213,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
 
         {/* Actions */}
         <div className="flex flex-col gap-2 mt-auto flex-shrink-0 pt-3 border-t border-slate-200/50 dark:border-white/5">
-          <h3 className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 tracking-wider text-left pl-1 mb-0.5">{t.headers.actions}</h3>
+          <h3 className="text-xs uppercase font-bold text-slate-400 dark:text-slate-500 tracking-wider text-left pl-1 mb-0.5">{t.headers.actions}</h3>
 
           <button
             onClick={() => { onOpenLibrary(); if (window.innerWidth < 768) onCloseSidebar(); }}
