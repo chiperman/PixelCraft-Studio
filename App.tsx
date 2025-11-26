@@ -251,7 +251,7 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ isOpen, onClose, language
                         <div className="space-y-3">
                             {TOOL_SHORTCUTS.map((shortcut) => (
                                 <div key={shortcut.label} className="flex items-center justify-between text-sm">
-                                    <span className="text-slate-700 dark:text-slate-300 font-medium">{shortcut.label}</span>
+                                    <span className="text-slate-700 dark:text-slate-300 font-medium shrink-0">{shortcut.label}</span>
                                     <div className="flex items-center">
                                         {shortcut.keys.map((k, i) => <Kbd key={i}>{k}</Kbd>)}
                                     </div>
@@ -265,9 +265,9 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ isOpen, onClose, language
                          <h4 className="text-[11px] uppercase font-bold text-slate-400 mb-4 tracking-wider">Editor</h4>
                          <div className="space-y-3">
                             {EDITOR_SHORTCUTS.map((shortcut) => (
-                                <div key={shortcut.label} className="flex items-center justify-between text-sm">
-                                    <span className="text-slate-700 dark:text-slate-300 font-medium">{shortcut.label}</span>
-                                    <div className="flex items-center gap-2">
+                                <div key={shortcut.label} className="flex flex-wrap items-start justify-between text-sm gap-y-2">
+                                    <span className="text-slate-700 dark:text-slate-300 font-medium shrink-0 mr-2 pt-1">{shortcut.label}</span>
+                                    <div className="flex items-center gap-2 flex-wrap justify-end">
                                         {shortcut.combinations.map((combo, i) => (
                                             <React.Fragment key={i}>
                                                 {i > 0 && <span className="text-xs text-slate-400">or</span>}
