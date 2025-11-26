@@ -122,17 +122,17 @@ export const Toolbar: React.FC<ToolbarProps> = ({
 
   return (
     <div
-      className={`fixed z-50 w-72 top-4 bottom-4 left-4 flex flex-col transform transition-transform duration-300 ease-spring rounded-[1.5rem] glass-panel overflow-y-auto custom-scrollbar ${isSidebarOpen
+      className={`fixed z-50 w-72 top-4 bottom-4 left-4 flex flex-col transform transition-transform duration-300 ease-spring rounded-[1.5rem] glass-panel overflow-y-auto custom-scrollbar ${
+        isSidebarOpen
           ? 'translate-x-0 shadow-2xl'
           : '-translate-x-[calc(100%+2rem)] md:translate-x-0 md:shadow-2xl'
-        }`}
+      }`}
     >
-
       <div className="p-4 flex flex-col h-full gap-2">
         {/* Logo & Mobile Close */}
         <div className="flex items-center justify-between relative w-full flex-shrink-0 pt-1 mb-1">
           <h1
-            className="text-xl bg-gradient-to-r from-indigo-500 to-blue-400 dark:from-blue-400 dark:to-cyan-300 bg-clip-text text-transparent leading-relaxed text-left font-bold tracking-tight filter drop-shadow-sm"
+            className="text-[20px] text-indigo-500 dark:text-transparent dark:bg-clip-text dark:bg-gradient-to-r dark:from-blue-400 dark:to-cyan-300 leading-relaxed text-left font-bold tracking-tight filter drop-shadow-sm"
             style={{ fontFamily: '"Press Start 2P", cursive' }}
           >
             PixelCraft
@@ -147,19 +147,29 @@ export const Toolbar: React.FC<ToolbarProps> = ({
 
         {/* Tools */}
         <div className="flex flex-col gap-1.5 flex-shrink-0 pb-2">
-          <h3 className="text-xs uppercase font-bold text-slate-400 dark:text-slate-500 tracking-wider text-left pl-1">{t.headers.tools}</h3>
+          <h3 className="text-xs uppercase font-bold text-slate-400 dark:text-slate-500 tracking-wider text-left pl-1">
+            {t.headers.tools}
+          </h3>
           <div className="grid grid-cols-4 gap-2 place-items-center">
             {tools.map((tool) => (
               <button
                 key={tool.id}
-                onClick={() => { setTool(tool.id); if (window.innerWidth < 768) onCloseSidebar(); }}
-                className={`w-11 h-11 rounded-xl flex justify-center items-center transition-all duration-200 group relative overflow-hidden ${activeTool === tool.id
+                onClick={() => {
+                  setTool(tool.id);
+                  if (window.innerWidth < 768) onCloseSidebar();
+                }}
+                className={`w-11 h-11 rounded-xl flex justify-center items-center transition-all duration-200 group relative overflow-hidden ${
+                  activeTool === tool.id
                     ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/25 ring-2 ring-indigo-500 ring-offset-1 ring-offset-white dark:ring-offset-[#1c1c1e] scale-105'
                     : 'bg-white/60 dark:bg-white/5 text-slate-500 hover:bg-white dark:hover:bg-white/10 dark:text-slate-400 dark:hover:text-white border border-white/20 dark:border-white/5 hover:scale-105 hover:shadow-sm'
-                  }`}
+                }`}
                 title={tool.label}
               >
-                <div className={`transition-transform duration-200 ${activeTool === tool.id ? 'scale-110' : 'group-hover:scale-110'}`}>
+                <div
+                  className={`transition-transform duration-200 ${
+                    activeTool === tool.id ? 'scale-110' : 'group-hover:scale-110'
+                  }`}
+                >
                   {tool.icon}
                 </div>
               </button>
@@ -169,7 +179,6 @@ export const Toolbar: React.FC<ToolbarProps> = ({
 
         {/* Palette Container */}
         <div className="flex flex-col gap-3 flex-shrink-0 pt-3 border-t border-slate-200/50 dark:border-white/5">
-
           {/* Presets */}
           <div className="flex flex-col gap-1.5">
             <h3 className="text-xs uppercase font-bold text-slate-400 dark:text-slate-500 tracking-wider text-left pl-1">
@@ -180,11 +189,15 @@ export const Toolbar: React.FC<ToolbarProps> = ({
               {DEFAULT_PALETTE.map((color) => (
                 <button
                   key={color}
-                  onClick={() => { setColor(color); if (window.innerWidth < 768) onCloseSidebar(); }}
-                  className={`w-9 h-9 rounded-full border border-black/5 dark:border-white/10 transition-all duration-200 ${selectedColor === color
+                  onClick={() => {
+                    setColor(color);
+                    if (window.innerWidth < 768) onCloseSidebar();
+                  }}
+                  className={`w-9 h-9 rounded-full border border-black/5 dark:border-white/10 transition-all duration-200 ${
+                    selectedColor === color
                       ? 'ring-2 ring-indigo-500 ring-offset-1 ring-offset-white dark:ring-offset-[#1c1c1e] scale-110 shadow-md z-10'
                       : 'hover:scale-110 hover:shadow-sm hover:z-10'
-                    }`}
+                  }`}
                   style={{ backgroundColor: color }}
                   title={color}
                 />
@@ -203,7 +216,10 @@ export const Toolbar: React.FC<ToolbarProps> = ({
                   key={idx}
                   color={color}
                   isSelected={selectedColor === color}
-                  onSelect={() => { setColor(color); if (window.innerWidth < 768) onCloseSidebar(); }}
+                  onSelect={() => {
+                    setColor(color);
+                    if (window.innerWidth < 768) onCloseSidebar();
+                  }}
                   onChange={(newColor) => onUpdateCustomColor(idx, newColor)}
                 />
               ))}
@@ -213,10 +229,15 @@ export const Toolbar: React.FC<ToolbarProps> = ({
 
         {/* Actions */}
         <div className="flex flex-col gap-2 mt-auto flex-shrink-0 pt-3 border-t border-slate-200/50 dark:border-white/5">
-          <h3 className="text-xs uppercase font-bold text-slate-400 dark:text-slate-500 tracking-wider text-left pl-1 mb-0.5">{t.headers.actions}</h3>
+          <h3 className="text-xs uppercase font-bold text-slate-400 dark:text-slate-500 tracking-wider text-left pl-1 mb-0.5">
+            {t.headers.actions}
+          </h3>
 
           <button
-            onClick={() => { onOpenLibrary(); if (window.innerWidth < 768) onCloseSidebar(); }}
+            onClick={() => {
+              onOpenLibrary();
+              if (window.innerWidth < 768) onCloseSidebar();
+            }}
             className="w-full h-9 bg-white/60 hover:bg-white dark:bg-white/5 dark:hover:bg-white/10 border border-white/20 dark:border-white/5 text-slate-700 dark:text-slate-200 px-4 rounded-xl flex flex-row items-center justify-center gap-3 text-sm transition-all font-semibold active:scale-[0.98] hover:shadow-sm"
           >
             <Library size={18} className="text-indigo-500" />
@@ -225,46 +246,62 @@ export const Toolbar: React.FC<ToolbarProps> = ({
 
           {/* Big Grid Actions */}
           <div className="grid grid-cols-2 gap-2">
-            <ActionCard
-              icon={<FolderOpen size={22} />}
-              label={t.actions.load}
-              isFile
-            >
+            <ActionCard icon={<FolderOpen size={22} />} label={t.actions.load} isFile>
               <input type="file" className="hidden" accept=".json" onChange={onLoad} />
             </ActionCard>
 
             <ActionCard
               icon={<Save size={22} />}
               label={t.actions.save}
-              onClick={() => { onSave(); if (window.innerWidth < 768) onCloseSidebar(); }}
+              onClick={() => {
+                onSave();
+                if (window.innerWidth < 768) onCloseSidebar();
+              }}
             />
 
-            <ActionCard
-              icon={<ImageIcon size={22} />}
-              label={t.actions.importImg}
-              isFile
-            >
-              <input type="file" className="hidden" accept="image/*" onChange={(e) => { onImageUpload(e, 'convert'); if (window.innerWidth < 768) onCloseSidebar(); }} />
+            <ActionCard icon={<ImageIcon size={22} />} label={t.actions.importImg} isFile>
+              <input
+                type="file"
+                className="hidden"
+                accept="image/*"
+                onChange={(e) => {
+                  onImageUpload(e, 'convert');
+                  if (window.innerWidth < 768) onCloseSidebar();
+                }}
+              />
             </ActionCard>
 
-            <ActionCard
-              icon={<Upload size={22} />}
-              label={t.actions.refLayer}
-              isFile
-            >
-              <input type="file" className="hidden" accept="image/*" onChange={(e) => { onImageUpload(e, 'background'); if (window.innerWidth < 768) onCloseSidebar(); }} />
+            <ActionCard icon={<Upload size={22} />} label={t.actions.refLayer} isFile>
+              <input
+                type="file"
+                className="hidden"
+                accept="image/*"
+                onChange={(e) => {
+                  onImageUpload(e, 'background');
+                  if (window.innerWidth < 768) onCloseSidebar();
+                }}
+              />
             </ActionCard>
           </div>
 
           <div className="flex flex-col gap-2 mt-1">
-            <button onClick={() => { onDownload(); if (window.innerWidth < 768) onCloseSidebar(); }} className="w-full h-9 bg-indigo-500 hover:bg-indigo-600 text-white px-4 rounded-xl flex flex-row items-center justify-center gap-3 text-sm transition-all shadow-lg shadow-indigo-500/30 font-bold active:scale-[0.98]">
+            <button
+              onClick={() => {
+                onDownload();
+                if (window.innerWidth < 768) onCloseSidebar();
+              }}
+              className="w-full h-9 bg-indigo-500 hover:bg-indigo-600 text-white px-4 rounded-xl flex flex-row items-center justify-center gap-3 text-sm transition-all shadow-lg shadow-indigo-500/30 font-bold active:scale-[0.98]"
+            >
               <Download size={18} />
               <span>{t.actions.export}</span>
             </button>
 
             <button
               type="button"
-              onClick={() => { onClear(); if (window.innerWidth < 768) onCloseSidebar(); }}
+              onClick={() => {
+                onClear();
+                if (window.innerWidth < 768) onCloseSidebar();
+              }}
               className="flex items-center justify-center h-9 gap-3 px-4 rounded-xl bg-white/80 hover:bg-red-50 text-red-500 dark:bg-white/5 dark:hover:bg-red-900/20 dark:text-red-400 text-sm transition-all w-full font-bold group active:scale-[0.98] border border-transparent hover:border-red-100 dark:hover:border-red-900/30"
             >
               <Trash2 size={18} className="group-hover:scale-110 transition-transform" />

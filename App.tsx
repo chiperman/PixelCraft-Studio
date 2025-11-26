@@ -113,7 +113,7 @@ const ResizeModal: React.FC<ResizeModalProps> = ({ isOpen, onClose, onResize, cu
                  <button
                     key={preset.label}
                     onClick={() => { setWidth(preset.w); setHeight(preset.h); }}
-                    className="px-2 py-2.5 bg-white/60 dark:bg-white/5 hover:bg-indigo-5 dark:hover:bg-indigo-500/20 hover:text-indigo-600 dark:hover:text-indigo-300 text-slate-600 dark:text-slate-400 text-xs font-medium rounded-xl transition-all"
+                    className="px-2 py-2.5 bg-white/60 dark:bg-white/5 hover:bg-indigo-50 dark:hover:bg-indigo-500/20 hover:text-indigo-600 dark:hover:text-indigo-300 text-slate-600 dark:text-slate-400 text-xs font-medium rounded-xl transition-all"
                  >
                    {preset.label}
                  </button>
@@ -202,11 +202,11 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ isOpen, onClose, language
 
   return (
     <div className="fixed inset-0 bg-black/30 dark:bg-black/60 backdrop-blur-md flex items-center justify-center z-[100] p-4 animate-in fade-in duration-300">
-       {/* Main Container - Unified layout, wider and more compact padding */}
-       <div className="glass-panel rounded-cupertino w-full max-w-5xl max-h-[95vh] flex flex-col overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300">
+       {/* Main Container - Unified layout */}
+       <div className="glass-panel rounded-cupertino w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300">
           
           {/* Header */}
-          <div className="px-6 py-5 flex justify-between items-start flex-shrink-0">
+          <div className="px-8 pt-8 pb-4 flex justify-between items-start flex-shrink-0">
               <div>
                 <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight">{t.tutorial.title}</h2>
                 <div className="h-1.5 w-16 bg-indigo-500 rounded-full shadow-sm"></div>
@@ -216,14 +216,14 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ isOpen, onClose, language
               </button>
           </div>
 
-          <div className="overflow-y-auto px-6 pb-6 flex-1 custom-scrollbar">
+          <div className="overflow-y-auto px-8 pb-8 flex-1 custom-scrollbar">
               {/* Content Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
                  {FEATURES.map((feature) => {
                      // @ts-ignore
                      const section = t.tutorial.sections[feature.key];
                      return (
-                        <div key={feature.key} className="flex items-start gap-4 p-4 rounded-2xl bg-white/40 dark:bg-white/5 border border-white/20 dark:border-white/5 hover:bg-white/60 dark:hover:bg-white/10 transition-all hover:scale-[1.02] shadow-sm">
+                        <div key={feature.key} className="flex items-start gap-4 p-5 rounded-2xl bg-white/40 dark:bg-white/5 border border-white/20 dark:border-white/5 hover:bg-white/60 dark:hover:bg-white/10 transition-all hover:scale-[1.02] shadow-sm">
                             <div className="flex-shrink-0 w-12 h-12 flex items-center justify-center bg-white dark:bg-[#2c2c2e] rounded-2xl shadow-sm">
                                 {feature.icon}
                             </div>
@@ -240,18 +240,18 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ isOpen, onClose, language
 
               {/* Shortcuts Section */}
               <div>
-                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
                     <Keyboard size={24} className="text-teal-500" />
                     {t.tutorial.sections.shortcuts.title}
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Tools Shortcuts */}
-                    <div className="bg-white/40 dark:bg-white/5 rounded-2xl border border-white/20 dark:border-white/5 p-5 backdrop-blur-sm shadow-sm">
+                    <div className="bg-white/40 dark:bg-white/5 rounded-2xl border border-white/20 dark:border-white/5 p-6 backdrop-blur-sm shadow-sm">
                         <h4 className="text-[11px] uppercase font-bold text-slate-400 mb-4 tracking-wider">{t.headers.tools}</h4>
                         <div className="space-y-3">
                             {TOOL_SHORTCUTS.map((shortcut) => (
                                 <div key={shortcut.label} className="flex items-center justify-between text-sm">
-                                    <span className="text-slate-700 dark:text-slate-300 font-medium shrink-0">{shortcut.label}</span>
+                                    <span className="text-slate-700 dark:text-slate-300 font-medium">{shortcut.label}</span>
                                     <div className="flex items-center">
                                         {shortcut.keys.map((k, i) => <Kbd key={i}>{k}</Kbd>)}
                                     </div>
@@ -261,13 +261,13 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ isOpen, onClose, language
                     </div>
 
                     {/* Editor Shortcuts */}
-                    <div className="bg-white/40 dark:bg-white/5 rounded-2xl border border-white/20 dark:border-white/5 p-5 backdrop-blur-sm shadow-sm">
+                    <div className="bg-white/40 dark:bg-white/5 rounded-2xl border border-white/20 dark:border-white/5 p-6 backdrop-blur-sm shadow-sm">
                          <h4 className="text-[11px] uppercase font-bold text-slate-400 mb-4 tracking-wider">Editor</h4>
                          <div className="space-y-3">
                             {EDITOR_SHORTCUTS.map((shortcut) => (
-                                <div key={shortcut.label} className="flex flex-wrap items-start justify-between text-sm gap-y-2">
-                                    <span className="text-slate-700 dark:text-slate-300 font-medium shrink-0 pt-1">{shortcut.label}</span>
-                                    <div className="flex items-center gap-2 flex-wrap justify-end">
+                                <div key={shortcut.label} className="flex items-center justify-between text-sm">
+                                    <span className="text-slate-700 dark:text-slate-300 font-medium">{shortcut.label}</span>
+                                    <div className="flex items-center gap-2">
                                         {shortcut.combinations.map((combo, i) => (
                                             <React.Fragment key={i}>
                                                 {i > 0 && <span className="text-xs text-slate-400">or</span>}
@@ -291,7 +291,7 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ isOpen, onClose, language
           </div>
 
           {/* Unified Action Area */}
-          <div className="p-5 flex flex-col items-center justify-center gap-6 border-t border-white/20 dark:border-white/5 shrink-0 z-10">
+          <div className="p-6 flex flex-col items-center justify-center gap-6 border-t border-white/20 dark:border-white/5 shrink-0 z-10">
                <button 
                 onClick={onClose}
                 className="w-full md:w-auto min-w-[200px] px-8 py-3.5 bg-indigo-500 hover:bg-indigo-600 text-white font-bold text-sm rounded-2xl shadow-lg shadow-indigo-500/30 flex items-center justify-center gap-2 transition-all active:scale-95"
@@ -418,7 +418,7 @@ const App: React.FC = () => {
       // Update Meta Theme Color for Mobile Browsers
       const metaThemeColor = document.querySelector('meta[name="theme-color"]');
       if (metaThemeColor) {
-          metaThemeColor.setAttribute('content', isDark ? '#000000' : '#fbfbfd');
+          metaThemeColor.setAttribute('content', isDark ? '#000000' : '#fcf7f1');
       }
     };
 
@@ -451,6 +451,37 @@ const App: React.FC = () => {
 
   // Helper function for blank grid
   const AQ = (w: number, h: number) => Array(w * h).fill('');
+
+  // Handle Space Key for Panning Mode
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.code === 'Space' || e.key === ' ') {
+            // Allow typing in inputs
+            if (document.activeElement?.tagName === 'INPUT' || document.activeElement?.tagName === 'TEXTAREA') {
+                return;
+            }
+            
+            e.preventDefault(); // Stop default browser scrolling
+            
+            if (!e.repeat) {
+                setIsSpacePressed(true);
+            }
+        }
+    };
+    const handleKeyUp = (e: KeyboardEvent) => {
+        if (e.code === 'Space' || e.key === ' ') {
+            setIsSpacePressed(false);
+            setIsPanning(false);
+        }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+    return () => {
+        window.removeEventListener('keydown', handleKeyDown);
+        window.removeEventListener('keyup', handleKeyUp);
+    };
+  }, []);
 
   // Handle Wheel Zoom (Ctrl + Wheel)
   useEffect(() => {
@@ -597,61 +628,47 @@ const App: React.FC = () => {
      setState(s => ({ ...s, tool }));
   }, []);
 
-  // Combined Keyboard Shortcuts & Space Pan Handler
+  // Keyboard Shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-        // Ignore if typing in an input
-        if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement || (e.target as HTMLElement).isContentEditable) return;
-
-        const isCtrl = e.ctrlKey || e.metaKey;
-        const key = e.key.toLowerCase();
-
-        // Space Panning (Use code for Space as key can be ambiguous or intercepted)
-        if (e.code === 'Space') {
-             e.preventDefault(); 
-             if (!e.repeat) setIsSpacePressed(true);
-             return;
+        // Ignore shortcuts if typing in input
+        if (document.activeElement?.tagName === 'INPUT' || document.activeElement?.tagName === 'TEXTAREA') {
+            return;
         }
 
-        if (isCtrl) {
-             // Undo: Ctrl+Z
-             if (key === 'z' && !e.shiftKey) {
-                 e.preventDefault();
-                 handleUndo();
-                 return;
-             }
-             // Redo: Ctrl+Y or Ctrl+Shift+Z
-             if ((key === 'y') || (key === 'z' && e.shiftKey)) {
-                 e.preventDefault();
-                 handleRedo();
-                 return;
-             }
-        } else {
-            // Tools (1-4)
-            if (!e.shiftKey && !e.altKey && !isCtrl) {
-                 switch (key) {
-                     case '1': e.preventDefault(); handleSetTool('pencil'); break;
-                     case '2': e.preventDefault(); handleSetTool('eraser'); break;
-                     case '3': e.preventDefault(); handleSetTool('bucket'); break;
-                     case '4': e.preventDefault(); handleSetTool('picker'); break;
-                 }
+        const isCmdOrCtrl = e.ctrlKey || e.metaKey;
+
+        // Tool Shortcuts (1-4)
+        if (!isCmdOrCtrl && !e.altKey && !e.shiftKey) {
+            switch(e.key) {
+                case '1': handleSetTool('pencil'); break;
+                case '2': handleSetTool('eraser'); break;
+                case '3': handleSetTool('bucket'); break;
+                case '4': handleSetTool('picker'); break;
+            }
+        }
+
+        if (isCmdOrCtrl) {
+            const key = e.key.toLowerCase();
+            
+            // Redo: Ctrl+Y or Ctrl+Shift+Z
+            if (key === 'y' || (e.shiftKey && key === 'z')) {
+                e.preventDefault();
+                handleRedo();
+                return;
+            }
+
+            // Undo: Ctrl+Z (check last to avoid conflict with Shift+Z)
+            if (key === 'z') {
+                e.preventDefault();
+                handleUndo();
+                return;
             }
         }
     };
 
-    const handleKeyUp = (e: KeyboardEvent) => {
-        if (e.code === 'Space') {
-            setIsSpacePressed(false);
-            setIsPanning(false);
-        }
-    };
-
     window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
-    return () => {
-        window.removeEventListener('keydown', handleKeyDown);
-        window.removeEventListener('keyup', handleKeyUp);
-    };
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, [handleUndo, handleRedo, handleSetTool]);
 
   const handleClear = () => {
@@ -1335,10 +1352,10 @@ const App: React.FC = () => {
                 isPanning || isMobilePanning ? 'cursor-grabbing' : isSpacePressed ? 'cursor-grab' : 'cursor-default'
              }`}
              style={{
-                 // Clean dot pattern - Cupertino Style
-                 backgroundImage: `radial-gradient(${computedIsDarkMode ? '#3a3a3c' : '#d1d1d6'} 1px, transparent 1px)`,
+                 // Clean dot pattern - Cupertino Style / Warmth
+                 backgroundImage: `radial-gradient(${computedIsDarkMode ? '#3a3a3c' : 'rgba(56, 56, 56, 0.1)'} 1px, transparent 1px)`,
                  backgroundSize: '24px 24px',
-                 backgroundColor: computedIsDarkMode ? '#000000' : '#f5f5f7',
+                 backgroundColor: computedIsDarkMode ? '#000000' : '#fcf7f1',
                  touchAction: 'none'
              }}
         >
