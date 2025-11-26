@@ -601,13 +601,13 @@ const App: React.FC = () => {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
         // Ignore if typing in an input
-        if (['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName || '')) return;
+        if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement || (e.target as HTMLElement).isContentEditable) return;
 
         const isCtrl = e.ctrlKey || e.metaKey;
-        const code = e.code;
+        const key = e.key.toLowerCase();
 
-        // Space Panning
-        if (code === 'Space') {
+        // Space Panning (Use code for Space as key can be ambiguous or intercepted)
+        if (e.code === 'Space') {
              e.preventDefault(); 
              if (!e.repeat) setIsSpacePressed(true);
              return;
@@ -615,25 +615,25 @@ const App: React.FC = () => {
 
         if (isCtrl) {
              // Undo: Ctrl+Z
-             if (code === 'KeyZ' && !e.shiftKey) {
+             if (key === 'z' && !e.shiftKey) {
                  e.preventDefault();
                  handleUndo();
                  return;
              }
              // Redo: Ctrl+Y or Ctrl+Shift+Z
-             if ((code === 'KeyY' && !e.shiftKey) || (code === 'KeyZ' && e.shiftKey)) {
+             if ((key === 'y') || (key === 'z' && e.shiftKey)) {
                  e.preventDefault();
                  handleRedo();
                  return;
              }
         } else {
-            // Tools (1-4) - Prevent default to avoid side effects (like scrolling if they were mapped to arrows, or browser shortcuts)
-            if (!e.shiftKey && !e.altKey) {
-                 switch (code) {
-                     case 'Digit1': case 'Numpad1': e.preventDefault(); handleSetTool('pencil'); break;
-                     case 'Digit2': case 'Numpad2': e.preventDefault(); handleSetTool('eraser'); break;
-                     case 'Digit3': case 'Numpad3': e.preventDefault(); handleSetTool('bucket'); break;
-                     case 'Digit4': case 'Numpad4': e.preventDefault(); handleSetTool('picker'); break;
+            // Tools (1-4)
+            if (!e.shiftKey && !e.altKey && !isCtrl) {
+                 switch (key) {
+                     case '1': e.preventDefault(); handleSetTool('pencil'); break;
+                     case '2': e.preventDefault(); handleSetTool('eraser'); break;
+                     case '3': e.preventDefault(); handleSetTool('bucket'); break;
+                     case '4': e.preventDefault(); handleSetTool('picker'); break;
                  }
             }
         }
