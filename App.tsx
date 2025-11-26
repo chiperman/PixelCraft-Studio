@@ -266,7 +266,7 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ isOpen, onClose, language
                          <div className="space-y-3">
                             {EDITOR_SHORTCUTS.map((shortcut) => (
                                 <div key={shortcut.label} className="flex flex-wrap items-start justify-between text-sm gap-y-2">
-                                    <span className="text-slate-700 dark:text-slate-300 font-medium shrink-0 mr-2 pt-1">{shortcut.label}</span>
+                                    <span className="text-slate-700 dark:text-slate-300 font-medium shrink-0 pt-1">{shortcut.label}</span>
                                     <div className="flex items-center gap-2 flex-wrap justify-end">
                                         {shortcut.combinations.map((combo, i) => (
                                             <React.Fragment key={i}>
@@ -452,37 +452,6 @@ const App: React.FC = () => {
   // Helper function for blank grid
   const AQ = (w: number, h: number) => Array(w * h).fill('');
 
-  // Handle Space Key for Panning Mode
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-        if (e.code === 'Space' || e.key === ' ') {
-            // Allow typing in inputs
-            if (document.activeElement?.tagName === 'INPUT' || document.activeElement?.tagName === 'TEXTAREA') {
-                return;
-            }
-            
-            e.preventDefault(); // Stop default browser scrolling
-            
-            if (!e.repeat) {
-                setIsSpacePressed(true);
-            }
-        }
-    };
-    const handleKeyUp = (e: KeyboardEvent) => {
-        if (e.code === 'Space' || e.key === ' ') {
-            setIsSpacePressed(false);
-            setIsPanning(false);
-        }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
-    return () => {
-        window.removeEventListener('keydown', handleKeyDown);
-        window.removeEventListener('keyup', handleKeyUp);
-    };
-  }, []);
-
   // Handle Wheel Zoom (Ctrl + Wheel)
   useEffect(() => {
       const container = canvasContainerRef.current;
@@ -628,47 +597,61 @@ const App: React.FC = () => {
      setState(s => ({ ...s, tool }));
   }, []);
 
-  // Keyboard Shortcuts
+  // Combined Keyboard Shortcuts & Space Pan Handler
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-        // Ignore shortcuts if typing in input
-        if (document.activeElement?.tagName === 'INPUT' || document.activeElement?.tagName === 'TEXTAREA') {
-            return;
+        // Ignore if typing in an input
+        if (['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName || '')) return;
+
+        const isCtrl = e.ctrlKey || e.metaKey;
+        const code = e.code;
+
+        // Space Panning
+        if (code === 'Space') {
+             e.preventDefault(); 
+             if (!e.repeat) setIsSpacePressed(true);
+             return;
         }
 
-        const isCmdOrCtrl = e.ctrlKey || e.metaKey;
-
-        // Tool Shortcuts (1-4)
-        if (!isCmdOrCtrl && !e.altKey && !e.shiftKey) {
-            switch(e.key) {
-                case '1': handleSetTool('pencil'); break;
-                case '2': handleSetTool('eraser'); break;
-                case '3': handleSetTool('bucket'); break;
-                case '4': handleSetTool('picker'); break;
-            }
-        }
-
-        if (isCmdOrCtrl) {
-            const key = e.key.toLowerCase();
-            
-            // Redo: Ctrl+Y or Ctrl+Shift+Z
-            if (key === 'y' || (e.shiftKey && key === 'z')) {
-                e.preventDefault();
-                handleRedo();
-                return;
-            }
-
-            // Undo: Ctrl+Z (check last to avoid conflict with Shift+Z)
-            if (key === 'z') {
-                e.preventDefault();
-                handleUndo();
-                return;
+        if (isCtrl) {
+             // Undo: Ctrl+Z
+             if (code === 'KeyZ' && !e.shiftKey) {
+                 e.preventDefault();
+                 handleUndo();
+                 return;
+             }
+             // Redo: Ctrl+Y or Ctrl+Shift+Z
+             if ((code === 'KeyY' && !e.shiftKey) || (code === 'KeyZ' && e.shiftKey)) {
+                 e.preventDefault();
+                 handleRedo();
+                 return;
+             }
+        } else {
+            // Tools (1-4) - Prevent default to avoid side effects (like scrolling if they were mapped to arrows, or browser shortcuts)
+            if (!e.shiftKey && !e.altKey) {
+                 switch (code) {
+                     case 'Digit1': case 'Numpad1': e.preventDefault(); handleSetTool('pencil'); break;
+                     case 'Digit2': case 'Numpad2': e.preventDefault(); handleSetTool('eraser'); break;
+                     case 'Digit3': case 'Numpad3': e.preventDefault(); handleSetTool('bucket'); break;
+                     case 'Digit4': case 'Numpad4': e.preventDefault(); handleSetTool('picker'); break;
+                 }
             }
         }
     };
 
+    const handleKeyUp = (e: KeyboardEvent) => {
+        if (e.code === 'Space') {
+            setIsSpacePressed(false);
+            setIsPanning(false);
+        }
+    };
+
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+    return () => {
+        window.removeEventListener('keydown', handleKeyDown);
+        window.removeEventListener('keyup', handleKeyUp);
+    };
   }, [handleUndo, handleRedo, handleSetTool]);
 
   const handleClear = () => {
