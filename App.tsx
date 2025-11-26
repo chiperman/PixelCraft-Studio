@@ -202,11 +202,11 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ isOpen, onClose, language
 
   return (
     <div className="fixed inset-0 bg-black/30 dark:bg-black/60 backdrop-blur-md flex items-center justify-center z-[100] p-4 animate-in fade-in duration-300">
-       {/* Main Container - Unified layout */}
-       <div className="glass-panel rounded-cupertino w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300">
+       {/* Main Container - Unified layout, wider and more compact padding */}
+       <div className="glass-panel rounded-cupertino w-full max-w-5xl max-h-[95vh] flex flex-col overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300">
           
           {/* Header */}
-          <div className="px-8 pt-8 pb-4 flex justify-between items-start flex-shrink-0">
+          <div className="px-6 py-5 flex justify-between items-start flex-shrink-0">
               <div>
                 <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight">{t.tutorial.title}</h2>
                 <div className="h-1.5 w-16 bg-indigo-500 rounded-full shadow-sm"></div>
@@ -216,14 +216,14 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ isOpen, onClose, language
               </button>
           </div>
 
-          <div className="overflow-y-auto px-8 pb-8 flex-1 custom-scrollbar">
+          <div className="overflow-y-auto px-6 pb-6 flex-1 custom-scrollbar">
               {/* Content Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
                  {FEATURES.map((feature) => {
                      // @ts-ignore
                      const section = t.tutorial.sections[feature.key];
                      return (
-                        <div key={feature.key} className="flex items-start gap-4 p-5 rounded-2xl bg-white/40 dark:bg-white/5 border border-white/20 dark:border-white/5 hover:bg-white/60 dark:hover:bg-white/10 transition-all hover:scale-[1.02] shadow-sm">
+                        <div key={feature.key} className="flex items-start gap-4 p-4 rounded-2xl bg-white/40 dark:bg-white/5 border border-white/20 dark:border-white/5 hover:bg-white/60 dark:hover:bg-white/10 transition-all hover:scale-[1.02] shadow-sm">
                             <div className="flex-shrink-0 w-12 h-12 flex items-center justify-center bg-white dark:bg-[#2c2c2e] rounded-2xl shadow-sm">
                                 {feature.icon}
                             </div>
@@ -240,13 +240,13 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ isOpen, onClose, language
 
               {/* Shortcuts Section */}
               <div>
-                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
                     <Keyboard size={24} className="text-teal-500" />
                     {t.tutorial.sections.shortcuts.title}
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* Tools Shortcuts */}
-                    <div className="bg-white/40 dark:bg-white/5 rounded-2xl border border-white/20 dark:border-white/5 p-6 backdrop-blur-sm shadow-sm">
+                    <div className="bg-white/40 dark:bg-white/5 rounded-2xl border border-white/20 dark:border-white/5 p-5 backdrop-blur-sm shadow-sm">
                         <h4 className="text-[11px] uppercase font-bold text-slate-400 mb-4 tracking-wider">{t.headers.tools}</h4>
                         <div className="space-y-3">
                             {TOOL_SHORTCUTS.map((shortcut) => (
@@ -261,7 +261,7 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ isOpen, onClose, language
                     </div>
 
                     {/* Editor Shortcuts */}
-                    <div className="bg-white/40 dark:bg-white/5 rounded-2xl border border-white/20 dark:border-white/5 p-6 backdrop-blur-sm shadow-sm">
+                    <div className="bg-white/40 dark:bg-white/5 rounded-2xl border border-white/20 dark:border-white/5 p-5 backdrop-blur-sm shadow-sm">
                          <h4 className="text-[11px] uppercase font-bold text-slate-400 mb-4 tracking-wider">Editor</h4>
                          <div className="space-y-3">
                             {EDITOR_SHORTCUTS.map((shortcut) => (
@@ -291,7 +291,7 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ isOpen, onClose, language
           </div>
 
           {/* Unified Action Area */}
-          <div className="p-6 flex flex-col items-center justify-center gap-6 border-t border-white/20 dark:border-white/5 shrink-0 z-10">
+          <div className="p-5 flex flex-col items-center justify-center gap-6 border-t border-white/20 dark:border-white/5 shrink-0 z-10">
                <button 
                 onClick={onClose}
                 className="w-full md:w-auto min-w-[200px] px-8 py-3.5 bg-indigo-500 hover:bg-indigo-600 text-white font-bold text-sm rounded-2xl shadow-lg shadow-indigo-500/30 flex items-center justify-center gap-2 transition-all active:scale-95"
