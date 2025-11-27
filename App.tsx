@@ -360,9 +360,9 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ isOpen, onClose, language
               </div>
 
               {/* Editor Shortcuts */}
-              <div className="bg-white/40 dark:bg-white/5 rounded-2xl border border-white/20 dark:border-white/5 p-6 backdrop-blur-sm shadow-sm">
+              <div className="bg-[#fcf7f1] dark:bg-white/5 rounded-2xl border border-white/20 dark:border-white/5 p-6 backdrop-blur-sm shadow-sm">
                 <h4 className="text-[11px] uppercase font-bold text-slate-400 mb-4 tracking-wider">
-                  Editor
+                  {t.headers.actions}
                 </h4>
                 <div className="space-y-3">
                   {EDITOR_SHORTCUTS.map((shortcut) => (
