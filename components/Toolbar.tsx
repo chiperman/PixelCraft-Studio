@@ -1,6 +1,19 @@
 import React, { useRef } from 'react';
 import { ToolType, DEFAULT_PALETTE, Language } from '../types';
-import { Pencil, Eraser, PaintBucket, Pipette, Download, Upload, Image as ImageIcon, Trash2, Save, FolderOpen, X, Library } from 'lucide-react';
+import {
+  Pencil,
+  Eraser,
+  PaintBucket,
+  Pipette,
+  Download,
+  Upload,
+  Image as ImageIcon,
+  Trash2,
+  Save,
+  FolderOpen,
+  X,
+  Library,
+} from 'lucide-react';
 import { TRANSLATIONS } from '../utils';
 
 // Helper component for Custom Color Logic
@@ -14,10 +27,11 @@ const CustomColorSlot: React.FC<{
 
   return (
     <div
-      className={`w-9 h-9 rounded-full border border-black/5 dark:border-white/10 transition-all duration-300 cursor-pointer relative group ${isSelected
+      className={`w-9 h-9 rounded-full border border-black/10 dark:border-white/10 transition-all duration-300 cursor-pointer relative group ${
+        isSelected
           ? 'ring-2 ring-indigo-500 ring-offset-1 ring-offset-white dark:ring-offset-[#1c1c1e] scale-110 shadow-md z-10'
-          : 'hover:scale-110 hover:shadow-sm hover:z-10'
-        }`}
+          : 'hover:scale-110 dark:hover:shadow-sm hover:z-10'
+      }`}
       style={{ backgroundColor: color }}
       onClick={onSelect}
       onDoubleClick={() => inputRef.current?.click()}
@@ -36,8 +50,8 @@ const CustomColorSlot: React.FC<{
         className="invisible absolute bottom-0 right-0 w-0 h-0"
       />
     </div>
-  )
-}
+  );
+};
 
 // Larger Action Card Component
 const ActionCard: React.FC<{
@@ -48,14 +62,16 @@ const ActionCard: React.FC<{
   children?: React.ReactNode;
 }> = ({ icon, label, onClick, isFile, children }) => {
   // Increased min-h and padding
-  const className = "group relative w-full bg-white/60 hover:bg-white dark:bg-white/5 dark:hover:bg-white/10 border border-white/20 dark:border-white/5 text-slate-700 dark:text-slate-200 p-2 rounded-xl flex flex-col items-center justify-center gap-1 transition-all active:scale-[0.98] hover:shadow-md min-h-[56px] cursor-pointer";
-
+  const className =
+    'group relative w-full bg-[#fcf7f1] hover:bg-white dark:bg-white/5 dark:hover:bg-white/10 border border-[var(--color-muted)]/30 dark:border-white/5 text-slate-500 dark:text-slate-500 p-2 rounded-xl flex flex-col items-center justify-center gap-1 transition-all active:scale-[0.98] dark:hover:shadow-md min-h-[56px] cursor-pointer';
   const content = (
     <>
-      <div className="text-slate-400 dark:text-slate-500 group-hover:text-indigo-500 dark:group-hover:text-indigo-400 transition-colors duration-300 group-hover:scale-110">
+      <div className="text-slate-500 dark:text-slate-500 group-hover:text-indigo-500 dark:group-hover:text-indigo-400 transition-colors duration-300 group-hover:scale-110">
         {icon}
       </div>
-      <span className="text-[10px] sm:text-xs font-bold text-center leading-tight tracking-wide">{label}</span>
+      <span className="text-[10px] sm:text-xs font-bold text-center leading-tight tracking-wide">
+        {label}
+      </span>
     </>
   );
 
@@ -110,7 +126,6 @@ export const Toolbar: React.FC<ToolbarProps> = ({
   isSidebarOpen,
   onCloseSidebar,
 }) => {
-
   const t = TRANSLATIONS[language];
 
   const tools = [
@@ -132,7 +147,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
         {/* Logo & Mobile Close */}
         <div className="flex items-center justify-between relative w-full flex-shrink-0 pt-1 mb-1">
           <h1
-            className="text-[20px] text-indigo-500 dark:text-transparent dark:bg-clip-text dark:bg-gradient-to-r dark:from-blue-400 dark:to-cyan-300 leading-relaxed text-left font-bold tracking-tight filter drop-shadow-sm"
+            className="text-xl bg-gradient-to-r from-indigo-500 to-blue-400 dark:from-blue-400 dark:to-cyan-300 bg-clip-text text-transparent leading-relaxed text-left font-bold tracking-tight filter drop-shadow-sm"
             style={{ fontFamily: '"Press Start 2P", cursive' }}
           >
             PixelCraft
@@ -158,11 +173,11 @@ export const Toolbar: React.FC<ToolbarProps> = ({
                   setTool(tool.id);
                   if (window.innerWidth < 768) onCloseSidebar();
                 }}
-                className={`w-11 h-11 rounded-xl flex justify-center items-center transition-all duration-200 group relative overflow-hidden ${
-                  activeTool === tool.id
-                    ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/25 ring-2 ring-indigo-500 ring-offset-1 ring-offset-white dark:ring-offset-[#1c1c1e] scale-105'
-                    : 'bg-white/60 dark:bg-white/5 text-slate-500 hover:bg-white dark:hover:bg-white/10 dark:text-slate-400 dark:hover:text-white border border-white/20 dark:border-white/5 hover:scale-105 hover:shadow-sm'
-                }`}
+                  className={`w-11 h-11 rounded-xl flex justify-center items-center transition-all duration-200 group relative overflow-hidden ${
+                    activeTool === tool.id
+                      ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/25 ring-2 ring-indigo-500 ring-offset-1 ring-offset-white dark:ring-offset-[#1c1c1e] scale-105'
+                      : 'bg-[#fcf7f1] text-slate-500 border border-[var(--color-muted)]/30 dark:border-none dark:bg-white/5 dark:text-slate-400 hover:bg-white dark:hover:bg-white/10 dark:hover:text-white hover:scale-105 dark:hover:shadow-sm'
+                  }`}
                 title={tool.label}
               >
                 <div
@@ -193,10 +208,10 @@ export const Toolbar: React.FC<ToolbarProps> = ({
                     setColor(color);
                     if (window.innerWidth < 768) onCloseSidebar();
                   }}
-                  className={`w-9 h-9 rounded-full border border-black/5 dark:border-white/10 transition-all duration-200 ${
+                  className={`w-9 h-9 rounded-full border border-black/10 dark:border-white/10 transition-all duration-200 ${
                     selectedColor === color
                       ? 'ring-2 ring-indigo-500 ring-offset-1 ring-offset-white dark:ring-offset-[#1c1c1e] scale-110 shadow-md z-10'
-                      : 'hover:scale-110 hover:shadow-sm hover:z-10'
+                      : 'hover:scale-110 dark:hover:shadow-sm hover:z-10'
                   }`}
                   style={{ backgroundColor: color }}
                   title={color}
@@ -238,9 +253,11 @@ export const Toolbar: React.FC<ToolbarProps> = ({
               onOpenLibrary();
               if (window.innerWidth < 768) onCloseSidebar();
             }}
-            className="w-full h-9 bg-white/60 hover:bg-white dark:bg-white/5 dark:hover:bg-white/10 border border-white/20 dark:border-white/5 text-slate-700 dark:text-slate-200 px-4 rounded-xl flex flex-row items-center justify-center gap-3 text-sm transition-all font-semibold active:scale-[0.98] hover:shadow-sm"
+            className="group w-full h-9 bg-[#fcf7f1] hover:bg-white dark:bg-white/5 dark:hover:bg-white/10 border border-[var(--color-muted)]/30 dark:border-white/5 text-slate-500 dark:text-slate-500 px-4 rounded-xl flex flex-row items-center justify-center gap-3 text-sm transition-all font-semibold active:scale-[0.98] dark:hover:shadow-sm"
           >
-            <Library size={18} className="text-indigo-500" />
+            <div className="transition-transform duration-200 group-hover:scale-110">
+              <Library size={18} className="text-indigo-500" />
+            </div>
             <span>{t.actions.library}</span>
           </button>
 
@@ -284,15 +301,17 @@ export const Toolbar: React.FC<ToolbarProps> = ({
             </ActionCard>
           </div>
 
-          <div className="flex flex-col gap-2 mt-1">
+          <div className="flex flex-col gap-2 mt-1 mb-2">
             <button
               onClick={() => {
                 onDownload();
                 if (window.innerWidth < 768) onCloseSidebar();
               }}
-              className="w-full h-9 bg-indigo-500 hover:bg-indigo-600 text-white px-4 rounded-xl flex flex-row items-center justify-center gap-3 text-sm transition-all shadow-lg shadow-indigo-500/30 font-bold active:scale-[0.98]"
+              className="group w-full h-9 bg-indigo-500 hover:bg-indigo-600 text-white px-4 rounded-xl flex flex-row items-center justify-center gap-3 text-sm transition-all shadow-lg shadow-indigo-500/30 font-bold active:scale-[0.98]"
             >
-              <Download size={18} />
+              <div className="transition-transform duration-200 group-hover:scale-110">
+                <Download size={18} />
+              </div>
               <span>{t.actions.export}</span>
             </button>
 
