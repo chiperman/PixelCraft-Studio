@@ -321,7 +321,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
                 onClear();
                 if (window.innerWidth < 768) onCloseSidebar();
               }}
-              className="flex items-center justify-center h-9 gap-3 px-4 rounded-xl bg-white/80 hover:bg-red-50 text-red-500 dark:bg-white/5 dark:hover:bg-red-900/20 dark:text-red-400 text-sm transition-all w-full font-bold group active:scale-[0.98] border border-transparent hover:border-red-100 dark:hover:border-red-900/30"
+              className="flex items-center justify-center h-9 gap-3 px-4 rounded-xl bg-[#fcf7f1] hover:bg-red-50 text-red-500 dark:bg-white/5 dark:hover:bg-red-900/20 dark:text-red-400 text-sm transition-all w-full font-bold group active:scale-[0.98] border border-slate-200 dark:border-white/5 hover:border-red-200 dark:hover:border-red-900/30"
             >
               <Trash2 size={18} className="group-hover:scale-110 transition-transform" />
               {t.actions.clear}
