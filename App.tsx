@@ -74,7 +74,7 @@ const CustomSelect = ({
     <div className="relative flex-1 min-w-0" ref={containerRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`w-full flex items-center justify-between px-3 bg-[#fcf7f1] dark:bg-white/5 rounded-xl border border-[var(--color-muted)]/30 dark:border-white/5 text-slate-500 dark:text-slate-400 transition-all active:scale-[0.98] hover:bg-white/70 dark:hover:bg-white/10 glass-panel ${
+        className={`w-full flex items-center justify-between px-3 bg-[#fcf7f1] dark:bg-white/5 rounded-xl border border-[var(--color-muted)]/30 text-slate-500 dark:text-slate-400 transition-all active:scale-[0.98] glass-panel ${
           isOpen ? 'ring-2 ring-indigo-500/20' : ''
         } ${className}`}
       >
@@ -91,7 +91,7 @@ const CustomSelect = ({
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-2 p-1 glass-panel rounded-xl shadow-xl z-50 max-h-64 overflow-y-auto custom-scrollbar animate-in fade-in zoom-in-95 duration-200">
+        <div className="absolute top-full left-0 right-0 mt-2 p-1 glass-panel rounded-xl shadow-xl z-50 max-h-64 overflow-y-auto custom-scrollbar animate-in fade-in zoom-in-95 duration-200 border border-[var(--color-muted)]/30 dark:border-white/5">
           {options.map((opt) => (
             <button
               key={opt.code}
@@ -102,7 +102,7 @@ const CustomSelect = ({
               className={`w-full text-left px-3 py-2.5 text-sm rounded-lg transition-colors flex items-center justify-between group ${
                 value === opt.code
                   ? 'bg-indigo-500 text-white shadow-md'
-                  : 'text-slate-600 dark:text-slate-300 hover:bg-black/5 dark:hover:bg-white/10'
+                  : 'text-slate-600 dark:text-slate-300'
               }`}
             >
               <span>{opt.label}</span>
@@ -1193,7 +1193,7 @@ const App: React.FC = () => {
                 setIsResizeModalOpen(true);
                 setIsMobileHeaderMenuOpen(false);
               }}
-              className="flex-1 h-12 flex items-center justify-center gap-2 bg-[#fcf7f1] hover:bg-[#fcf7f1] dark:bg-white/5 dark:hover:bg-white/10 text-white rounded-xl border border-white/20 dark:border-white/5 font-medium text-sm transition-colors active:scale-95"
+              className="flex-1 h-12 flex items-center justify-center gap-2 bg-[#fcf7f1] hover:bg-[#fcf7f1] dark:bg-white/5 dark:hover:bg-white/10 text-slate-500 dark:text-slate-400 rounded-xl border border-white/20 dark:border-white/5 font-medium text-sm transition-colors active:scale-95"
             >
               <Grid3X3 size={18} className="text-indigo-500" />
               {state.config.width} × {state.config.height}
@@ -1354,25 +1354,30 @@ const App: React.FC = () => {
                   onClick={() => setIsMobilePanning(!isMobilePanning)}
                   className={`p-2.5 rounded-xl transition-all ${
                     isMobilePanning
-                                        ? 'bg-indigo-500 text-white shadow-md'
-                                        : 'bg-[#fcf7f1] text-slate-500 dark:bg-white/5 dark:text-slate-400 hover:bg-[#fcf7f1] dark:hover:bg-white/10 border border-[var(--color-muted)]/30 dark:border-transparent'
-                                    }`}                  title={t.ui.pan}
+                      ? 'bg-indigo-500 text-white shadow-md'
+                      : 'bg-[#fcf7f1] text-slate-500 dark:bg-white/5 dark:text-slate-400 hover:bg-[#fcf7f1] dark:hover:bg-white/10 border border-[var(--color-muted)]/30 dark:border-transparent'
+                  }`}
+                  title={t.ui.pan}
                 >
                   <Hand size={20} />
                 </button>
 
                 <div className="flex items-center gap-1">
                   <button
-                                      onClick={handleUndo}
-                                      disabled={state.historyIndex === 0}
-                                      className="p-2.5 bg-[#fcf7f1] hover:bg-[#fcf7f1] dark:bg-white/5 dark:hover:bg-white/10 text-slate-500 dark:text-slate-400 rounded-xl disabled:opacity-30 transition-colors border border-[var(--color-muted)]/30 dark:border-transparent"
-                                    >                    <Undo size={20} />
+                    onClick={handleUndo}
+                    disabled={state.historyIndex === 0}
+                    className="p-2.5 bg-[#fcf7f1] hover:bg-[#fcf7f1] dark:bg-white/5 dark:hover:bg-white/10 text-slate-500 dark:text-slate-400 rounded-xl disabled:opacity-30 transition-colors border border-[var(--color-muted)]/30 dark:border-transparent"
+                  >
+                    {' '}
+                    <Undo size={20} />
                   </button>
                   <button
-                                      onClick={handleRedo}
-                                      disabled={state.historyIndex === state.history.length - 1}
-                                      className="p-2.5 bg-[#fcf7f1] hover:bg-[#fcf7f1] dark:bg-white/5 dark:hover:bg-white/10 text-slate-500 dark:text-slate-400 rounded-xl disabled:opacity-30 transition-colors border border-[var(--color-muted)]/30 dark:border-transparent"
-                                    >                    <Redo size={20} />
+                    onClick={handleRedo}
+                    disabled={state.historyIndex === state.history.length - 1}
+                    className="p-2.5 bg-[#fcf7f1] hover:bg-[#fcf7f1] dark:bg-white/5 dark:hover:bg-white/10 text-slate-500 dark:text-slate-400 rounded-xl disabled:opacity-30 transition-colors border border-[var(--color-muted)]/30 dark:border-transparent"
+                  >
+                    {' '}
+                    <Redo size={20} />
                   </button>
                 </div>
               </div>
@@ -1381,9 +1386,10 @@ const App: React.FC = () => {
                 onClick={() => setIsMobileHeaderMenuOpen(!isMobileHeaderMenuOpen)}
                 className={`p-2.5 rounded-xl transition-colors ${
                   isMobileHeaderMenuOpen
-                                      ? 'bg-indigo-500 text-white'
-                                      : 'bg-[#fcf7f1] text-slate-500 dark:bg-white/5 dark:text-slate-400 hover:bg-[#fcf7f1] dark:hover:bg-white/10 border border-[var(--color-muted)]/30 dark:border-transparent'
-                                  }`}              >
+                    ? 'bg-indigo-500 text-white'
+                    : 'bg-[#fcf7f1] text-slate-500 dark:bg-white/5 dark:text-slate-400 hover:bg-[#fcf7f1] dark:hover:bg-white/10 border border-[var(--color-muted)]/30 dark:border-transparent'
+                }`}
+              >
                 <MoreVertical size={20} />
               </button>
             </div>
