@@ -74,7 +74,7 @@ const CustomSelect = ({
     <div className="relative flex-1 min-w-0" ref={containerRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`w-full flex items-center justify-between px-3 bg-[#fcf7f1] dark:bg-white/5 rounded-xl border border-[var(--color-muted)]/30 text-slate-500 dark:text-slate-400 transition-all active:scale-[0.98] glass-panel ${
+        className={`w-full flex items-center justify-between px-3 bg-[#fcf7f1] dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/5 text-slate-500 dark:text-slate-400 transition-all active:scale-[0.98] ${
           isOpen ? 'ring-2 ring-indigo-500/20' : ''
         } ${className}`}
       >
@@ -91,7 +91,7 @@ const CustomSelect = ({
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-2 p-1 glass-panel rounded-xl shadow-xl z-50 max-h-64 overflow-y-auto custom-scrollbar animate-in fade-in zoom-in-95 duration-200 border border-[var(--color-muted)]/30 dark:border-white/5">
+        <div className="absolute top-full left-0 right-0 mt-2 p-1 glass-panel rounded-xl shadow-xl z-50 max-h-64 overflow-y-auto custom-scrollbar animate-in fade-in zoom-in-95 duration-200 border border-slate-200/50 dark:border-white/5">
           {options.map((opt) => (
             <button
               key={opt.code}

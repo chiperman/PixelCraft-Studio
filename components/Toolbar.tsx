@@ -173,16 +173,16 @@ export const Toolbar: React.FC<ToolbarProps> = ({
                   setTool(tool.id);
                   if (window.innerWidth < 768) onCloseSidebar();
                 }}
-                  className={`w-11 h-11 rounded-xl flex justify-center items-center transition-all duration-200 group relative overflow-hidden ${
+                  className={`w-11 h-11 rounded-xl flex justify-center items-center transition-all duration-200 group relative overflow-hidden active:scale-95 ${
                     activeTool === tool.id
-                      ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/25 ring-2 ring-indigo-500 ring-offset-1 ring-offset-white dark:ring-offset-[#1c1c1e] scale-105'
-                      : 'bg-[#fcf7f1] text-slate-500 border border-[var(--color-muted)]/30 dark:border-none dark:bg-white/5 dark:text-slate-400 hover:bg-white dark:hover:bg-white/10 dark:hover:text-white hover:scale-105 dark:hover:shadow-sm'
+                      ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/25 ring-2 ring-indigo-500 ring-offset-1 ring-offset-white dark:ring-offset-[#1c1c1e]'
+                      : 'bg-[#fcf7f1] text-slate-500 border border-[var(--color-muted)]/30 dark:border-none dark:bg-white/5 dark:text-slate-400 hover:bg-white dark:hover:bg-white/10 dark:hover:text-white dark:hover:shadow-sm'
                   }`}
                 title={tool.label}
               >
                 <div
-                  className={`transition-transform duration-200 ${
-                    activeTool === tool.id ? 'scale-110' : 'group-hover:scale-110'
+                  className={`transition-transform duration-200 group-hover:scale-110 ${
+                    activeTool === tool.id ? 'scale-110' : ''
                   }`}
                 >
                   {tool.icon}
