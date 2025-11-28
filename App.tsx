@@ -74,9 +74,7 @@ const CustomSelect = ({
     <div className="relative flex-1 min-w-0" ref={containerRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`w-full flex items-center justify-between px-3 bg-[#fcf7f1] dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/5 text-slate-500 dark:text-slate-400 transition-all active:scale-[0.98] ${
-          isOpen ? 'ring-2 ring-indigo-500/20' : ''
-        } ${className}`}
+        className={`w-full flex items-center justify-between px-3 bg-[#fcf7f1] dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/5 text-slate-500 dark:text-slate-400 transition-all active:scale-[0.98] ${className}`}
       >
         <span className="flex items-center gap-2 truncate pr-2">
           <Globe size={16} className="opacity-70 shrink-0" />
@@ -1536,7 +1534,7 @@ const App: React.FC = () => {
                     onClick={() => setIsThemeDropdownOpen(!isThemeDropdownOpen)}
                     className={`h-10 w-10 flex items-center justify-center bg-[#fcf7f1] dark:bg-white/5 rounded-xl border border-[var(--color-muted)]/30 dark:border-white/5 text-slate-500 hover:text-indigo-500 dark:text-slate-400 dark:hover:text-white transition-colors hover:bg-[#fcf7f1] dark:hover:bg-white/10 shadow-sm ${
                       isThemeDropdownOpen
-                        ? 'bg-[#fcf7f1] dark:bg-white/10 text-indigo-500 dark:text-white ring-2 ring-indigo-500/20'
+                        ? 'bg-[#fcf7f1] dark:bg-white/10 text-indigo-500 dark:text-white'
                         : ''
                     }`}
                   >
