@@ -59,7 +59,12 @@ const CustomSelect = ({
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const [coords, setCoords] = useState<{ top?: number; bottom?: number; left: number; width: number } | null>(null);
+  const [coords, setCoords] = useState<{
+    top?: number;
+    bottom?: number;
+    left: number;
+    width: number;
+  } | null>(null);
 
   const toggleOpen = () => {
     if (isOpen) {
@@ -1460,7 +1465,7 @@ const App: React.FC = () => {
             <div className="hidden md:flex flex-1 items-center justify-between min-w-0 gap-4">
               {/* LEFT SIDE: Undo/Redo & Size */}
               <div className="flex items-center gap-4">
-                <div className="flex items-center bg-[#fcf7f1] dark:bg-white/5 rounded-xl p-1 border border-[var(--color-muted)]/30 dark:border-white/5 shadow-sm">
+                <div className="h-10 flex items-center bg-[#fcf7f1] dark:bg-white/5 rounded-xl p-1 border border-[var(--color-muted)]/30 dark:border-white/5 shadow-sm">
                   <button
                     onClick={handleUndo}
                     disabled={state.historyIndex === 0}
