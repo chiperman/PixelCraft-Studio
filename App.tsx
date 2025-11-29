@@ -48,13 +48,19 @@ const CustomSelect = ({
   onChange,
   options,
   isDarkMode,
-  className = 'h-12',
+  className = 'w-full h-12 justify-between px-3',
+  labelClass = '',
+  chevronClass = '',
+  containerClass = 'flex-1 min-w-0',
 }: {
   value: string;
   onChange: (val: string) => void;
   options: { code: string; label: string }[];
   isDarkMode: boolean;
   className?: string;
+  labelClass?: string;
+  chevronClass?: string;
+  containerClass?: string;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -82,7 +88,7 @@ const CustomSelect = ({
 
         setCoords({
           left: ZX.left,
-          width: ZX.width,
+          width: Math.max(ZX.width, 160), // Ensure min width for dropdown
           ...(openUp ? { bottom: viewportHeight - ZX.top + 8 } : { top: ZX.bottom + 8 }),
         });
         setIsOpen(true);
@@ -128,18 +134,18 @@ const CustomSelect = ({
   const selectedLabel = options.find((o) => o.code === value)?.label || value;
 
   return (
-    <div className="relative flex-1 min-w-0" ref={containerRef}>
+    <div className={`relative ${containerClass}`} ref={containerRef}>
       <button
         onClick={toggleOpen}
-        className={`w-full flex items-center justify-between px-3 bg-[#fcf7f1] dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/5 text-slate-500 dark:text-slate-400 transition-all active:scale-[0.98] ${className}`}
+        className={`flex items-center bg-[#fcf7f1] dark:bg-white/5 rounded-xl border border-[var(--color-muted)]/30 dark:border-white/5 text-slate-500 hover:text-indigo-500 dark:text-slate-400 dark:hover:text-white transition-colors hover:bg-[#fcf7f1] dark:hover:bg-white/10 shadow-sm active:scale-[0.98] ${className}`}
       >
-        <span className="flex items-center gap-2 truncate pr-2">
-          <Globe size={16} className="opacity-70 shrink-0" />
-          <span className="text-sm font-medium truncate">{selectedLabel}</span>
+        <span className="flex items-center gap-2 truncate">
+          <Globe size={20} className="shrink-0" />
+          <span className={`text-sm font-medium truncate ${labelClass}`}>{selectedLabel}</span>
         </span>
         <ChevronDown
           size={16}
-          className={`opacity-50 shrink-0 transition-transform duration-200 ${
+          className={`opacity-50 shrink-0 transition-transform duration-200 ${chevronClass} ${
             isOpen ? 'rotate-180' : ''
           }`}
         />
@@ -1587,13 +1593,16 @@ const App: React.FC = () => {
                 </button>
 
                 {/* Language Switcher */}
-                <div className="relative group z-50 w-40">
+                <div className="relative group z-50">
                   <CustomSelect
                     value={state.language}
                     onChange={(val) => setState((s) => ({ ...s, language: val as Language }))}
                     options={SUPPORTED_LANGUAGES}
                     isDarkMode={computedIsDarkMode}
-                    className="h-10"
+                    containerClass=""
+                    className="h-10 w-10 xl:w-40 transition-all duration-300 justify-center xl:justify-between px-0 xl:px-3"
+                    labelClass="hidden xl:block"
+                    chevronClass="hidden xl:block"
                   />
                 </div>
 
@@ -1607,9 +1616,9 @@ const App: React.FC = () => {
                         : ''
                     }`}
                   >
-                    {state.theme === 'light' && <Sun size={18} />}
-                    {state.theme === 'dark' && <Moon size={18} />}
-                    {state.theme === 'system' && <Monitor size={18} />}
+                    {state.theme === 'light' && <Sun size={20} />}
+                    {state.theme === 'dark' && <Moon size={20} />}
+                    {state.theme === 'system' && <Monitor size={20} />}
                   </button>
 
                   {isThemeDropdownOpen && (
