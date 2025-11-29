@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import CanvasBoard from './components/CanvasBoard';
 import { Toolbar } from './components/Toolbar';
 import ProjectLibraryModal from './components/ProjectLibraryModal';
@@ -57,15 +58,66 @@ const CustomSelect = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [coords, setCoords] = useState<{ top?: number; bottom?: number; left: number; width: number } | null>(null);
+
+  const toggleOpen = () => {
+    if (isOpen) {
+      setIsOpen(false);
+    } else {
+      if (containerRef.current) {
+        const ZX = containerRef.current.getBoundingClientRect();
+        const viewportHeight = window.innerHeight;
+        const spaceBelow = viewportHeight - ZX.bottom;
+        const spaceAbove = ZX.top;
+
+        // Decide whether to open upwards or downwards
+        // If tight space below (< 250px) and more space above, open up
+        const openUp = spaceBelow < 250 && spaceAbove > spaceBelow;
+
+        setCoords({
+          left: ZX.left,
+          width: ZX.width,
+          ...(openUp ? { bottom: viewportHeight - ZX.top + 8 } : { top: ZX.bottom + 8 }),
+        });
+        setIsOpen(true);
+      }
+    }
+  };
 
   useEffect(() => {
-    const handleClick = (e: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(e.target as Node) &&
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node)
+      ) {
         setIsOpen(false);
       }
     };
-    if (isOpen) document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
+
+    const handleScroll = (e: Event) => {
+      // Allow scrolling inside the dropdown itself
+      if (dropdownRef.current && dropdownRef.current.contains(e.target as Node)) {
+        return;
+      }
+      // Close on external scroll to prevent detached UI
+      setIsOpen(false);
+    };
+
+    const handleResize = () => setIsOpen(false);
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      window.addEventListener('scroll', handleScroll, true);
+      window.addEventListener('resize', handleResize);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      window.removeEventListener('scroll', handleScroll, true);
+      window.removeEventListener('resize', handleResize);
+    };
   }, [isOpen]);
 
   const selectedLabel = options.find((o) => o.code === value)?.label || value;
@@ -73,7 +125,7 @@ const CustomSelect = ({
   return (
     <div className="relative flex-1 min-w-0" ref={containerRef}>
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={toggleOpen}
         className={`w-full flex items-center justify-between px-3 bg-[#fcf7f1] dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/5 text-slate-500 dark:text-slate-400 transition-all active:scale-[0.98] ${className}`}
       >
         <span className="flex items-center gap-2 truncate pr-2">
@@ -88,27 +140,39 @@ const CustomSelect = ({
         />
       </button>
 
-      {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-2 p-1 glass-panel rounded-xl shadow-xl z-50 max-h-64 overflow-y-auto custom-scrollbar animate-in fade-in zoom-in-95 duration-200 border border-slate-200/50 dark:border-white/5">
-          {options.map((opt) => (
-            <button
-              key={opt.code}
-              onClick={() => {
-                onChange(opt.code);
-                setIsOpen(false);
-              }}
-              className={`w-full text-left px-3 py-2.5 text-sm rounded-lg transition-colors flex items-center justify-between group ${
-                value === opt.code
-                  ? 'bg-indigo-500 text-white shadow-md'
-                  : 'text-slate-600 dark:text-slate-300'
-              }`}
-            >
-              <span>{opt.label}</span>
-              {value === opt.code && <Check size={14} />}
-            </button>
-          ))}
-        </div>
-      )}
+      {isOpen &&
+        coords &&
+        createPortal(
+          <div
+            ref={dropdownRef}
+            className="fixed z-[100] p-1 glass-panel rounded-xl shadow-xl max-h-64 overflow-y-auto custom-scrollbar animate-in fade-in zoom-in-95 duration-200 border border-slate-200/50 dark:border-white/5"
+            style={{
+              left: coords.left,
+              width: coords.width,
+              top: coords.top,
+              bottom: coords.bottom,
+            }}
+          >
+            {options.map((opt) => (
+              <button
+                key={opt.code}
+                onClick={() => {
+                  onChange(opt.code);
+                  setIsOpen(false);
+                }}
+                className={`w-full text-left px-3 py-2.5 text-sm rounded-lg transition-colors flex items-center justify-between group ${
+                  value === opt.code
+                    ? 'bg-indigo-500 text-white shadow-md'
+                    : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10'
+                }`}
+              >
+                <span>{opt.label}</span>
+                {value === opt.code && <Check size={14} />}
+              </button>
+            ))}
+          </div>,
+          document.body
+        )}
     </div>
   );
 };
@@ -1266,7 +1330,7 @@ const App: React.FC = () => {
               <div className="pt-3 border-t border-slate-200/50 dark:border-white/10">
                 <div className="flex justify-between mb-2">
                   <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">
-                    {t.ui.refOpacity}11
+                    {t.ui.refOpacity}
                   </span>
                   <span className="text-xs font-mono text-slate-500">
                     {Math.round(state.backgroundOpacity * 100)}%
@@ -1490,7 +1554,7 @@ const App: React.FC = () => {
                 {state.backgroundImage && state.showReferenceLayer && (
                   <div className="h-10 flex items-center gap-3 bg-white/50 dark:bg-white/5 px-3 rounded-xl border border-[var(--color-muted)]/30 dark:border-white/5 animate-in fade-in slide-in-from-right-2 shadow-sm">
                     <span className="text-sm text-slate-500 font-bold uppercase hidden sm:block tracking-widest">
-                      {t.ui.refOpacity}22
+                      {t.ui.refOpacity}
                     </span>
                     <input
                       type="range"
