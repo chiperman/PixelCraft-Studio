@@ -77,19 +77,19 @@ const CustomSelect = ({
       setIsOpen(false);
     } else {
       if (containerRef.current) {
-        const ZX = containerRef.current.getBoundingClientRect();
+        const rect = containerRef.current.getBoundingClientRect();
         const viewportHeight = window.innerHeight;
-        const spaceBelow = viewportHeight - ZX.bottom;
-        const spaceAbove = ZX.top;
+        const spaceBelow = viewportHeight - rect.bottom;
+        const spaceAbove = rect.top;
 
         // Decide whether to open upwards or downwards
         // If tight space below (< 250px) and more space above, open up
         const openUp = spaceBelow < 250 && spaceAbove > spaceBelow;
 
         setCoords({
-          left: ZX.left,
-          width: Math.max(ZX.width, 160), // Ensure min width for dropdown
-          ...(openUp ? { bottom: viewportHeight - ZX.top + 8 } : { top: ZX.bottom + 8 }),
+          left: rect.left,
+          width: Math.max(rect.width, 160), // Ensure min width for dropdown
+          ...(openUp ? { bottom: viewportHeight - rect.top + 8 } : { top: rect.bottom + 8 }),
         });
         setIsOpen(true);
       }
@@ -1130,6 +1130,20 @@ const App: React.FC = () => {
     });
   };
 
+  const handleExportFromLibrary = (project: StoredProject) => {
+    const data = JSON.stringify(project, null, 2);
+    const blob = new Blob([data], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${project.name.replace(/[^a-z0-9\u4e00-\u9fa5-_]/gi, '_')}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showNotification(t.notifications.projectSaved, 'success'); 
+  };
+
   const showNotification = (msg: string, type: 'success' | 'error') => {
     setNotification({ msg, type });
     setTimeout(() => setNotification(null), 3000);
@@ -1269,6 +1283,7 @@ const App: React.FC = () => {
         onLoad={handleLoadFromLibrary}
         onDelete={handleDeleteFromLibrary}
         onRename={handleRenameInLibrary}
+        onExport={handleExportFromLibrary}
         language={state.language}
       />
 

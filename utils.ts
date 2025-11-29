@@ -1,3 +1,4 @@
+
 import { GridConfig } from './types';
 
 // Convert RGB(A) to Hex
@@ -142,7 +143,11 @@ export const TRANSLATIONS = {
       load: 'Load',
       rename: 'Rename',
       delete: 'Delete',
-      deleteConfirm: 'Delete this project?'
+      deleteConfirm: 'Delete this project?',
+      projectsCount: (n: number) => `${n} Projects`,
+      untitled: 'Untitled Project',
+      emptyDesc: 'Your creative journey starts here. Save your first masterpiece to see it appear in this collection.',
+      exportJSON: 'Export JSON'
     },
     notifications: {
       projectLoaded: 'Project loaded!',
@@ -228,7 +233,11 @@ export const TRANSLATIONS = {
       load: '加载',
       rename: '重命名',
       delete: '删除',
-      deleteConfirm: '确定要删除这个项目吗？'
+      deleteConfirm: '确定要删除这个项目吗？',
+      projectsCount: (n: number) => `共 ${n} 个项目`,
+      untitled: '未命名项目',
+      emptyDesc: '您的创作之旅由此开始。保存您的第一个杰作，它将显示在这里。',
+      exportJSON: '导出 JSON'
     },
     notifications: {
       projectLoaded: '项目已加载！',
@@ -314,7 +323,11 @@ export const TRANSLATIONS = {
       load: '載入',
       rename: '重新命名',
       delete: '刪除',
-      deleteConfirm: '確定要刪除這個專案嗎？'
+      deleteConfirm: '確定要刪除這個專案嗎？',
+      projectsCount: (n: number) => `共 ${n} 個專案`,
+      untitled: '未命名專案',
+      emptyDesc: '您的創作之旅由此開始。儲存您的第一個傑作，它將顯示在這裡。',
+      exportJSON: '匯出 JSON'
     },
     notifications: {
       projectLoaded: '專案已載入！',
@@ -400,7 +413,11 @@ export const TRANSLATIONS = {
       load: '読込',
       rename: '名前変更',
       delete: '削除',
-      deleteConfirm: 'このプロジェクトを削除しますか？'
+      deleteConfirm: 'このプロジェクトを削除しますか？',
+      projectsCount: (n: number) => `${n} プロジェクト`,
+      untitled: '無題のプロジェクト',
+      emptyDesc: '創作の旅はここから始まります。最初の傑作を保存して、ここに表示させましょう。',
+      exportJSON: 'JSON出力'
     },
     notifications: {
       projectLoaded: 'プロジェクトを読み込みました！',
@@ -486,7 +503,11 @@ export const TRANSLATIONS = {
       load: '불러오기',
       rename: '이름 변경',
       delete: '삭제',
-      deleteConfirm: '이 프로젝트를 삭제하시겠습니까?'
+      deleteConfirm: '이 프로젝트를 삭제하시겠습니까?',
+      projectsCount: (n: number) => `${n} 프로젝트`,
+      untitled: '제목 없는 프로젝트',
+      emptyDesc: '창의적인 여정이 여기서 시작됩니다. 첫 번째 걸작을 저장하여 여기에 표시하세요.',
+      exportJSON: 'JSON 내보내기'
     },
     notifications: {
       projectLoaded: '프로젝트를 불러왔습니다!',
@@ -572,7 +593,11 @@ export const TRANSLATIONS = {
       load: 'Charger',
       rename: 'Renommer',
       delete: 'Supprimer',
-      deleteConfirm: 'Supprimer ce projet ?'
+      deleteConfirm: 'Supprimer ce projet ?',
+      projectsCount: (n: number) => `${n} Projets`,
+      untitled: 'Projet sans titre',
+      emptyDesc: 'Votre voyage créatif commence ici. Enregistrez votre premier chef-d\'œuvre pour le voir apparaître ici.',
+      exportJSON: 'Exporter JSON'
     },
     notifications: {
       projectLoaded: 'Projet chargé !',
@@ -658,7 +683,11 @@ export const TRANSLATIONS = {
       load: 'Laden',
       rename: 'Umbenennen',
       delete: 'Löschen',
-      deleteConfirm: 'Dieses Projekt löschen?'
+      deleteConfirm: 'Dieses Projekt löschen?',
+      projectsCount: (n: number) => `${n} Projekte`,
+      untitled: 'Unbenanntes Projekt',
+      emptyDesc: 'Ihre kreative Reise beginnt hier. Speichern Sie Ihr erstes Meisterwerk, damit es hier erscheint.',
+      exportJSON: 'JSON exportieren'
     },
     notifications: {
       projectLoaded: 'Projekt geladen!',
@@ -744,7 +773,11 @@ export const TRANSLATIONS = {
       load: 'Cargar',
       rename: 'Renombrar',
       delete: 'Eliminar',
-      deleteConfirm: '¿Eliminar este proyecto?'
+      deleteConfirm: '¿Eliminar este proyecto?',
+      projectsCount: (n: number) => `${n} Proyectos`,
+      untitled: 'Proyecto sin título',
+      emptyDesc: 'Tu viaje creativo comienza aquí. Guarda tu primera obra maestra para verla aquí.',
+      exportJSON: 'Exportar JSON'
     },
     notifications: {
       projectLoaded: 'Proyecto cargado!',
@@ -830,7 +863,11 @@ export const TRANSLATIONS = {
       load: 'Carregar',
       rename: 'Renommer',
       delete: 'Excluir',
-      deleteConfirm: 'Excluir este projeto?'
+      deleteConfirm: 'Excluir este projeto?',
+      projectsCount: (n: number) => `${n} Projetos`,
+      untitled: 'Projeto sem título',
+      emptyDesc: 'Sua jornada criativa começa aqui. Salve sua primeira obra-prima para vê-la aparecer aqui.',
+      exportJSON: 'Exportar JSON'
     },
     notifications: {
       projectLoaded: 'Projeto carregado!',
@@ -916,7 +953,11 @@ export const TRANSLATIONS = {
       load: 'Загрузить',
       rename: 'Переименовать',
       delete: 'Удалить',
-      deleteConfirm: 'Удалить этот проект?'
+      deleteConfirm: 'Удалить этот проект?',
+      projectsCount: (n: number) => `${n} Проектов`,
+      untitled: 'Безымянный проект',
+      emptyDesc: 'Ваше творческое путешествие начинается здесь. Сохраните свой первый шедевр, чтобы увидеть его здесь.',
+      exportJSON: 'Экспорт JSON'
     },
     notifications: {
       projectLoaded: 'Проект загружен!',
@@ -1002,7 +1043,11 @@ export const TRANSLATIONS = {
       load: 'تحميل',
       rename: 'إعادة تسمية',
       delete: 'حذف',
-      deleteConfirm: 'هل تريد حذف هذا المشروع؟'
+      deleteConfirm: 'هل تريد حذف هذا المشروع؟',
+      projectsCount: (n: number) => `${n} مشاريع`,
+      untitled: 'مشروع بدون عنوان',
+      emptyDesc: 'رحلتك الإبداعية تبدأ هنا. احفظ تحفتك الأولى لتظهر هنا.',
+      exportJSON: 'تصدير JSON'
     },
     notifications: {
       projectLoaded: 'تم تحميل المشروع!',
