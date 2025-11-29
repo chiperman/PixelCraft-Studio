@@ -924,13 +924,45 @@ const App: React.FC = () => {
   };
 
   const handleExport = () => {
-    const canvas = document.querySelector('canvas');
-    if (canvas) {
+    const { width, height } = state.config;
+
+    // Calculate scale to ensure high resolution (approx 2048px on longest side)
+    // We use integer scaling to preserve sharp edges (nearest neighbor effect)
+    const maxDim = Math.max(width, height);
+    const targetDim = 2048; 
+    let scale = Math.floor(targetDim / maxDim);
+    if (scale < 1) scale = 1;
+
+    // Create off-screen canvas for clean export
+    const exportCanvas = document.createElement('canvas');
+    exportCanvas.width = width * scale;
+    exportCanvas.height = height * scale;
+    const ctx = exportCanvas.getContext('2d');
+
+    if (!ctx) return;
+
+    // Draw only pixels (no grid lines)
+    state.grid.forEach((color, i) => {
+      if (color) {
+        const x = (i % width) * scale;
+        const y = Math.floor(i / width) * scale;
+        ctx.fillStyle = color;
+        ctx.fillRect(x, y, scale, scale);
+      }
+    });
+
+    // Generate download
+    try {
       const link = document.createElement('a');
-      link.download = 'pixel-art.png';
-      link.href = canvas.toDataURL('image/png');
+      link.download = `pixel-art-${new Date().toISOString().slice(0, 10)}.png`;
+      link.href = exportCanvas.toDataURL('image/png');
+      document.body.appendChild(link);
       link.click();
+      document.body.removeChild(link);
       showNotification(t.notifications.exported, 'success');
+    } catch (e) {
+      console.error('Export error:', e);
+      showNotification('Export failed', 'error');
     }
   };
 
