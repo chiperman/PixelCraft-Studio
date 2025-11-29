@@ -1,3 +1,4 @@
+
 import React, { useRef } from 'react';
 import { ToolType, DEFAULT_PALETTE, Language } from '../types';
 import {
@@ -22,7 +23,8 @@ const CustomColorSlot: React.FC<{
   isSelected: boolean;
   onSelect: () => void;
   onChange: (c: string) => void;
-}> = ({ color, isSelected, onSelect, onChange }) => {
+  title: string;
+}> = ({ color, isSelected, onSelect, onChange, title }) => {
   const inputRef = useRef<HTMLInputElement>(null);
 
   return (
@@ -35,7 +37,7 @@ const CustomColorSlot: React.FC<{
       style={{ backgroundColor: color }}
       onClick={onSelect}
       onDoubleClick={() => inputRef.current?.click()}
-      title="Click to select, Double-click to edit"
+      title={title}
     >
       {/* Tiny indicator for editability */}
       <div className="absolute bottom-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -236,6 +238,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
                     if (window.innerWidth < 768) onCloseSidebar();
                   }}
                   onChange={(newColor) => onUpdateCustomColor(idx, newColor)}
+                  title={t.ui.customTooltip}
                 />
               ))}
             </div>

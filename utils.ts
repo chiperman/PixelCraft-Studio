@@ -133,7 +133,8 @@ export const TRANSLATIONS = {
       lightMode: 'Light Mode',
       darkMode: 'Dark Mode',
       systemMode: 'System',
-      language: 'Language'
+      language: 'Language',
+      customTooltip: 'Click to select, Double-click to edit'
     },
     library: {
       title: 'Project Library',
@@ -223,7 +224,8 @@ export const TRANSLATIONS = {
       lightMode: '浅色模式',
       darkMode: '深色模式',
       systemMode: '跟随系统',
-      language: '语言'
+      language: '语言',
+      customTooltip: '单击选择，双击编辑'
     },
     library: {
       title: '项目库',
@@ -313,7 +315,8 @@ export const TRANSLATIONS = {
       lightMode: '淺色模式',
       darkMode: '深色模式',
       systemMode: '跟隨系統',
-      language: '語言'
+      language: '語言',
+      customTooltip: '點擊選取，雙擊編輯'
     },
     library: {
       title: '專案庫',
@@ -403,7 +406,8 @@ export const TRANSLATIONS = {
       lightMode: 'ライト',
       darkMode: 'ダーク',
       systemMode: 'システム設定',
-      language: '言語'
+      language: '言語',
+      customTooltip: 'クリックで選択、ダブルクリックで編集'
     },
     library: {
       title: 'プロジェクトライブラリ',
@@ -493,7 +497,8 @@ export const TRANSLATIONS = {
       lightMode: '라이트 모드',
       darkMode: '다크 모드',
       systemMode: '시스템 설정',
-      language: '언어'
+      language: '언어',
+      customTooltip: '클릭하여 선택, 더블 클릭하여 편집'
     },
     library: {
       title: '프로젝트 라이브러리',
@@ -583,7 +588,8 @@ export const TRANSLATIONS = {
       lightMode: 'Mode Clair',
       darkMode: 'Mode Sombre',
       systemMode: 'Système',
-      language: 'Langue'
+      language: 'Langue',
+      customTooltip: 'Cliquez pour sélectionner, double-cliquez pour modifier'
     },
     library: {
       title: 'Bibliothèque de projets',
@@ -673,7 +679,8 @@ export const TRANSLATIONS = {
       lightMode: 'Hell',
       darkMode: 'Dunkel',
       systemMode: 'System',
-      language: 'Sprache'
+      language: 'Sprache',
+      customTooltip: 'Klicken zum Auswählen, Doppelklick zum Bearbeiten'
     },
     library: {
       title: 'Projektbibliothek',
@@ -763,7 +770,8 @@ export const TRANSLATIONS = {
       lightMode: 'Modo Claro',
       darkMode: 'Modo Oscuro',
       systemMode: 'Sistema',
-      language: 'Idioma'
+      language: 'Idioma',
+      customTooltip: 'Clic para seleccionar, doble clic para editar'
     },
     library: {
       title: 'Biblioteca',
@@ -853,7 +861,8 @@ export const TRANSLATIONS = {
       lightMode: 'Modo Claro',
       darkMode: 'Modo Escuro',
       systemMode: 'Sistema',
-      language: 'Idioma'
+      language: 'Idioma',
+      customTooltip: 'Clique para selecionar, clique duplo para editar'
     },
     library: {
       title: 'Biblioteca',
@@ -943,7 +952,8 @@ export const TRANSLATIONS = {
       lightMode: 'Светлая',
       darkMode: 'Темная',
       systemMode: 'Системная',
-      language: 'Язык'
+      language: 'Язык',
+      customTooltip: 'Клик для выбора, двойной клик для редактирования'
     },
     library: {
       title: 'Библиотека проектов',
@@ -1033,7 +1043,8 @@ export const TRANSLATIONS = {
       lightMode: 'وضع فاتح',
       darkMode: 'وضع داكن',
       systemMode: 'النظام',
-      language: 'اللغة'
+      language: 'اللغة',
+      customTooltip: 'انقر للتحديد، انقر مرتين للتحرير'
     },
     library: {
       title: 'مكتبة المشاريع',
