@@ -144,9 +144,22 @@ const ProjectLibraryModal: React.FC<ProjectLibraryModalProps> = ({
         <div className="flex-1 overflow-y-auto p-6 sm:p-8 custom-scrollbar bg-slate-50/50 dark:bg-black/20">
            {projects.length === 0 ? (
              <div className="h-full flex flex-col items-center justify-center text-center animate-in fade-in zoom-in-95 duration-500">
-                <div className="w-32 h-32 bg-gradient-to-tr from-slate-100 to-white dark:from-white/5 dark:to-white/10 rounded-[2rem] flex items-center justify-center mb-8 shadow-inner border border-white/40 dark:border-white/5">
-                   <Plus size={48} className="text-slate-300 dark:text-slate-600 opacity-50"/>
+                {/* Empty State Cards Stack */}
+                <div className="relative w-32 h-32 mb-10 group select-none">
+                    {/* Card 1 (Back Right) */}
+                    <div className="absolute inset-0 bg-slate-200/60 dark:bg-white/5 rounded-[1.75rem] transform translate-y-3 translate-x-3 rotate-6 border border-slate-300/30 dark:border-white/5 transition-transform duration-500 group-hover:translate-x-6 group-hover:rotate-12 group-hover:translate-y-2"></div>
+                    
+                    {/* Card 2 (Back Left) */}
+                    <div className="absolute inset-0 bg-slate-100/80 dark:bg-white/10 rounded-[1.75rem] transform -translate-y-2 -translate-x-2 -rotate-6 border border-slate-300/40 dark:border-white/5 transition-transform duration-500 group-hover:-translate-x-6 group-hover:-rotate-12 group-hover:-translate-y-2 shadow-sm"></div>
+                    
+                    {/* Card 3 (Main Top) */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-white to-slate-50 dark:from-[#2a2a2c] dark:to-[#202022] rounded-[1.75rem] shadow-2xl shadow-slate-200/50 dark:shadow-black/50 border border-slate-200/80 dark:border-white/10 flex items-center justify-center transform transition-all duration-500 group-hover:scale-105 group-hover:-translate-y-2 z-10">
+                       <div className="w-14 h-14 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center group-hover:bg-indigo-50 dark:group-hover:bg-indigo-500/20 transition-colors duration-300 ring-4 ring-slate-50 dark:ring-white/5">
+                          <Plus size={32} className="text-slate-400 dark:text-slate-500 group-hover:text-indigo-500 dark:group-hover:text-indigo-400 transition-colors duration-300" />
+                       </div>
+                    </div>
                 </div>
+
                 <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3">{t.library.empty}</h3>
                 <p className="text-slate-500 dark:text-slate-400 text-base max-w-sm mx-auto leading-relaxed">
                     {t.library.emptyDesc}
