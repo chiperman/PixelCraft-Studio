@@ -39,6 +39,7 @@ import {
   Menu,
   Check,
   ChevronDown,
+  Grid,
 } from 'lucide-react';
 import { SiGithub } from '@icons-pack/react-simple-icons';
 
@@ -145,9 +146,8 @@ const CustomSelect = ({
         </span>
         <ChevronDown
           size={16}
-          className={`opacity-50 shrink-0 transition-transform duration-200 ${chevronClass} ${
-            isOpen ? 'rotate-180' : ''
-          }`}
+          className={`opacity-50 shrink-0 transition-transform duration-200 ${chevronClass} ${isOpen ? 'rotate-180' : ''
+            }`}
         />
       </button>
 
@@ -171,11 +171,10 @@ const CustomSelect = ({
                   onChange(opt.code);
                   setIsOpen(false);
                 }}
-                className={`w-full text-left px-3 py-2.5 text-sm rounded-lg transition-colors flex items-center justify-between group ${
-                  value === opt.code
-                    ? 'bg-indigo-500 text-white shadow-md'
-                    : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10'
-                }`}
+                className={`w-full text-left px-3 py-2.5 text-sm rounded-lg transition-colors flex items-center justify-between group ${value === opt.code
+                  ? 'bg-indigo-500 text-white shadow-md'
+                  : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10'
+                  }`}
               >
                 <span>{opt.label}</span>
                 {value === opt.code && <Check size={14} />}
@@ -929,7 +928,7 @@ const App: React.FC = () => {
     // Calculate scale to ensure high resolution (approx 2048px on longest side)
     // We use integer scaling to preserve sharp edges (nearest neighbor effect)
     const maxDim = Math.max(width, height);
-    const targetDim = 2048; 
+    const targetDim = 2048;
     let scale = Math.floor(targetDim / maxDim);
     if (scale < 1) scale = 1;
 
@@ -1141,7 +1140,7 @@ const App: React.FC = () => {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    showNotification(t.notifications.projectSaved, 'success'); 
+    showNotification(t.notifications.projectSaved, 'success');
   };
 
   const showNotification = (msg: string, type: 'success' | 'error') => {
@@ -1320,11 +1319,10 @@ const App: React.FC = () => {
             </button>
             <button
               onClick={() => setState((s) => ({ ...s, showGrid: !s.showGrid }))}
-              className={`flex-1 h-12 flex items-center justify-center gap-2 rounded-xl border border-white/20 dark:border-white/5 text-sm font-medium transition-colors active:scale-95 ${
-                state.showGrid
-                  ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/20 border-transparent'
-                  : 'bg-[#fcf7f1] dark:bg-white/5 text-slate-500 dark:text-slate-400'
-              }`}
+              className={`flex-1 h-12 flex items-center justify-center gap-2 rounded-xl border border-white/20 dark:border-white/5 text-sm font-medium transition-colors active:scale-95 ${state.showGrid
+                ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/20 border-transparent'
+                : 'bg-[#fcf7f1] dark:bg-white/5 text-slate-500 dark:text-slate-400'
+                }`}
             >
               {state.showGrid ? t.ui.gridOn : t.ui.gridOff}
             </button>
@@ -1358,11 +1356,10 @@ const App: React.FC = () => {
             <div className="flex gap-2 mb-4">
               <button
                 onClick={() => setState((s) => ({ ...s, showDrawingLayer: !s.showDrawingLayer }))}
-                className={`flex-1 py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-2 transition-colors active:scale-95 ${
-                  state.showDrawingLayer
-                    ? 'bg-indigo-500 text-white shadow-md'
-                    : 'bg-[#fcf7f1] dark:bg-white/5 text-slate-500'
-                }`}
+                className={`flex-1 py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-2 transition-colors active:scale-95 ${state.showDrawingLayer
+                  ? 'bg-indigo-500 text-white shadow-md'
+                  : 'bg-[#fcf7f1] dark:bg-white/5 text-slate-500'
+                  }`}
               >
                 {state.showDrawingLayer ? <Eye size={16} /> : <EyeOff size={16} />}
                 {t.ui.layers}
@@ -1372,13 +1369,12 @@ const App: React.FC = () => {
                   setState((s) => ({ ...s, showReferenceLayer: !s.showReferenceLayer }))
                 }
                 disabled={!state.backgroundImage}
-                className={`flex-1 py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-2 transition-colors active:scale-95 ${
-                  !state.backgroundImage
-                    ? 'opacity-50 cursor-not-allowed bg-[#fcf7f1] dark:bg-white/5 text-slate-400'
-                    : state.showReferenceLayer
+                className={`flex-1 py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-2 transition-colors active:scale-95 ${!state.backgroundImage
+                  ? 'opacity-50 cursor-not-allowed bg-[#fcf7f1] dark:bg-white/5 text-slate-400'
+                  : state.showReferenceLayer
                     ? 'bg-green-500 text-white shadow-md'
                     : 'bg-[#fcf7f1] dark:bg-white/5 text-slate-500'
-                }`}
+                  }`}
               >
                 {state.showReferenceLayer ? <Eye size={16} /> : <EyeOff size={16} />}
                 {t.ui.refLayer}
@@ -1462,7 +1458,10 @@ const App: React.FC = () => {
             <div className="flex md:hidden items-center justify-between w-full h-full">
               <div className="flex items-center gap-2">
                 <button
-                  onClick={() => setIsSidebarOpen(true)}
+                  onClick={() => {
+                    setIsSidebarOpen(true);
+                    setIsMobileHeaderMenuOpen(false);
+                  }}
                   className="p-2.5 bg-[#fcf7f1] hover:bg-[#fcf7f1] text-slate-500 hover:text-slate-900 dark:bg-white/5 dark:text-slate-400 dark:hover:text-white rounded-xl dark:hover:bg-white/10 transition-colors border border-[var(--color-muted)]/30 dark:border-transparent"
                 >
                   <Menu size={20} />
@@ -1472,11 +1471,10 @@ const App: React.FC = () => {
 
                 <button
                   onClick={() => setIsMobilePanning(!isMobilePanning)}
-                  className={`p-2.5 rounded-xl transition-all ${
-                    isMobilePanning
-                      ? 'bg-indigo-500 text-white shadow-md'
-                      : 'bg-[#fcf7f1] text-slate-500 dark:bg-white/5 dark:text-slate-400 hover:bg-[#fcf7f1] dark:hover:bg-white/10 border border-[var(--color-muted)]/30 dark:border-transparent'
-                  }`}
+                  className={`p-2.5 rounded-xl transition-all ${isMobilePanning
+                    ? 'bg-indigo-500 text-white shadow-md'
+                    : 'bg-[#fcf7f1] text-slate-500 dark:bg-white/5 dark:text-slate-400 hover:bg-[#fcf7f1] dark:hover:bg-white/10 border border-[var(--color-muted)]/30 dark:border-transparent'
+                    }`}
                   title={t.ui.pan}
                 >
                   <Hand size={20} />
@@ -1503,21 +1501,23 @@ const App: React.FC = () => {
               </div>
 
               <button
-                onClick={() => setIsMobileHeaderMenuOpen(!isMobileHeaderMenuOpen)}
-                className={`p-2.5 rounded-xl transition-colors ${
-                  isMobileHeaderMenuOpen
-                    ? 'bg-indigo-500 text-white'
-                    : 'bg-[#fcf7f1] text-slate-500 dark:bg-white/5 dark:text-slate-400 hover:bg-[#fcf7f1] dark:hover:bg-white/10 border border-[var(--color-muted)]/30 dark:border-transparent'
-                }`}
+                onClick={() => {
+                  if (!isMobileHeaderMenuOpen) setIsSidebarOpen(false);
+                  setIsMobileHeaderMenuOpen(!isMobileHeaderMenuOpen);
+                }}
+                className={`p-2.5 rounded-xl transition-colors ${isMobileHeaderMenuOpen
+                  ? 'bg-indigo-500 text-white'
+                  : 'bg-[#fcf7f1] text-slate-500 dark:bg-white/5 dark:text-slate-400 hover:bg-[#fcf7f1] dark:hover:bg-white/10 border border-[var(--color-muted)]/30 dark:border-transparent'
+                  }`}
               >
                 <MoreVertical size={20} />
               </button>
             </div>
 
             {/* DESKTOP LAYOUT */}
-            <div className="hidden md:flex flex-1 items-center justify-between min-w-0 gap-4">
+            <div className="hidden md:flex flex-1 items-center justify-between min-w-0 gap-2">
               {/* LEFT SIDE: Undo/Redo & Size */}
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
                 <div className="h-10 flex items-center bg-[#fcf7f1] dark:bg-white/5 rounded-xl p-1 border border-[var(--color-muted)]/30 dark:border-white/5 shadow-sm">
                   <button
                     onClick={handleUndo}
@@ -1540,20 +1540,20 @@ const App: React.FC = () => {
 
                 <button
                   onClick={() => setIsResizeModalOpen(true)}
-                  className="h-10 flex items-center gap-2 bg-[#fcf7f1] dark:bg-white/5 hover:bg-[#fcf7f1] dark:hover:bg-white/10 text-slate-500 px-4 rounded-xl border border-[var(--color-muted)]/30 dark:border-white/5 transition-all group hover:shadow-sm"
+                  className="h-10 flex items-center gap-2 bg-[#fcf7f1] dark:bg-white/5 hover:bg-[#fcf7f1] dark:hover:bg-white/10 text-slate-500 px-2 lg:px-4 rounded-xl border border-[var(--color-muted)]/30 dark:border-white/5 transition-all group hover:shadow-sm"
                 >
                   <Grid3X3
                     size={18}
                     className="text-indigo-500 group-hover:scale-110 transition-transform"
                   />
-                  <span className="text-sm font-semibold hidden sm:inline">
+                  <span className="text-sm font-semibold hidden xl:inline">
                     {state.config.width} × {state.config.height}
                   </span>
                   <Settings size={14} className="ml-1 opacity-50 group-hover:opacity-100" />
                 </button>
 
-                <div className="h-10 flex items-center gap-3 bg-[#fcf7f1] dark:bg-white/5 px-4 rounded-xl border border-[var(--color-muted)]/30 dark:border-white/5 shadow-sm">
-                  <label className="text-sm text-slate-500 font-bold uppercase tracking-widest hidden sm:block">
+                <div className="h-10 hidden lg:flex items-center gap-3 bg-[#fcf7f1] dark:bg-white/5 px-4 rounded-xl border border-[var(--color-muted)]/30 dark:border-white/5 shadow-sm">
+                  <label className="text-sm text-slate-500 font-bold uppercase tracking-widest hidden xl:block">
                     {t.ui.zoom}
                   </label>
                   <input
@@ -1574,19 +1574,18 @@ const App: React.FC = () => {
               </div>
 
               {/*ZG RIGHT SIDE: Layers, Grid, Theme */}
-              <div className="flex items-center gap-3 pl-2">
+              <div className="flex items-center gap-2">
                 {/* Layers Control */}
                 <div className="h-10 flex items-center gap-1 bg-[#fcf7f1] dark:bg-white/5 px-2 rounded-xl border border-[var(--color-muted)]/30 dark:border-white/5 shadow-sm">
-                  <Layers size={16} className="text-slate-400 mx-2 hidden sm:block" />
+                  <Layers size={16} className="text-slate-400 mx-2 hidden lg:block" />
                   <button
                     onClick={() =>
                       setState((s) => ({ ...s, showDrawingLayer: !s.showDrawingLayer }))
                     }
-                    className={`p-1.5 rounded-lg transition-all ${
-                      state.showDrawingLayer
-                        ? 'bg-[#fcf7f1] dark:bg-white/20 text-indigo-500 dark:text-indigo-400 shadow-sm'
-                        : 'text-slate-400 hover:text-slate-500'
-                    }`}
+                    className={`p-1.5 rounded-lg transition-all ${state.showDrawingLayer
+                      ? 'bg-[#fcf7f1] dark:bg-white/20 text-indigo-500 dark:text-indigo-400 shadow-sm'
+                      : 'text-slate-400 hover:text-slate-500'
+                      }`}
                     title={t.ui.layers}
                   >
                     {state.showDrawingLayer ? <Eye size={18} /> : <EyeOff size={18} />}
@@ -1596,13 +1595,12 @@ const App: React.FC = () => {
                       setState((s) => ({ ...s, showReferenceLayer: !s.showReferenceLayer }))
                     }
                     disabled={!state.backgroundImage}
-                    className={`p-1.5 rounded-lg transition-all ${
-                      !state.backgroundImage
-                        ? 'text-slate-300 dark:text-slate-600 cursor-not-allowed'
-                        : state.showReferenceLayer
+                    className={`p-1.5 rounded-lg transition-all ${!state.backgroundImage
+                      ? 'text-slate-300 dark:text-slate-600 cursor-not-allowed'
+                      : state.showReferenceLayer
                         ? 'bg-[#fcf7f1] dark:bg-white/20 text-green-500 shadow-sm'
                         : 'text-slate-400 hover:text-slate-500'
-                    }`}
+                      }`}
                     title={t.ui.refLayer}
                   >
                     {state.showReferenceLayer ? <Eye size={18} /> : <EyeOff size={18} />}
@@ -1610,8 +1608,8 @@ const App: React.FC = () => {
                 </div>
 
                 {state.backgroundImage && state.showReferenceLayer && (
-                  <div className="h-10 flex items-center gap-3 bg-white/50 dark:bg-white/5 px-3 rounded-xl border border-[var(--color-muted)]/30 dark:border-white/5 animate-in fade-in slide-in-from-right-2 shadow-sm">
-                    <span className="text-sm text-slate-500 font-bold uppercase hidden sm:block tracking-widest">
+                  <div className="h-10 hidden lg:flex items-center gap-3 bg-white/50 dark:bg-white/5 px-3 rounded-xl border border-[var(--color-muted)]/30 dark:border-white/5 animate-in fade-in slide-in-from-right-2 shadow-sm">
+                    <span className="text-sm text-slate-500 font-bold uppercase hidden xl:block tracking-widest">
                       {t.ui.refOpacity}
                     </span>
                     <input
@@ -1630,13 +1628,14 @@ const App: React.FC = () => {
                 )}
                 <button
                   onClick={() => setState((s) => ({ ...s, showGrid: !s.showGrid }))}
-                  className={`h-10 px-3 rounded-xl text-sm font-bold uppercase tracking-widest transition-all border flex items-center justify-center ${
-                    state.showGrid
-                      ? 'bg-indigo-500 text-white border-transparent shadow-md shadow-indigo-500/20'
-                      : 'bg-[#fcf7f1] dark:bg-white/5 border-[var(--color-muted)]/30 dark:border-white/5 text-slate-500 hover:bg-[#fcf7f1] dark:hover:bg-white/10 shadow-sm'
-                  }`}
+                  className={`h-10 px-2 lg:px-3 rounded-xl text-sm font-bold uppercase tracking-widest transition-all border flex items-center justify-center gap-2 ${state.showGrid
+                    ? 'bg-indigo-500 text-white border-transparent shadow-md shadow-indigo-500/20'
+                    : 'bg-[#fcf7f1] dark:bg-white/5 border-[var(--color-muted)]/30 dark:border-white/5 text-slate-500 hover:bg-[#fcf7f1] dark:hover:bg-white/10 shadow-sm'
+                    }`}
+                  title={state.showGrid ? t.ui.gridOn : t.ui.gridOff}
                 >
-                  {state.showGrid ? t.ui.gridOn : t.ui.gridOff}
+                  <Grid size={18} />
+                  <span className="hidden xl:inline">{state.showGrid ? t.ui.gridOn : t.ui.gridOff}</span>
                 </button>
 
                 {/* Language Switcher */}
@@ -1657,11 +1656,10 @@ const App: React.FC = () => {
                 <div className="relative z-50" ref={themeDropdownRef}>
                   <button
                     onClick={() => setIsThemeDropdownOpen(!isThemeDropdownOpen)}
-                    className={`h-10 w-10 flex items-center justify-center bg-[#fcf7f1] dark:bg-white/5 rounded-xl border border-[var(--color-muted)]/30 dark:border-white/5 text-slate-500 hover:text-indigo-500 dark:text-slate-400 dark:hover:text-white transition-colors hover:bg-[#fcf7f1] dark:hover:bg-white/10 shadow-sm ${
-                      isThemeDropdownOpen
-                        ? 'bg-[#fcf7f1] dark:bg-white/10 text-indigo-500 dark:text-white'
-                        : ''
-                    }`}
+                    className={`h-10 w-10 flex items-center justify-center bg-[#fcf7f1] dark:bg-white/5 rounded-xl border border-[var(--color-muted)]/30 dark:border-white/5 text-slate-500 hover:text-indigo-500 dark:text-slate-400 dark:hover:text-white transition-colors hover:bg-[#fcf7f1] dark:hover:bg-white/10 shadow-sm ${isThemeDropdownOpen
+                      ? 'bg-[#fcf7f1] dark:bg-white/10 text-indigo-500 dark:text-white'
+                      : ''
+                      }`}
                   >
                     {state.theme === 'light' && <Sun size={20} />}
                     {state.theme === 'dark' && <Moon size={20} />}
@@ -1676,11 +1674,10 @@ const App: React.FC = () => {
                             setState((s) => ({ ...s, theme: 'light' }));
                             setIsThemeDropdownOpen(false);
                           }}
-                          className={`w-full text-left px-3 py-2 text-sm rounded-lg flex items-center gap-2 transition-colors ${
-                            state.theme === 'light'
-                              ? 'bg-indigo-500 text-white'
-                              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10'
-                          }`}
+                          className={`w-full text-left px-3 py-2 text-sm rounded-lg flex items-center gap-2 transition-colors ${state.theme === 'light'
+                            ? 'bg-indigo-500 text-white'
+                            : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10'
+                            }`}
                         >
                           <Sun size={16} /> {t.ui.lightMode}
                         </button>
@@ -1689,11 +1686,10 @@ const App: React.FC = () => {
                             setState((s) => ({ ...s, theme: 'dark' }));
                             setIsThemeDropdownOpen(false);
                           }}
-                          className={`w-full text-left px-3 py-2 text-sm rounded-lg flex items-center gap-2 transition-colors ${
-                            state.theme === 'dark'
-                              ? 'bg-indigo-500 text-white'
-                              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10'
-                          }`}
+                          className={`w-full text-left px-3 py-2 text-sm rounded-lg flex items-center gap-2 transition-colors ${state.theme === 'dark'
+                            ? 'bg-indigo-500 text-white'
+                            : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10'
+                            }`}
                         >
                           <Moon size={16} /> {t.ui.darkMode}
                         </button>
@@ -1702,11 +1698,10 @@ const App: React.FC = () => {
                             setState((s) => ({ ...s, theme: 'system' }));
                             setIsThemeDropdownOpen(false);
                           }}
-                          className={`w-full text-left px-3 py-2 text-sm rounded-lg flex items-center gap-2 transition-colors ${
-                            state.theme === 'system'
-                              ? 'bg-indigo-500 text-white'
-                              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10'
-                          }`}
+                          className={`w-full text-left px-3 py-2 text-sm rounded-lg flex items-center gap-2 transition-colors ${state.theme === 'system'
+                            ? 'bg-indigo-500 text-white'
+                            : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10'
+                            }`}
                         >
                           <Monitor size={16} /> {t.ui.systemMode}
                         </button>
@@ -1729,18 +1724,16 @@ const App: React.FC = () => {
           onTouchStart={handleContainerTouchStart}
           onTouchMove={handleContainerTouchMove}
           onTouchEnd={handleContainerTouchEnd}
-          className={`flex-1 overflow-hidden relative transition-colors ${
-            isPanning || isMobilePanning
-              ? 'cursor-grabbing'
-              : isSpacePressed
+          className={`flex-1 overflow-hidden relative transition-colors ${isPanning || isMobilePanning
+            ? 'cursor-grabbing'
+            : isSpacePressed
               ? 'cursor-grab'
               : 'cursor-default'
-          }`}
+            }`}
           style={{
             // Clean dot pattern - Cupertino Style / Warmth
-            backgroundImage: `radial-gradient(${
-              computedIsDarkMode ? '#3a3a3c' : 'rgba(56, 56, 56, 0.1)'
-            } 1px, transparent 1px)`,
+            backgroundImage: `radial-gradient(${computedIsDarkMode ? '#3a3a3c' : 'rgba(56, 56, 56, 0.1)'
+              } 1px, transparent 1px)`,
             backgroundSize: '24px 24px',
             backgroundColor: computedIsDarkMode ? '#000000' : '#fcf7f1',
             touchAction: 'none',
@@ -1785,16 +1778,14 @@ const App: React.FC = () => {
         {/* Notification Toast */}
         {isNotificationVisible && (
           <div
-            className={`fixed bottom-10 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-2xl shadow-2xl border flex items-center gap-3 z-[100] w-max max-w-[90vw] whitespace-nowrap glass-panel animate-in slide-in-from-bottom-5 fade-in duration-300 backdrop-blur-xl ${
-              isNotificationVisible.type === 'success'
-                ? 'border-green-500/20 text-green-600 dark:text-green-400'
-                : 'border-red-500/20 text-red-600 dark:text-red-400'
-            }`}
+            className={`fixed bottom-10 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-2xl shadow-2xl border flex items-center gap-3 z-[100] w-max max-w-[90vw] whitespace-nowrap glass-panel animate-in slide-in-from-bottom-5 fade-in duration-300 backdrop-blur-xl ${isNotificationVisible.type === 'success'
+              ? 'border-green-500/20 text-green-600 dark:text-green-400'
+              : 'border-red-500/20 text-red-600 dark:text-red-400'
+              }`}
           >
             <div
-              className={`w-2.5 h-2.5 rounded-full flex-shrink-0 shadow-sm ${
-                isNotificationVisible.type === 'success' ? 'bg-green-500' : 'bg-red-500'
-              }`}
+              className={`w-2.5 h-2.5 rounded-full flex-shrink-0 shadow-sm ${isNotificationVisible.type === 'success' ? 'bg-green-500' : 'bg-red-500'
+                }`}
             ></div>
             <span className="font-semibold text-sm">{isNotificationVisible.msg}</span>
           </div>
